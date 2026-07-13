@@ -27,6 +27,18 @@ def list_activities(
     return list(session.exec(stmt))
 
 
+@router.get("/food-options")
+def food_options(session: Session = Depends(get_session)) -> list[str]:
+    """Distinct foods used across all activities — the learned suggestion vocabulary
+    for the food_during / food_after inputs. (Declared before /{activity_id}.)"""
+    foods: set[str] = set()
+    for activity in session.exec(select(Activity)):
+        for lst in (activity.food_during, activity.food_after):
+            if lst:
+                foods.update(lst)
+    return sorted(foods)
+
+
 @router.get("/{activity_id}")
 def get_activity(
     activity_id: int, session: Session = Depends(get_session)

@@ -30,19 +30,21 @@ lives under `./data`.
 - **Sync** pulls recent activities (with the raw `.fit` saved to disk) and nightly
   sleep, upserting into SQLite. Re-syncing is safe: it only overwrites Garmin-sourced
   fields and never touches your annotations.
-- **Annotate** each activity/sleep record with `feeling`, `rpe`, `mood`, `tags`, and
-  free-text markdown `notes`. These are yours and survive every re-sync.
-- Sleep page shows a stacked stage chart for the last 14 nights.
+- **Annotate** activities by marking them `annotated` ("I've reviewed this"). This
+  flag is yours and survives every re-sync. The richer annotation set (feeling, RPE,
+  notes, …) is still TBD.
+- **Overview** highlights not-yet-annotated activities and a rolling running-load chart;
+  **Calendar** shows activities per day; **Sleep** shows a stacked stage chart.
 
 ## API
 
 | Method | Path | Purpose |
 |--------|------|---------|
-| GET  | `/api/activities` | list (params: `limit`, `offset`, `activity_type`) |
+| GET  | `/api/activities` | list (params: `limit`, `offset`, `activity_type`, `annotated`) |
 | GET  | `/api/activities/{id}` | one activity |
-| PATCH| `/api/activities/{id}` | update annotation fields |
+| PATCH| `/api/activities/{id}` | update annotation fields (`annotated`) |
 | GET  | `/api/sleep` | list sleep records |
-| PATCH| `/api/sleep/{id}` | update annotation fields |
+| GET  | `/api/sleep/{id}` | one sleep record |
 | POST | `/api/sync` | pull from Garmin (params: `days`, `download_fits`) |
 
 ## Native dev (optional)

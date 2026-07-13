@@ -21,6 +21,59 @@ ANNOTATED_CUTOFF = "2026-07-13"
 
 def run_migrations() -> None:
     _add_activity_annotated_column()
+    _add_activity_column("subtype", "VARCHAR")
+    _drop_legacy_annotation_columns()  # must run before (re)adding feeling
+    _add_activity_column("feeling", "INTEGER")
+    _add_activity_column("effort", "INTEGER")
+    _add_activity_column("caffeine", "VARCHAR")
+    _add_activity_column("weather", "VARCHAR")
+    _add_activity_column("notes", "VARCHAR")
+    _add_activity_column("food_during", "JSON")
+    _add_activity_column("food_after", "JSON")
+    _seed_running_subtypes()
+
+
+def _drop_legacy_annotation_columns() -> None:
+    """Remove the old placeholder annotation columns (rpe/mood/tags/notes) and the
+    old TEXT `feeling` so it can be re-added as INTEGER. Idempotent: `feeling` is only
+    dropped while it's still the legacy (non-INTEGER) column."""
+    with engine.begin() as conn:
+        types = {
+            row[1]: (row[2] or "").upper()
+            for row in conn.execute(text("PRAGMA table_info(activity)"))
+        }
+        # notes is intentionally NOT here — it's a real field again (re-added below).
+        for name in ("rpe", "mood", "tags"):
+            if name in types:
+                log.info("migration: dropping legacy column activity.%s", name)
+                conn.execute(text(f"ALTER TABLE activity DROP COLUMN {name}"))
+        if "feeling" in types and "INT" not in types["feeling"]:
+            log.info("migration: dropping legacy TEXT activity.feeling (re-add as INT)")
+            conn.execute(text("ALTER TABLE activity DROP COLUMN feeling"))
+
+
+def _seed_running_subtypes() -> None:
+    """Seed subtype for unambiguous running (processing step) on rows that don't have
+    one yet. Only touches NULLs, so hand-set values are safe."""
+    with engine.begin() as conn:
+        conn.execute(
+            text("UPDATE activity SET subtype='road' "
+                 "WHERE subtype IS NULL AND activity_type='running'")
+        )
+        conn.execute(
+            text("UPDATE activity SET subtype='treadmill' "
+                 "WHERE subtype IS NULL AND activity_type LIKE '%treadmill%'")
+        )
+
+
+def _add_activity_column(name: str, sql_type: str) -> None:
+    """Add a nullable column to `activity` if it isn't there yet."""
+    with engine.begin() as conn:
+        cols = {row[1] for row in conn.execute(text("PRAGMA table_info(activity)"))}
+        if name in cols:
+            return
+        log.info("migration: adding activity.%s", name)
+        conn.execute(text(f"ALTER TABLE activity ADD COLUMN {name} {sql_type}"))
 
 
 def _add_activity_annotated_column() -> None:

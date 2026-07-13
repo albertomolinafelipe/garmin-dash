@@ -16,6 +16,7 @@ from ..models import Activity, Sleep
 from ..schemas import SyncResult
 from .client import get_client
 from .fit import download_fit
+from .process import seed_subtype
 
 log = logging.getLogger(__name__)
 
@@ -62,10 +63,11 @@ def _sync_activities(session, client, result, *, limit: int = 50, download_fits=
         if download_fits and not fit_path:
             fit_path = download_fit(client, gid)
 
+        activity_type = (a.get("activityType") or {}).get("typeKey")
+        # Synced metrics — rewritten on every process (never name/subtype).
         synced = dict(
             garmin_activity_id=gid,
-            name=a.get("activityName"),
-            activity_type=(a.get("activityType") or {}).get("typeKey"),
+            activity_type=activity_type,
             start_time=_parse_dt(a.get("startTimeLocal")),
             duration_s=a.get("duration"),
             distance_m=a.get("distance"),
@@ -81,11 +83,18 @@ def _sync_activities(session, client, result, *, limit: int = 50, download_fits=
 
         if existing:
             for k, v in synced.items():
-                setattr(existing, k, v)  # only synced fields; annotations untouched
+                setattr(existing, k, v)  # only synced metrics; name/subtype/annotations kept
             session.add(existing)
             result.activities_updated += 1
         else:
-            session.add(Activity(**synced))
+            # Seed name + subtype once (processing step), then never clobber.
+            session.add(
+                Activity(
+                    **synced,
+                    name=a.get("activityName"),
+                    subtype=seed_subtype(activity_type),
+                )
+            )
             result.activities_created += 1
 
 

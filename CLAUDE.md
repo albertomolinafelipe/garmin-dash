@@ -68,10 +68,11 @@ garmin-dash/
     garmin/
       client.py              # login + token cache (garth), thin wrappers
       sync.py                # pull → download .fit → parse summary → upsert
+      process.py             # ingest step: seed name + auto subtype (discrete from edit)
       fit.py                 # .fit parsing (summary/laps only)
     routers/
-      activities.py            # list/get + PATCH annotations
-      sleep.py                 # list/get + PATCH annotations
+      activities.py            # list/get + PATCH annotations + GET food suggestions
+      sleep.py                 # list/get
       sync.py                  # POST /api/sync
   web/                       # React + Vite + TS + Mantine SPA
     src/
@@ -80,21 +81,67 @@ garmin-dash/
 ```
 
 ### Data model (SQLite)
-- Two column families per record: **synced** (from Garmin, overwritten on each sync)
-  and **annotation** (user-owned, **never** overwritten by sync). Keep them clearly
-  separated so re-syncing is safe.
+- Three families of columns per activity (see Processing vs annotation below):
+  - **synced** — from Garmin, overwritten on each process/sync (metrics, fit_path).
+  - **seeded-once** — machine-decided at first ingest, then user-editable and never
+    clobbered by re-processing: `name`, and the running `subtype` for the unambiguous
+    cases (`running→road`, `treadmill_running→treadmill`).
+  - **annotation** — purely user-owned, never touched by processing.
 - `activities`: garmin_activity_id (unique), start_time, sport/type, duration,
   distance, avg/max HR, elevation gain, calories, avg pace/power, fit_path (raw file
-  on disk), … + annotation fields.
+  on disk) [synced]; `name`, `subtype` [seeded-once] + annotation fields (see
+  Annotations): `feeling`, `effort`, `food_during[]`, `food_after[]`, `caffeine`.
 - `sleep`: calendar_date (unique), start/end, total, deep/light/rem/awake, avg HRV,
-  resting HR, sleep score, … + annotation fields.
-- Sync is **idempotent**: upsert by garmin id / date; seed annotation fields empty on
-  first insert; never clobber them afterward.
+  resting HR, sleep score, … (no annotation fields yet).
+- Processing/sync is **idempotent**: upsert by garmin id / date; seed name/subtype on
+  first insert; never clobber seeded or annotation fields afterward.
 
-### Annotations (extend-on-top) — set TBD
-Placeholder candidates: `feeling`, `rpe`, `mood`, `tags[]`, `notes` (markdown body).
-Finalize with the user before building the editor. These map 1:1 to the future
-markdown frontmatter for the Obsidian export.
+### Processing vs annotation — two discrete, separate steps
+Every activity goes through two clearly separated phases. Keep the code paths distinct
+(a processing/ingest step vs. the annotation PATCH surface).
+
+1. **Processing (ingest).** Runs when an activity is first pulled from the Garmin API,
+   and is re-runnable. Deterministic, idempotent, machine-only. It writes the **synced**
+   metrics from the API / `.fit` summary (overwritten on re-process) and **seeds** the
+   fields the machine can decide once: `name` (from Garmin) and the running `subtype`
+   when unambiguous (`running→road`, `treadmill_running→treadmill`). Processing must
+   **never** touch anything the user has entered.
+2. **Annotation (edit).** The human layer, done later per activity on the detail page.
+   Seeded fields (`name`) stay editable and are **not** clobbered by re-processing;
+   annotation fields are user-owned and never overwritten.
+
+The user is not actively syncing right now, but the design must keep these two steps
+discrete regardless.
+
+### Annotations
+The activity detail page is the annotation surface. It must: let the user **edit the
+name**, and have **no "back" button** and **no manual "annotated" toggle**.
+
+Required annotation fields depend on the activity **category** (taxonomy lives in
+`web/src/activityTypes.ts`):
+
+- **Running** (road / trail / treadmill / mountain):
+  - `subtype` — auto-set in processing for road & treadmill. **trail_running** is
+    ambiguous, so the user must choose **trail** or **mountain**.
+  - `feeling` — 1–5, shown as five faces (sad → happy).
+  - `effort` — 1–5 (how hard I tried).
+  - `food_during`, `food_after` — each a **creatable multi-select**: no options at
+    first; typing a new value adds it, and previously-used values are suggested so the
+    vocabulary converges (type "oat…" → suggest "oatmeal"). Suggestions are the distinct
+    set of foods used across all activities (a learned vocabulary served by the API);
+    both fields share the same suggestion list.
+  - `caffeine` — `yes` / `no` / `residual`.
+- **Climbing**: `subtype` must be set by hand — `rope` / `boulder` / `board`.
+- Other categories: no required fields yet.
+
+**Completeness is derived, not stored.** An activity **needs annotation** when any
+required field for its category is missing, and flips to **done** once all are filled.
+This drives the Overview "needs annotation" panel (no manual flag). Historical activities
+before **2026-07-13** are grandfathered as done so they don't flood the panel — this
+supersedes the old `annotated` boolean + date backfill (reconcile that column in code
+when implementing).
+
+All annotation fields map 1:1 to the future Obsidian markdown frontmatter.
 
 ### Config (env / `.env`)
 `GARMIN_EMAIL`, `GARMIN_PASSWORD`, `DATA_DIR` (default `/data`). Garth token cache

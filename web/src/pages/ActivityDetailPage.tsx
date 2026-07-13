@@ -1,34 +1,34 @@
+import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
-  Anchor,
+  ActionIcon,
+  Badge,
   Card,
   Center,
-  Grid,
   Group,
   Loader,
-  SimpleGrid,
+  Select,
+  Stack,
   Text,
-  Title,
+  TextInput,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { Link, useParams } from "react-router-dom";
+import { IconCheck } from "@tabler/icons-react";
+import { useParams } from "react-router-dom";
 
 import { api } from "../api/client";
 import { queryClient } from "../queryClient";
 import type { Annotation } from "../api/types";
-import { fmtDate, fmtDistance, fmtDuration, fmtPace } from "../format";
-import AnnotationForm from "../components/AnnotationForm";
-
-function Stat({ label, value }: { label: string; value: string | number }) {
-  return (
-    <Card withBorder padding="sm">
-      <Text size="xs" c="dimmed">
-        {label}
-      </Text>
-      <Text fw={600}>{value}</Text>
-    </Card>
-  );
-}
+import { fmtDate } from "../format";
+import {
+  categoryColor,
+  categoryOf,
+  CLIMBING_SUBTYPES,
+  needsAnnotation,
+} from "../activityTypes";
+import ActivityMetrics from "../components/ActivityMetrics";
+import ActivityTypeLabel from "../components/ActivityTypeLabel";
+import RunningAnnotation from "../components/RunningAnnotation";
 
 export default function ActivityDetailPage() {
   const { id } = useParams();
@@ -38,15 +38,27 @@ export default function ActivityDetailPage() {
     queryKey: ["activity", activityId],
     queryFn: () => api.getActivity(activityId),
   });
+  const { data: foodOptions } = useQuery({
+    queryKey: ["food-options"],
+    queryFn: () => api.foodOptions(),
+  });
 
   const save = useMutation({
     mutationFn: (body: Annotation) => api.updateActivity(activityId, body),
     onSuccess: () => {
-      notifications.show({ message: "Saved", color: "green" });
       queryClient.invalidateQueries({ queryKey: ["activity", activityId] });
       queryClient.invalidateQueries({ queryKey: ["activities"] });
+      queryClient.invalidateQueries({ queryKey: ["food-options"] });
     },
+    onError: (e: unknown) =>
+      notifications.show({ title: "Save failed", message: String(e), color: "red" }),
   });
+
+  // Editable name — local buffer, saved only on explicit confirm.
+  const [name, setName] = useState("");
+  useEffect(() => {
+    if (a) setName(a.name ?? "");
+  }, [a?.name]);
 
   if (isLoading || !a)
     return (
@@ -55,49 +67,84 @@ export default function ActivityDetailPage() {
       </Center>
     );
 
+  const category = categoryOf(a.activity_type, a.subtype);
+  const color = categoryColor[category];
+  const nameDirty = name !== (a.name ?? "");
+  const confirmName = () => nameDirty && save.mutate({ name });
+
   return (
-    <>
-      <Group justify="space-between" mb="md">
-        <div>
-          <Title order={3}>{a.name ?? "Activity"}</Title>
+    <Stack>
+      {/* Header — category color accent, like the calendar */}
+      <Card withBorder style={{ borderLeft: `4px solid ${color}` }}>
+        <Group gap="xs" wrap="nowrap">
+          <TextInput
+            variant="unstyled"
+            style={{ flex: 1 }}
+            value={name}
+            onChange={(e) => setName(e.currentTarget.value)}
+            onKeyDown={(e) => e.key === "Enter" && confirmName()}
+            placeholder="Activity name"
+            styles={{ input: { fontSize: "var(--mantine-font-size-xl)", fontWeight: 700 } }}
+          />
+          {nameDirty && (
+            <ActionIcon
+              variant="light"
+              color="green"
+              size="lg"
+              aria-label="Confirm name"
+              onClick={confirmName}
+            >
+              <IconCheck size={18} />
+            </ActionIcon>
+          )}
+        </Group>
+        <Group gap="sm" mt={4}>
           <Text c="dimmed">{fmtDate(a.start_time)}</Text>
-        </div>
-        <Anchor component={Link} to="/">
-          ← Back
-        </Anchor>
-      </Group>
+          <ActivityTypeLabel activity={a} size={18} />
+          {needsAnnotation(a) && (
+            <Badge color="orange" variant="light">
+              needs annotation
+            </Badge>
+          )}
+        </Group>
+      </Card>
 
-      <Grid>
-        <Grid.Col span={{ base: 12, md: 7 }}>
-          <SimpleGrid cols={{ base: 2, sm: 3 }} spacing="sm">
-            <Stat label="Type" value={a.activity_type ?? "—"} />
-            <Stat label="Distance" value={fmtDistance(a.distance_m)} />
-            <Stat label="Duration" value={fmtDuration(a.duration_s)} />
-            <Stat label="Avg pace" value={fmtPace(a.avg_speed_mps)} />
-            <Stat label="Avg HR" value={a.avg_hr ?? "—"} />
-            <Stat label="Max HR" value={a.max_hr ?? "—"} />
-            <Stat label="Elev gain" value={a.elevation_gain_m ? `${Math.round(a.elevation_gain_m)} m` : "—"} />
-            <Stat label="Calories" value={a.calories ?? "—"} />
-            <Stat label="Avg power" value={a.avg_power_w ? `${a.avg_power_w} W` : "—"} />
-          </SimpleGrid>
-          <Text size="xs" c="dimmed" mt="sm">
-            Raw file: {a.fit_path ?? "not downloaded"}
+      {/* Metrics — full width */}
+      <Card withBorder>
+        <ActivityMetrics activity={a} />
+      </Card>
+
+      {/* Annotation — full width, laid out wide (not a tall column) */}
+      <Card withBorder>
+        {category === "running" ? (
+          <RunningAnnotation
+            activity={a}
+            foodOptions={foodOptions ?? []}
+            onSave={(b) => save.mutate(b)}
+          />
+        ) : category === "climbing" ? (
+          <Select
+            label="Climbing type"
+            placeholder="Rope, boulder or board?"
+            data={CLIMBING_SUBTYPES.map((s) => ({
+              value: s,
+              label: s[0].toUpperCase() + s.slice(1),
+            }))}
+            value={a.subtype}
+            onChange={(v) => v && save.mutate({ subtype: v })}
+            error={!a.subtype ? "Climbing needs a type" : undefined}
+            maw={280}
+          />
+        ) : (
+          <Text c="dimmed" size="sm">
+            No annotations for this activity type yet.
           </Text>
-        </Grid.Col>
+        )}
+      </Card>
 
-        <Grid.Col span={{ base: 12, md: 5 }}>
-          <Card withBorder>
-            <Title order={5} mb="sm">
-              Your notes
-            </Title>
-            <AnnotationForm
-              initial={a}
-              saving={save.isPending}
-              onSave={(v) => save.mutate(v)}
-            />
-          </Card>
-        </Grid.Col>
-      </Grid>
-    </>
+      <Text size="xs" c="dimmed">
+        Raw file: {a.fit_path ?? "not downloaded"}
+      </Text>
+    </Stack>
   );
 }

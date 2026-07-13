@@ -1,41 +1,15 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-  Card,
-  Center,
-  Loader,
-  Modal,
-  Table,
-  Text,
-  Title,
-} from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { useQuery } from "@tanstack/react-query";
+import { Card, Center, Loader, Table, Text, Title } from "@mantine/core";
 import { BarChart } from "@mantine/charts";
-import { notifications } from "@mantine/notifications";
-import { useState } from "react";
 
 import { api } from "../api/client";
-import { queryClient } from "../queryClient";
-import type { Annotation, Sleep } from "../api/types";
 import { fmtDuration } from "../format";
-import AnnotationForm from "../components/AnnotationForm";
 import { chartColors } from "../theme";
 
 export default function SleepPage() {
-  const [opened, { open, close }] = useDisclosure(false);
-  const [selected, setSelected] = useState<Sleep | null>(null);
-
   const { data, isLoading } = useQuery({
     queryKey: ["sleep"],
     queryFn: () => api.listSleep({ limit: 200 }),
-  });
-
-  const save = useMutation({
-    mutationFn: (body: Annotation) => api.updateSleep(selected!.id, body),
-    onSuccess: () => {
-      notifications.show({ message: "Saved", color: "green" });
-      queryClient.invalidateQueries({ queryKey: ["sleep"] });
-      close();
-    },
   });
 
   if (isLoading)
@@ -100,14 +74,7 @@ export default function SleepPage() {
           </Table.Thead>
           <Table.Tbody>
             {sleep.map((s) => (
-              <Table.Tr
-                key={s.id}
-                style={{ cursor: "pointer" }}
-                onClick={() => {
-                  setSelected(s);
-                  open();
-                }}
-              >
+              <Table.Tr key={s.id}>
                 <Table.Td>{s.calendar_date}</Table.Td>
                 <Table.Td>{fmtDuration(s.total_sleep_s)}</Table.Td>
                 <Table.Td>{fmtDuration(s.deep_sleep_s)}</Table.Td>
@@ -125,20 +92,6 @@ export default function SleepPage() {
           </Text>
         )}
       </Card>
-
-      <Modal
-        opened={opened}
-        onClose={close}
-        title={selected ? `Sleep — ${selected.calendar_date}` : ""}
-      >
-        {selected && (
-          <AnnotationForm
-            initial={selected}
-            saving={save.isPending}
-            onSave={(v) => save.mutate(v)}
-          />
-        )}
-      </Modal>
     </>
   );
 }

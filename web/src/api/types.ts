@@ -16,10 +16,13 @@ export interface Activity {
   synced_at: string | null;
   // annotations
   annotated: boolean;
-  feeling: string | null;
-  rpe: number | null;
-  mood: string | null;
-  tags: string | null;
+  subtype: string | null;
+  feeling: number | null;
+  effort: number | null;
+  food_during: string[] | null;
+  food_after: string[] | null;
+  caffeine: string | null;
+  weather: string | null;
   notes: string | null;
 }
 
@@ -37,19 +40,19 @@ export interface Sleep {
   resting_hr: number | null;
   sleep_score: number | null;
   synced_at: string | null;
-  // annotations
-  feeling: string | null;
-  rpe: number | null;
-  mood: string | null;
-  tags: string | null;
-  notes: string | null;
+  // no user annotation fields yet
 }
 
 export interface Annotation {
-  feeling?: string | null;
-  rpe?: number | null;
-  mood?: string | null;
-  tags?: string | null;
+  name?: string | null;
+  annotated?: boolean | null;
+  subtype?: string | null;
+  feeling?: number | null;
+  effort?: number | null;
+  food_during?: string[] | null;
+  food_after?: string[] | null;
+  caffeine?: string | null;
+  weather?: string | null;
   notes?: string | null;
 }
 

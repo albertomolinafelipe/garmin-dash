@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 
 import { api } from "../api/client";
 import { fmtDate, fmtDistance, fmtDuration } from "../format";
+import { needsAnnotation } from "../activityTypes";
+import ActivityTypeLabel from "../components/ActivityTypeLabel";
 
 export default function ActivitiesPage() {
   const navigate = useNavigate();
@@ -36,7 +38,7 @@ export default function ActivitiesPage() {
               <Table.Th>Distance</Table.Th>
               <Table.Th>Duration</Table.Th>
               <Table.Th>Avg HR</Table.Th>
-              <Table.Th>Annotated</Table.Th>
+              <Table.Th>Status</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -49,15 +51,15 @@ export default function ActivitiesPage() {
                 <Table.Td>{fmtDate(a.start_time)}</Table.Td>
                 <Table.Td>{a.name ?? "—"}</Table.Td>
                 <Table.Td>
-                  {a.activity_type ? <Badge variant="light">{a.activity_type}</Badge> : "—"}
+                  <ActivityTypeLabel activity={a} />
                 </Table.Td>
                 <Table.Td>{fmtDistance(a.distance_m)}</Table.Td>
                 <Table.Td>{fmtDuration(a.duration_s)}</Table.Td>
                 <Table.Td>{a.avg_hr ?? "—"}</Table.Td>
                 <Table.Td>
-                  {a.notes || a.feeling || a.rpe ? (
-                    <Badge color="green" variant="dot">
-                      yes
+                  {needsAnnotation(a) ? (
+                    <Badge color="orange" variant="light">
+                      needs annotation
                     </Badge>
                   ) : (
                     ""

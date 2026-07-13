@@ -2,13 +2,21 @@ import { AppShell, Burger, Group, NavLink, Title, Button } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
-import { IconActivity, IconBed, IconRefresh } from "@tabler/icons-react";
+import {
+  IconActivity,
+  IconBed,
+  IconCalendar,
+  IconLayoutDashboard,
+  IconRefresh,
+} from "@tabler/icons-react";
 import { Link, Route, Routes, useLocation } from "react-router-dom";
 
 import { api } from "./api/client";
 import { queryClient } from "./queryClient";
+import OverviewPage from "./pages/OverviewPage";
 import ActivitiesPage from "./pages/ActivitiesPage";
 import ActivityDetailPage from "./pages/ActivityDetailPage";
+import CalendarPage from "./pages/CalendarPage";
 import SleepPage from "./pages/SleepPage";
 
 export default function App() {
@@ -60,9 +68,23 @@ export default function App() {
         <NavLink
           component={Link}
           to="/"
+          label="Overview"
+          leftSection={<IconLayoutDashboard size={18} />}
+          active={location.pathname === "/"}
+        />
+        <NavLink
+          component={Link}
+          to="/activities"
           label="Activities"
           leftSection={<IconActivity size={18} />}
-          active={location.pathname === "/" || location.pathname.startsWith("/activities")}
+          active={location.pathname.startsWith("/activities")}
+        />
+        <NavLink
+          component={Link}
+          to="/calendar"
+          label="Calendar"
+          leftSection={<IconCalendar size={18} />}
+          active={location.pathname.startsWith("/calendar")}
         />
         <NavLink
           component={Link}
@@ -75,8 +97,10 @@ export default function App() {
 
       <AppShell.Main>
         <Routes>
-          <Route path="/" element={<ActivitiesPage />} />
+          <Route path="/" element={<OverviewPage />} />
+          <Route path="/activities" element={<ActivitiesPage />} />
           <Route path="/activities/:id" element={<ActivityDetailPage />} />
+          <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/sleep" element={<SleepPage />} />
         </Routes>
       </AppShell.Main>

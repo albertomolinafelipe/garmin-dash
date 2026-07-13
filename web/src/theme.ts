@@ -20,6 +20,11 @@ export const kanagawa = {
   carpYellow: "#E6C384",
   waveRed: "#E46876",
   sakuraPink: "#D27E99",
+  // muted "autumn" tones — good for category accents (darker, not bright)
+  autumnRed: "#C34043",
+  autumnGreen: "#76946A",
+  autumnYellow: "#DCA561",
+  boatYellow2: "#C0A36E",
 } as const;
 
 // Mantine "dark" tuple: index 0 = lightest (text) → 9 = darkest (bg).
@@ -64,4 +69,5 @@ export const chartColors = {
   light: kanagawa.crystalBlue,
   rem: kanagawa.oniViolet,
   awake: kanagawa.sumiInk4,
+  load: kanagawa.waveAqua2,
 } as const;

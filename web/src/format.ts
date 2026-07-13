@@ -25,6 +25,15 @@ export function fmtDate(iso: string | null): string {
   return isNaN(d.getTime()) ? iso : d.toLocaleString();
 }
 
+// Local YYYY-MM-DD key for a Date (matches the local date in a start_time string,
+// avoiding the UTC drift you'd get from toISOString()).
+export function dayKey(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 export function fmtPace(speedMps: number | null): string {
   if (!speedMps || speedMps <= 0) return "—";
   const secPerKm = 1000 / speedMps;

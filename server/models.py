@@ -1,31 +1,39 @@
 """SQLModel tables.
 
-Each record has two column families:
-  - synced      : pulled from Garmin, OVERWRITTEN on every sync.
-  - annotation  : user-owned, seeded empty on insert and NEVER overwritten by sync.
-
-Keeping them separate is what makes re-syncing safe.
+Each activity row has three column families (see CLAUDE.md > Processing vs annotation):
+  - synced       : from Garmin, OVERWRITTEN on every process/sync.
+  - seeded-once  : machine-decided at first ingest (name, auto subtype), then user-
+                   editable and NEVER clobbered by re-processing.
+  - annotation   : purely user-owned, never touched by processing.
 """
 from __future__ import annotations
 
 from datetime import datetime
 
+from sqlalchemy import JSON, Column
 from sqlmodel import Field, SQLModel
 
-# Fields the sync is allowed to write. Everything else on a row is user-owned and
-# must survive a re-sync untouched. Kept here so sync.py has one source of truth.
+# Metrics the processing step overwrites on every run. name/subtype are seeded once
+# (see SEEDED_ONCE_FIELDS) and everything else is user-owned annotation.
 ACTIVITY_SYNCED_FIELDS = {
-    "garmin_activity_id", "name", "activity_type", "start_time", "duration_s",
+    "garmin_activity_id", "activity_type", "start_time", "duration_s",
     "distance_m", "avg_hr", "max_hr", "elevation_gain_m", "calories",
     "avg_speed_mps", "avg_power_w", "fit_path", "synced_at",
 }
+# Written only on first insert, then owned by the user.
+SEEDED_ONCE_FIELDS = {"name", "subtype"}
 SLEEP_SYNCED_FIELDS = {
     "calendar_date", "start_time", "end_time", "total_sleep_s", "deep_sleep_s",
     "light_sleep_s", "rem_sleep_s", "awake_s", "avg_hrv", "resting_hr",
     "sleep_score", "synced_at",
 }
 
-ANNOTATION_FIELDS = {"annotated", "feeling", "rpe", "mood", "tags", "notes"}
+# User-owned annotation fields (never overwritten by processing). `subtype` and `name`
+# are seeded once but then editable, so they behave like annotations after insert.
+ANNOTATION_FIELDS = {
+    "annotated", "subtype", "name",
+    "feeling", "effort", "food_during", "food_after", "caffeine", "weather", "notes",
+}
 
 
 class Activity(SQLModel, table=True):
@@ -47,13 +55,21 @@ class Activity(SQLModel, table=True):
     fit_path: str | None = None          # raw .fit on disk (relative to DATA_DIR)
     synced_at: datetime | None = None
 
-    # --- user annotations (never overwritten by sync) ---
-    annotated: bool = Field(default=False, index=True)  # explicit "I've reviewed this"
-    feeling: str | None = None
-    rpe: int | None = None               # rating of perceived exertion 1-10
-    mood: str | None = None
-    tags: str | None = None              # comma-separated for now
-    notes: str | None = None             # markdown body
+    # --- user annotations (never overwritten by processing) ---
+    # Legacy explicit flag; superseded by derived completeness (web/src/activityTypes.ts
+    # needsAnnotation). Kept as a column for now; not used by the UI.
+    annotated: bool = Field(default=False, index=True)
+    # Discipline sub-classification: running → road/trail/mountain/treadmill,
+    # climbing → rope/boulder/board. Seeded at ingest for road/treadmill.
+    subtype: str | None = None
+    # Running annotations (see CLAUDE.md > Annotations):
+    feeling: int | None = None                 # 1..5, sad → happy
+    effort: int | None = None                  # 1..5, how hard I tried
+    food_during: list[str] | None = Field(default=None, sa_column=Column(JSON))
+    food_after: list[str] | None = Field(default=None, sa_column=Column(JSON))
+    caffeine: str | None = None                # yes | no | residual
+    weather: str | None = None                 # normal | cold | hot | bad (optional)
+    notes: str | None = None                   # free-text general notes
 
 
 class Sleep(SQLModel, table=True):
@@ -73,9 +89,4 @@ class Sleep(SQLModel, table=True):
     sleep_score: int | None = None
     synced_at: datetime | None = None
 
-    # --- user annotations (never overwritten by sync) ---
-    feeling: str | None = None
-    rpe: int | None = None
-    mood: str | None = None
-    tags: str | None = None
-    notes: str | None = None
+    # No user annotation fields yet — TBD, see CLAUDE.md > Annotations.
