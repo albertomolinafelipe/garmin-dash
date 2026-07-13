@@ -1,0 +1,17 @@
+# secrets & local state
+.env
+data/
+*.db
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# node / vite
+web/node_modules/
+web/dist/
+
+# misc
+.DS_Store

@@ -1,0 +1,12 @@
+services:
+  garmin-dash:
+    build: .
+    image: garmin-dash
+    container_name: garmin-dash
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/data       # sqlite db + raw .fit files + garth token cache
+    restart: unless-stopped
