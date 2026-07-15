@@ -2,7 +2,7 @@
 
 # production app at http://localhost:8000
 up:
-    docker compose up --build
+    docker compose up --build -d
 
 # native hot-reload dev (no containers): FastAPI on :8000, Vite HMR on :5173.
 # Requires the Nix dev shell — `direnv allow` (or `nix develop`) provides python + node.
@@ -20,9 +20,7 @@ dev:
 # containerized hot-reload dev (fallback if the Nix shell isn't set up)
 dev-docker:
     docker compose build
-    docker compose -f docker-compose.dev.yml up
 
 # stop the docker stacks (prod + dev-docker), data is kept
 down:
     docker compose down
-    docker compose -f docker-compose.dev.yml down
