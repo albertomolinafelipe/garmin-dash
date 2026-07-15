@@ -43,6 +43,7 @@
           sqlmodel
           garminconnect
           garth
+          fitdecode # .fit parsing for per-activity time-series
         ]
       );
     in

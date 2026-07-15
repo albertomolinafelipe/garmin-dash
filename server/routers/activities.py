@@ -4,8 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
 from ..db import get_session
+from ..garmin import fit
 from ..models import Activity
-from ..schemas import AnnotationUpdate
+from ..schemas import ActivityStreams, AnnotationUpdate
 
 router = APIRouter(prefix="/api/activities", tags=["activities"])
 
@@ -47,6 +48,22 @@ def get_activity(
     if not activity:
         raise HTTPException(404, "Activity not found")
     return activity
+
+
+@router.get("/{activity_id}/streams")
+def activity_streams(
+    activity_id: int, session: Session = Depends(get_session)
+) -> ActivityStreams:
+    """Per-record time-series parsed on demand from the raw .fit (HR for now)."""
+    activity = session.get(Activity, activity_id)
+    if not activity:
+        raise HTTPException(404, "Activity not found")
+    return ActivityStreams(
+        activity_id=activity_id,
+        heart_rate=fit.heart_rate(activity.fit_path),
+        elevation=fit.elevation(activity.fit_path),
+        track=fit.track(activity.fit_path),
+    )
 
 
 @router.patch("/{activity_id}")

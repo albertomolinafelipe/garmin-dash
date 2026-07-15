@@ -34,68 +34,94 @@ def _parse_dt(value) -> datetime | None:
     return None
 
 
-def sync(session: Session, days: int = 30, download_fits: bool = True) -> SyncResult:
+def sync(
+    session: Session,
+    days: int = 30,
+    download_fits: bool = True,
+    max_activities: int | None = 50,
+) -> SyncResult:
+    """Pull activities + sleep into the DB.
+
+    ``max_activities`` caps how far back activities are pulled; ``None`` paginates
+    all the way to the start of history (full backfill). ``days`` bounds the sleep
+    look-back (sleep is one API call per day, so a backfill still caps this).
+    """
     result = SyncResult()
     client = get_client()
-    _sync_activities(session, client, result, download_fits=download_fits)
+    _sync_activities(
+        session, client, result, max_activities=max_activities, download_fits=download_fits
+    )
     _sync_sleep(session, client, result, days=days)
     session.commit()
     return result
 
 
-def _sync_activities(session, client, result, *, limit: int = 50, download_fits=True):
-    try:
-        raw = client.get_activities(0, limit)
-    except Exception as exc:  # noqa: BLE001
-        result.errors.append(f"get_activities failed: {exc}")
-        return
-
+def _sync_activities(
+    session, client, result, *, max_activities: int | None = 50, download_fits=True, batch=100
+):
     now = datetime.now(timezone.utc)
-    for a in raw:
-        gid = a.get("activityId")
-        if gid is None:
-            continue
-        existing = session.exec(
-            select(Activity).where(Activity.garmin_activity_id == gid)
-        ).first()
+    start = 0
+    fetched = 0
+    while max_activities is None or fetched < max_activities:
+        want = batch if max_activities is None else min(batch, max_activities - fetched)
+        try:
+            raw = client.get_activities(start, want)
+        except Exception as exc:  # noqa: BLE001
+            result.errors.append(f"get_activities({start}, {want}) failed: {exc}")
+            break
+        if not raw:
+            break  # reached the start of history
 
-        fit_path = existing.fit_path if existing else None
-        if download_fits and not fit_path:
-            fit_path = download_fit(client, gid)
+        for a in raw:
+            gid = a.get("activityId")
+            if gid is None:
+                continue
+            existing = session.exec(
+                select(Activity).where(Activity.garmin_activity_id == gid)
+            ).first()
 
-        activity_type = (a.get("activityType") or {}).get("typeKey")
-        # Synced metrics — rewritten on every process (never name/subtype).
-        synced = dict(
-            garmin_activity_id=gid,
-            activity_type=activity_type,
-            start_time=_parse_dt(a.get("startTimeLocal")),
-            duration_s=a.get("duration"),
-            distance_m=a.get("distance"),
-            avg_hr=a.get("averageHR"),
-            max_hr=a.get("maxHR"),
-            elevation_gain_m=a.get("elevationGain"),
-            calories=a.get("calories"),
-            avg_speed_mps=a.get("averageSpeed"),
-            avg_power_w=a.get("avgPower"),
-            fit_path=fit_path,
-            synced_at=now,
-        )
+            fit_path = existing.fit_path if existing else None
+            if download_fits and not fit_path:
+                fit_path = download_fit(client, gid)
 
-        if existing:
-            for k, v in synced.items():
-                setattr(existing, k, v)  # only synced metrics; name/subtype/annotations kept
-            session.add(existing)
-            result.activities_updated += 1
-        else:
-            # Seed name + subtype once (processing step), then never clobber.
-            session.add(
-                Activity(
-                    **synced,
-                    name=a.get("activityName"),
-                    subtype=seed_subtype(activity_type),
-                )
+            activity_type = (a.get("activityType") or {}).get("typeKey")
+            # Synced metrics — rewritten on every process (never name/subtype).
+            synced = dict(
+                garmin_activity_id=gid,
+                activity_type=activity_type,
+                start_time=_parse_dt(a.get("startTimeLocal")),
+                duration_s=a.get("duration"),
+                distance_m=a.get("distance"),
+                avg_hr=a.get("averageHR"),
+                max_hr=a.get("maxHR"),
+                elevation_gain_m=a.get("elevationGain"),
+                calories=a.get("calories"),
+                avg_speed_mps=a.get("averageSpeed"),
+                avg_power_w=a.get("avgPower"),
+                fit_path=fit_path,
+                synced_at=now,
             )
-            result.activities_created += 1
+
+            if existing:
+                for k, v in synced.items():
+                    setattr(existing, k, v)  # only synced metrics; name/subtype/annotations kept
+                session.add(existing)
+                result.activities_updated += 1
+            else:
+                # Seed name + subtype once (processing step), then never clobber.
+                session.add(
+                    Activity(
+                        **synced,
+                        name=a.get("activityName"),
+                        subtype=seed_subtype(activity_type),
+                    )
+                )
+                result.activities_created += 1
+
+        fetched += len(raw)
+        start += len(raw)
+        if len(raw) < want:
+            break  # last (partial) page — no more to fetch
 
 
 def _sync_sleep(session, client, result, *, days: int):

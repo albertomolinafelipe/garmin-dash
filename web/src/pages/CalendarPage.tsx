@@ -221,7 +221,7 @@ export default function CalendarPage() {
 				<div style={{ width: 108 }} />
 			</Group>
 
-			<div style={{ flex: 1, display: "flex", minHeight: 0 }}>
+			<div className="calendar-body">
 				<div style={{ flex: 1, minWidth: 0 }}>
 					<Calendar<ActivityEvent>
 						localizer={localizer}

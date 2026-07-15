@@ -6,6 +6,7 @@ import {
   Button,
   Card,
   Center,
+  Grid,
   Group,
   Loader,
   Stack,
@@ -23,6 +24,8 @@ import { fmtDate } from "../format";
 import { categoryColor, categoryOf, needsAnnotation } from "../activityTypes";
 import ActivityMetrics from "../components/ActivityMetrics";
 import ActivityTypeLabel from "../components/ActivityTypeLabel";
+import HrElevationChart from "../components/HrElevationChart";
+import RouteMap from "../components/RouteMap";
 import RunningAnnotation from "../components/RunningAnnotation";
 import ClimbingAnnotation from "../components/ClimbingAnnotation";
 
@@ -37,6 +40,12 @@ export default function ActivityDetailPage() {
   const { data: foodOptions } = useQuery({
     queryKey: ["food-options"],
     queryFn: () => api.foodOptions(),
+  });
+  // Per-record streams parsed on demand from the raw .fit (only if we have one).
+  const { data: streams, isLoading: streamsLoading } = useQuery({
+    queryKey: ["activity", activityId, "streams"],
+    queryFn: () => api.activityStreams(activityId),
+    enabled: !!a?.fit_path,
   });
 
   const save = useMutation({
@@ -73,45 +82,85 @@ export default function ActivityDetailPage() {
 
   return (
     <Stack>
-      {/* Header — category color accent, like the calendar */}
-      <Card withBorder style={{ borderLeft: `4px solid ${color}` }}>
-        <Group gap="xs" wrap="nowrap">
-          <TextInput
-            variant="unstyled"
-            style={{ flex: 1 }}
-            value={name}
-            onChange={(e) => setName(e.currentTarget.value)}
-            onKeyDown={(e) => e.key === "Enter" && confirmName()}
-            placeholder="Activity name"
-            styles={{ input: { fontSize: "var(--mantine-font-size-xl)", fontWeight: 700 } }}
-          />
-          {nameDirty && (
-            <ActionIcon
-              variant="light"
-              color="green"
-              size="lg"
-              aria-label="Confirm name"
-              onClick={confirmName}
-            >
-              <IconCheck size={18} />
-            </ActionIcon>
-          )}
-        </Group>
-        <Group gap="sm" mt={4}>
-          <Text c="dimmed">{fmtDate(a.start_time)}</Text>
-          <ActivityTypeLabel activity={a} size={18} />
-          {needsAnnotation(a) && (
-            <Badge color="orange" variant="light">
-              needs annotation
-            </Badge>
-          )}
-        </Group>
-      </Card>
+      {/* Title (1/3) + metrics (2/3) on one row */}
+      <Grid align="stretch">
+        <Grid.Col span={{ base: 12, md: 4 }}>
+          <Card withBorder h="100%" style={{ borderLeft: `4px solid ${color}` }}>
+            <Group gap="xs" wrap="nowrap">
+              <TextInput
+                variant="unstyled"
+                style={{ flex: 1 }}
+                value={name}
+                onChange={(e) => setName(e.currentTarget.value)}
+                onKeyDown={(e) => e.key === "Enter" && confirmName()}
+                placeholder="Activity name"
+                styles={{
+                  input: { fontSize: "var(--mantine-font-size-xl)", fontWeight: 700 },
+                }}
+              />
+              {nameDirty && (
+                <ActionIcon
+                  variant="light"
+                  color="green"
+                  size="lg"
+                  aria-label="Confirm name"
+                  onClick={confirmName}
+                >
+                  <IconCheck size={18} />
+                </ActionIcon>
+              )}
+            </Group>
+            <Group gap="sm" mt={4}>
+              <Text c="dimmed">{fmtDate(a.start_time)}</Text>
+              <ActivityTypeLabel activity={a} size={18} />
+              {needsAnnotation(a) && (
+                <Badge color="orange" variant="light">
+                  needs annotation
+                </Badge>
+              )}
+            </Group>
+          </Card>
+        </Grid.Col>
 
-      {/* Metrics — full width */}
-      <Card withBorder>
-        <ActivityMetrics activity={a} />
-      </Card>
+        <Grid.Col span={{ base: 12, md: 8 }}>
+          <Card withBorder h="100%">
+            <ActivityMetrics activity={a} />
+          </Card>
+        </Grid.Col>
+      </Grid>
+
+      {/* Detail charts + map — parsed on demand from the raw .fit */}
+      {a.fit_path && streamsLoading && (
+        <Card withBorder>
+          <Center h={180}>
+            <Loader />
+          </Center>
+        </Card>
+      )}
+      {(() => {
+        const hasTrack = (streams?.track?.length ?? 0) > 0;
+        const hasChart =
+          (streams?.heart_rate?.length ?? 0) > 0 ||
+          (streams?.elevation?.length ?? 0) > 0;
+        if (!hasTrack && !hasChart) return null;
+        return (
+          <Grid>
+            {hasTrack && (
+              <Grid.Col span={{ base: 12, md: hasChart ? 6 : 12 }}>
+                <RouteMap track={streams!.track} />
+              </Grid.Col>
+            )}
+            {hasChart && (
+              <Grid.Col span={{ base: 12, md: hasTrack ? 6 : 12 }}>
+                <HrElevationChart
+                  hr={streams!.heart_rate}
+                  elevation={streams!.elevation}
+                />
+              </Grid.Col>
+            )}
+          </Grid>
+        );
+      })()}
 
       {/* Annotation — full width, laid out wide (not a tall column) */}
       <Card withBorder>

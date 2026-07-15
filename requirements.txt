@@ -5,3 +5,5 @@ python-dotenv==1.0.1
 garminconnect==0.2.25
 # Pinned explicitly (kept visible); must match what garminconnect requires (0.5.2).
 garth==0.5.2
+# .fit parsing for per-activity time-series (HR, later elevation/track).
+fitdecode==0.11.0

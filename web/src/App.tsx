@@ -6,6 +6,7 @@ import {
   IconActivity,
   IconBed,
   IconCalendar,
+  IconHistory,
   IconLayoutDashboard,
   IconRefresh,
 } from "@tabler/icons-react";
@@ -24,7 +25,10 @@ export default function App() {
   const location = useLocation();
 
   const sync = useMutation({
-    mutationFn: () => api.sync({ days: 30 }),
+    mutationFn: (v: {
+      label: string;
+      params: { days?: number; download_fits?: boolean; max_activities?: number };
+    }) => api.sync(v.params),
     onSuccess: (r) => {
       notifications.show({
         title: "Sync complete",
@@ -41,6 +45,31 @@ export default function App() {
       }),
   });
 
+  // Which button triggered the in-flight sync (so only it shows the spinner).
+  const running = sync.isPending ? sync.variables?.label : null;
+
+  // Recent: fast everyday pull — last couple weeks, with .fit downloads.
+  const syncRecent = () =>
+    sync.mutate({
+      label: "recent",
+      params: { days: 14, max_activities: 30, download_fits: true },
+    });
+
+  // Backfill: full history, summaries only (no .fit) for speed, sleep capped at 2y.
+  const backfill = () => {
+    if (
+      !window.confirm(
+        "Backfill your full Garmin history? This pulls every activity (summaries " +
+          "only) and up to 2 years of sleep — it can take a few minutes.",
+      )
+    )
+      return;
+    sync.mutate({
+      label: "backfill",
+      params: { days: 730, max_activities: 0, download_fits: false },
+    });
+  };
+
   return (
     <AppShell
       header={{ height: 56 }}
@@ -53,14 +82,26 @@ export default function App() {
             <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
             <Title order={4}>garmin-dash</Title>
           </Group>
-          <Button
-            leftSection={<IconRefresh size={16} />}
-            loading={sync.isPending}
-            onClick={() => sync.mutate()}
-            variant="light"
-          >
-            Sync
-          </Button>
+          <Group gap="xs">
+            <Button
+              leftSection={<IconHistory size={16} />}
+              loading={running === "backfill"}
+              disabled={sync.isPending && running !== "backfill"}
+              onClick={backfill}
+              variant="default"
+            >
+              Backfill
+            </Button>
+            <Button
+              leftSection={<IconRefresh size={16} />}
+              loading={running === "recent"}
+              disabled={sync.isPending && running !== "recent"}
+              onClick={syncRecent}
+              variant="light"
+            >
+              Sync
+            </Button>
+          </Group>
         </Group>
       </AppShell.Header>
 

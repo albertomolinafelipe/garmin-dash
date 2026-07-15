@@ -17,23 +17,21 @@ import { dayKey } from "../format";
 import { kanagawa } from "../theme";
 
 const SPAN_DAYS = 30; // how many days to plot
+const WINDOW_DAYS = 7; // trailing window for the rolling mean (matches load panels)
 
 const INTENSITY = kanagawa.waveRed;
 const FEEL = kanagawa.springGreen;
 const SLEEP = kanagawa.crystalBlue;
 
-// Per-day average of a 1–5 annotation field across that day's activities.
-function dailyAvg(activities: Activity[], valueOf: (a: Activity) => number | null) {
-  const agg = new Map<string, { sum: number; n: number }>();
+// Collect a 1–5 annotation field per calendar day (a day may hold several values).
+function perDay(activities: Activity[], valueOf: (a: Activity) => number | null) {
+  const agg = new Map<string, number[]>();
   for (const a of activities) {
     if (!a.start_time) continue;
     const v = valueOf(a);
     if (v == null) continue;
     const key = a.start_time.slice(0, 10);
-    const cur = agg.get(key) ?? { sum: 0, n: 0 };
-    cur.sum += v;
-    cur.n += 1;
-    agg.set(key, cur);
+    (agg.get(key) ?? agg.set(key, []).get(key)!).push(v);
   }
   return agg;
 }
@@ -52,16 +50,24 @@ export default function WellbeingPanel() {
   const activities = activitiesQ.data ?? [];
   const sleep = sleepQ.data ?? [];
 
-  const intensity = dailyAvg(activities, (a) => a.effort);
-  const feel = dailyAvg(activities, (a) => a.feeling);
+  const intensity = perDay(activities, (a) => a.effort);
+  const feel = perDay(activities, (a) => a.feeling);
   const sleepByDate = new Map<string, number>();
   for (const s of sleep as Sleep[]) {
     if (s.sleep_score != null) sleepByDate.set(s.calendar_date, s.sleep_score);
   }
 
-  const avg = (m: Map<string, { sum: number; n: number }>, key: string) => {
-    const c = m.get(key);
-    return c ? +(c.sum / c.n).toFixed(1) : null;
+  // Mean of every rating that falls in the trailing WINDOW_DAYS ending on `day`.
+  const rollingMean = (m: Map<string, number[]>, day: Date) => {
+    const vals: number[] = [];
+    for (let w = 0; w < WINDOW_DAYS; w++) {
+      const d = new Date(day);
+      d.setDate(day.getDate() - w);
+      const got = m.get(dayKey(d));
+      if (got) vals.push(...got);
+    }
+    if (!vals.length) return null;
+    return +(vals.reduce((s, v) => s + v, 0) / vals.length).toFixed(2);
   };
 
   const today = new Date();
@@ -77,8 +83,8 @@ export default function WellbeingPanel() {
     const key = dayKey(day);
     rows.push({
       date: key.slice(5),
-      intensity: avg(intensity, key),
-      feel: avg(feel, key),
+      intensity: rollingMean(intensity, day),
+      feel: rollingMean(feel, day),
       sleep: sleepByDate.get(key) ?? null,
     });
   }
@@ -100,7 +106,8 @@ export default function WellbeingPanel() {
         </Group>
       </Group>
       <Text size="xs" c="dimmed" mb="sm">
-        Daily avg intensity &amp; feel (1–5), sleep score, last {SPAN_DAYS} days
+        {WINDOW_DAYS}-day avg intensity &amp; feel (1–5), sleep score, last {SPAN_DAYS}{" "}
+        days
       </Text>
       {isLoading ? (
         <Center h={300}>

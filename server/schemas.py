@@ -22,6 +22,26 @@ class AnnotationUpdate(BaseModel):
     hard_tries: int | None = None
 
 
+class Sample(BaseModel):
+    """One point of a per-activity time-series."""
+    t: int    # seconds from activity start
+    v: float  # value (e.g. bpm)
+
+
+class LatLng(BaseModel):
+    lat: float
+    lng: float
+
+
+class ActivityStreams(BaseModel):
+    """Parsed-on-demand time-series for an activity's detail charts. Streams are
+    empty when the .fit is absent or lacks that channel."""
+    activity_id: int
+    heart_rate: list[Sample] = []
+    elevation: list[Sample] = []
+    track: list[LatLng] = []
+
+
 class SyncResult(BaseModel):
     activities_created: int = 0
     activities_updated: int = 0

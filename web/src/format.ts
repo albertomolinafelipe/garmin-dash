@@ -34,6 +34,15 @@ export function dayKey(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
+// Elapsed seconds → "m:ss" (or "h:mm:ss" past an hour); for time-series axes.
+export function clock(sec: number): string {
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = Math.floor(sec % 60);
+  const mm = h ? String(m).padStart(2, "0") : String(m);
+  return `${h ? `${h}:` : ""}${mm}:${String(s).padStart(2, "0")}`;
+}
+
 export function fmtPace(speedMps: number | null): string {
   if (!speedMps || speedMps <= 0) return "—";
   const secPerKm = 1000 / speedMps;

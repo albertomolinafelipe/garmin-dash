@@ -60,6 +60,23 @@ export interface Annotation {
   hard_tries?: number | null;
 }
 
+export interface Sample {
+  t: number; // seconds from activity start
+  v: number; // value (e.g. bpm)
+}
+
+export interface LatLng {
+  lat: number;
+  lng: number;
+}
+
+export interface ActivityStreams {
+  activity_id: number;
+  heart_rate: Sample[];
+  elevation: Sample[];
+  track: LatLng[];
+}
+
 export interface SyncResult {
   activities_created: number;
   activities_updated: number;

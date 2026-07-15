@@ -28,8 +28,14 @@ export default function ActivitiesPage() {
       <Title order={3} mb="md">
         List
       </Title>
-      <Card withBorder padding={0}>
-        <Table highlightOnHover striped stickyHeader>
+      <Card withBorder padding={0} className="table-panel">
+        <Table
+          className="grafana-table"
+          highlightOnHover
+          stickyHeader
+          borderColor="var(--mantine-color-dark-5)"
+          verticalSpacing="sm"
+        >
           <Table.Thead>
             <Table.Tr>
               <Table.Th w={12} p={0} />

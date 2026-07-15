@@ -8,16 +8,39 @@
 	background-color: var(--mantine-color-dark-6);
 }
 
-/* --- react-big-calendar: re-skin to the Mantine/Kanagawa dark theme --- */
+/* --- react-big-calendar: Grafana-style dark panel --- */
+
+/* Outer panel wrapper: rounded border, clipped internal gridlines. Holds the
+   month grid + the week-totals column as one seamless surface. */
+.calendar-body {
+	flex: 1;
+	display: flex;
+	min-height: 0;
+	border: 1px solid var(--mantine-color-default-border);
+	border-radius: var(--mantine-radius-md);
+	overflow: hidden;
+	background: var(--mantine-color-dark-7);
+}
+
 .rbc-calendar {
 	color: var(--mantine-color-text);
 }
-.rbc-month-view,
-.rbc-header,
+/* Hairline internal gridlines — subtler than the panel border (Grafana look). */
+.rbc-month-view {
+	border: none;
+}
 .rbc-header + .rbc-header,
 .rbc-day-bg + .rbc-day-bg,
 .rbc-month-row + .rbc-month-row {
-	border-color: var(--mantine-color-default-border);
+	border-color: var(--mantine-color-dark-5);
+}
+.rbc-month-row {
+	border-color: var(--mantine-color-dark-5);
+}
+/* Weekday header row: muted, uppercase, tracked-out labels on a tinted bar. */
+.rbc-month-header {
+	background: var(--mantine-color-dark-6);
+	border-bottom: 1px solid var(--mantine-color-default-border);
 }
 .rbc-header {
 	/* Fixed height so the week-totals column header lines up with it. */
@@ -25,7 +48,12 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	border-bottom: none;
 	font-weight: 600;
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--mantine-color-dimmed);
 }
 
 /* Week-totals column to the right of the month grid. Uses flex:1 cells so each
@@ -34,8 +62,7 @@
 	width: 172px;
 	display: flex;
 	flex-direction: column;
-	border: 1px solid var(--mantine-color-default-border);
-	border-left: none;
+	border-left: 1px solid var(--mantine-color-default-border);
 	/* Subtle tint to set the totals column apart from the day grid. */
 	background: var(--mantine-color-dark-8);
 }
@@ -45,15 +72,18 @@
 	align-items: center;
 	justify-content: center;
 	font-weight: 600;
-	font-size: var(--mantine-font-size-sm);
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--mantine-color-dimmed);
 	border-bottom: 1px solid var(--mantine-color-default-border);
 	background: var(--mantine-color-dark-6);
 }
 .week-col-cell {
 	flex: 1 1 0;
 	min-height: 0;
-	padding: 4px 8px;
-	border-bottom: 1px solid var(--mantine-color-default-border);
+	padding: 6px 10px;
+	border-bottom: 1px solid var(--mantine-color-dark-5);
 	overflow: hidden;
 }
 .week-col-cell:last-child {
@@ -63,6 +93,9 @@
 	background: var(--mantine-color-dark-8);
 }
 /* Dim the day numbers so events/totals stand out — smaller and semi-transparent. */
+.rbc-date-cell {
+	padding: 4px 6px 0 0;
+}
 .rbc-date-cell,
 .rbc-date-cell .rbc-button-link {
 	color: var(--mantine-color-dimmed);
@@ -74,9 +107,9 @@
 	color: var(--mantine-color-dimmed);
 }
 .rbc-today {
-	/* Bright inset border instead of a background fill. */
-	background: none;
-	box-shadow: inset 0 0 0 2px var(--mantine-primary-color-filled);
+	/* Soft tint + a thin top accent bar — subtle, not a heavy inset box. */
+	background: color-mix(in srgb, var(--mantine-primary-color-filled) 8%, transparent);
+	box-shadow: inset 0 2px 0 0 var(--mantine-primary-color-filled);
 }
 .rbc-event,
 .rbc-event.rbc-selected {
@@ -89,9 +122,13 @@
 	min-height: 42px; /* taller — we rarely have >3 per day and show 2 lines */
 	margin-bottom: 3px;
 	font-size: var(--mantine-font-size-xs);
+	transition:
+		background-color 100ms ease,
+		box-shadow 100ms ease;
 }
 .rbc-event:hover {
 	background-color: var(--mantine-color-dark-5);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
 .rbc-event:focus {
 	outline: 2px solid var(--mantine-color-dark-4);
@@ -102,30 +139,42 @@
 .rbc-show-more {
 	color: var(--mantine-primary-color-light-color);
 	background: transparent;
-}
-/* Toolbar (month nav + Today) */
-.rbc-toolbar button {
-	color: var(--mantine-color-text);
-	border-color: var(--mantine-color-default-border);
-	background: var(--mantine-color-default);
-}
-.rbc-toolbar button:hover,
-.rbc-toolbar button:focus {
-	background: var(--mantine-color-dark-5);
-	color: var(--mantine-color-text);
-}
-.rbc-toolbar button.rbc-active,
-.rbc-toolbar button.rbc-active:hover {
-	background: var(--mantine-primary-color-filled);
-	color: var(--mantine-color-white);
-	border-color: var(--mantine-primary-color-filled);
+	font-size: 11px;
+	font-weight: 600;
 }
 /* "+N more" overflow popup */
 .rbc-overlay {
 	background: var(--mantine-color-body);
 	border-color: var(--mantine-color-default-border);
+	border-radius: var(--mantine-radius-md);
 	box-shadow: var(--mantine-shadow-md);
 }
 .rbc-overlay-header {
 	border-color: var(--mantine-color-default-border);
+}
+
+/* --- Grafana-style data tables (List, Sleep) --- */
+/* Panel wrapper: round + clip so the sticky header bar meets the border cleanly. */
+.table-panel {
+	overflow: hidden;
+}
+.grafana-table thead th {
+	background: var(--mantine-color-dark-6);
+	color: var(--mantine-color-dimmed);
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	border-bottom: 1px solid var(--mantine-color-default-border);
+}
+/* Hairline row separators (subtler than the panel border). */
+.grafana-table tbody td {
+	border-top: 1px solid var(--mantine-color-dark-5);
+}
+.grafana-table tbody tr:first-of-type td {
+	border-top: none;
+}
+/* Numeric-feeling rows: tabular figures so columns line up. */
+.grafana-table tbody td {
+	font-variant-numeric: tabular-nums;
 }

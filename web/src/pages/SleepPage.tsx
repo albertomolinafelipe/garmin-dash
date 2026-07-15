@@ -59,8 +59,14 @@ export default function SleepPage() {
         </Card>
       )}
 
-      <Card withBorder padding={0}>
-        <Table highlightOnHover striped stickyHeader>
+      <Card withBorder padding={0} className="table-panel">
+        <Table
+          className="grafana-table"
+          highlightOnHover
+          stickyHeader
+          borderColor="var(--mantine-color-dark-5)"
+          verticalSpacing="sm"
+        >
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Date</Table.Th>
