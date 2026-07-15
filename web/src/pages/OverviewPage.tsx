@@ -18,6 +18,7 @@ import { api } from "../api/client";
 import { fmtDate, fmtDistance } from "../format";
 import { categoryColor, categoryOf, needsAnnotation } from "../activityTypes";
 import GrafanaLoadPanel from "../components/GrafanaLoadPanel";
+import SleepRingPanel from "../components/SleepRingPanel";
 import WellbeingPanel from "../components/WellbeingPanel";
 import { chartColors, kanagawa } from "../theme";
 
@@ -158,6 +159,10 @@ export default function OverviewPage() {
 
         <Grid.Col span={{ base: 12, md: 4 }}>
           <WellbeingPanel />
+        </Grid.Col>
+
+        <Grid.Col span={{ base: 12, md: 4 }}>
+          <SleepRingPanel />
         </Grid.Col>
       </Grid>
     </>
