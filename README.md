@@ -1,6 +1,6 @@
 # garmin-dash
 
-<img src="screenshot.png" alt="cr8s logo" width="200"/>
+<img src="screenshot.png" alt="cr8s logo"/>
 
 Local-only dashboard to pull, visualize, and annotate your Garmin **activities** and
 **sleep**. FastAPI + SQLite backend, React + Mantine frontend, shipped as a single
