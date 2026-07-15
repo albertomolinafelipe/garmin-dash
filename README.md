@@ -1,5 +1,7 @@
 # garmin-dash
 
+<img src="screenshot.png" alt="cr8s logo" width="200"/>
+
 Local-only dashboard to pull, visualize, and annotate your Garmin **activities** and
 **sleep**. FastAPI + SQLite backend, React + Mantine frontend, shipped as a single
 Docker image. See [CLAUDE.md](./CLAUDE.md) for the full design.
