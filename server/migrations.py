@@ -28,6 +28,8 @@ def run_migrations() -> None:
     _add_activity_column("caffeine", "VARCHAR")
     _add_activity_column("weather", "VARCHAR")
     _add_activity_column("notes", "VARCHAR")
+    _add_activity_column("focus", "VARCHAR")
+    _add_activity_column("hard_tries", "INTEGER")
     _add_activity_column("food_during", "JSON")
     _add_activity_column("food_after", "JSON")
     _seed_running_subtypes()

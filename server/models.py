@@ -31,8 +31,9 @@ SLEEP_SYNCED_FIELDS = {
 # User-owned annotation fields (never overwritten by processing). `subtype` and `name`
 # are seeded once but then editable, so they behave like annotations after insert.
 ANNOTATION_FIELDS = {
-    "annotated", "subtype", "name",
-    "feeling", "effort", "food_during", "food_after", "caffeine", "weather", "notes",
+    "annotated", "subtype", "name", "feeling", "effort",
+    "food_during", "food_after", "caffeine", "weather", "notes",  # running
+    "focus", "hard_tries",                                        # climbing
 }
 
 
@@ -70,6 +71,9 @@ class Activity(SQLModel, table=True):
     caffeine: str | None = None                # yes | no | residual
     weather: str | None = None                 # normal | cold | hot | bad (optional)
     notes: str | None = None                   # free-text general notes
+    # Climbing annotations:
+    focus: str | None = None                   # general/specific strength, power, …
+    hard_tries: int | None = None              # number of hard attempts
 
 
 class Sleep(SQLModel, table=True):

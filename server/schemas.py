@@ -18,6 +18,8 @@ class AnnotationUpdate(BaseModel):
     caffeine: str | None = None
     weather: str | None = None
     notes: str | None = None
+    focus: str | None = None
+    hard_tries: int | None = None
 
 
 class SyncResult(BaseModel):

@@ -3,11 +3,11 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   ActionIcon,
   Badge,
+  Button,
   Card,
   Center,
   Group,
   Loader,
-  Select,
   Stack,
   Text,
   TextInput,
@@ -20,15 +20,11 @@ import { api } from "../api/client";
 import { queryClient } from "../queryClient";
 import type { Annotation } from "../api/types";
 import { fmtDate } from "../format";
-import {
-  categoryColor,
-  categoryOf,
-  CLIMBING_SUBTYPES,
-  needsAnnotation,
-} from "../activityTypes";
+import { categoryColor, categoryOf, needsAnnotation } from "../activityTypes";
 import ActivityMetrics from "../components/ActivityMetrics";
 import ActivityTypeLabel from "../components/ActivityTypeLabel";
 import RunningAnnotation from "../components/RunningAnnotation";
+import ClimbingAnnotation from "../components/ClimbingAnnotation";
 
 export default function ActivityDetailPage() {
   const { id } = useParams();
@@ -53,6 +49,9 @@ export default function ActivityDetailPage() {
     onError: (e: unknown) =>
       notifications.show({ title: "Save failed", message: String(e), color: "red" }),
   });
+
+  // Local override: mark a strength session as climbing (persists once a type is set).
+  const [asClimbing, setAsClimbing] = useState(false);
 
   // Editable name — local buffer, saved only on explicit confirm.
   const [name, setName] = useState("");
@@ -122,23 +121,19 @@ export default function ActivityDetailPage() {
             foodOptions={foodOptions ?? []}
             onSave={(b) => save.mutate(b)}
           />
-        ) : category === "climbing" ? (
-          <Select
-            label="Climbing type"
-            placeholder="Rope, boulder or board?"
-            data={CLIMBING_SUBTYPES.map((s) => ({
-              value: s,
-              label: s[0].toUpperCase() + s.slice(1),
-            }))}
-            value={a.subtype}
-            onChange={(v) => v && save.mutate({ subtype: v })}
-            error={!a.subtype ? "Climbing needs a type" : undefined}
-            maw={280}
-          />
+        ) : category === "climbing" || asClimbing ? (
+          <ClimbingAnnotation activity={a} onSave={(b) => save.mutate(b)} />
         ) : (
-          <Text c="dimmed" size="sm">
-            No annotations for this activity type yet.
-          </Text>
+          <Group justify="space-between">
+            <Text c="dimmed" size="sm">
+              No annotations for this activity type yet.
+            </Text>
+            {category === "strength" && (
+              <Button variant="light" size="xs" onClick={() => setAsClimbing(true)}>
+                Log as climbing
+              </Button>
+            )}
+          </Group>
         )}
       </Card>
 

@@ -24,6 +24,8 @@ export interface Activity {
   caffeine: string | null;
   weather: string | null;
   notes: string | null;
+  focus: string | null;
+  hard_tries: number | null;
 }
 
 export interface Sleep {
@@ -54,6 +56,8 @@ export interface Annotation {
   caffeine?: string | null;
   weather?: string | null;
   notes?: string | null;
+  focus?: string | null;
+  hard_tries?: number | null;
 }
 
 export interface SyncResult {

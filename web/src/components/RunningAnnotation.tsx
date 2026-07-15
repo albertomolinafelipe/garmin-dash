@@ -13,6 +13,7 @@ import type { Activity, Annotation } from "../api/types";
 import {
   CAFFEINE_OPTIONS,
   needsSubtype,
+  SCALE_OPTIONS,
   terrainOptions,
   WEATHER_OPTIONS,
 } from "../activityTypes";
@@ -27,12 +28,6 @@ interface Props {
 const labelStyles = {
   label: { marginBottom: "var(--mantine-spacing-xs)", fontWeight: 700 },
 } as const;
-
-// 1–5 scale shown as Roman numerals (value stored as the number).
-const SCALE_DATA = ["I", "II", "III", "IV", "V"].map((label, i) => ({
-  value: String(i + 1),
-  label,
-}));
 
 const caffeineData = CAFFEINE_OPTIONS.map((c) => ({
   value: c,
@@ -59,7 +54,7 @@ export default function RunningAnnotation({ activity: a, foodOptions, onSave }: 
         <Input.Wrapper label="FEEL" styles={labelStyles}>
           <SegmentedControl
             fullWidth
-            data={SCALE_DATA}
+            data={SCALE_OPTIONS}
             value={a.feeling ? String(a.feeling) : ""}
             onChange={(v) => onSave({ feeling: Number(v) })}
           />
@@ -67,7 +62,7 @@ export default function RunningAnnotation({ activity: a, foodOptions, onSave }: 
         <Input.Wrapper label="INTENSITY" styles={labelStyles}>
           <SegmentedControl
             fullWidth
-            data={SCALE_DATA}
+            data={SCALE_OPTIONS}
             value={a.effort ? String(a.effort) : ""}
             onChange={(v) => onSave({ effort: Number(v) })}
           />

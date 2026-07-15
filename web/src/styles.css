@@ -2,122 +2,130 @@
    derive from the Kanagawa theme), never hardcoded. */
 
 .hoverable-row {
-  transition: background-color 100ms ease;
+	transition: background-color 100ms ease;
 }
 .hoverable-row:hover {
-  background-color: var(--mantine-color-dark-6);
+	background-color: var(--mantine-color-dark-6);
 }
 
 /* --- react-big-calendar: re-skin to the Mantine/Kanagawa dark theme --- */
 .rbc-calendar {
-  color: var(--mantine-color-text);
+	color: var(--mantine-color-text);
 }
 .rbc-month-view,
 .rbc-header,
 .rbc-header + .rbc-header,
 .rbc-day-bg + .rbc-day-bg,
 .rbc-month-row + .rbc-month-row {
-  border-color: var(--mantine-color-default-border);
+	border-color: var(--mantine-color-default-border);
 }
 .rbc-header {
-  /* Fixed height so the week-totals column header lines up with it. */
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
+	/* Fixed height so the week-totals column header lines up with it. */
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 600;
 }
 
 /* Week-totals column to the right of the month grid. Uses flex:1 cells so each
    row aligns with a react-big-calendar week row (which are also flex:1). */
 .week-col {
-  width: 172px;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--mantine-color-default-border);
-  border-left: none;
-  /* Subtle tint to set the totals column apart from the day grid. */
-  background: var(--mantine-color-dark-8);
+	width: 172px;
+	display: flex;
+	flex-direction: column;
+	border: 1px solid var(--mantine-color-default-border);
+	border-left: none;
+	/* Subtle tint to set the totals column apart from the day grid. */
+	background: var(--mantine-color-dark-8);
 }
 .week-col-header {
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: var(--mantine-font-size-sm);
-  border-bottom: 1px solid var(--mantine-color-default-border);
-  background: var(--mantine-color-dark-6);
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 600;
+	font-size: var(--mantine-font-size-sm);
+	border-bottom: 1px solid var(--mantine-color-default-border);
+	background: var(--mantine-color-dark-6);
 }
 .week-col-cell {
-  flex: 1 1 0;
-  min-height: 0;
-  padding: 4px 8px;
-  border-bottom: 1px solid var(--mantine-color-default-border);
-  overflow: hidden;
+	flex: 1 1 0;
+	min-height: 0;
+	padding: 4px 8px;
+	border-bottom: 1px solid var(--mantine-color-default-border);
+	overflow: hidden;
 }
 .week-col-cell:last-child {
-  border-bottom: none;
+	border-bottom: none;
 }
 .rbc-off-range-bg {
-  background: var(--mantine-color-dark-8);
+	background: var(--mantine-color-dark-8);
+}
+/* Dim the day numbers so events/totals stand out — smaller and semi-transparent. */
+.rbc-date-cell,
+.rbc-date-cell .rbc-button-link {
+	color: var(--mantine-color-dimmed);
+	font-size: var(--mantine-font-size-xs);
+	font-weight: 500;
+	opacity: 0.55;
 }
 .rbc-off-range {
-  color: var(--mantine-color-dimmed);
+	color: var(--mantine-color-dimmed);
 }
 .rbc-today {
-  /* Bright inset border instead of a background fill. */
-  background: none;
-  box-shadow: inset 0 0 0 2px var(--mantine-primary-color-filled);
+	/* Bright inset border instead of a background fill. */
+	background: none;
+	box-shadow: inset 0 0 0 2px var(--mantine-primary-color-filled);
 }
 .rbc-event,
 .rbc-event.rbc-selected {
-  /* Dark neutral chip; the category color comes in as a left accent (set inline
+	/* Dark neutral chip; the category color comes in as a left accent (set inline
      via eventPropGetter in CalendarPage). */
-  background-color: var(--mantine-color-dark-6);
-  color: var(--mantine-color-text);
-  border-radius: var(--mantine-radius-sm);
-  padding: 4px 8px;
-  min-height: 42px; /* taller — we rarely have >3 per day and show 2 lines */
-  margin-bottom: 3px;
-  font-size: var(--mantine-font-size-xs);
+	background-color: var(--mantine-color-dark-6);
+	color: var(--mantine-color-text);
+	border-radius: var(--mantine-radius-sm);
+	padding: 4px 8px;
+	min-height: 42px; /* taller — we rarely have >3 per day and show 2 lines */
+	margin-bottom: 3px;
+	font-size: var(--mantine-font-size-xs);
 }
 .rbc-event:hover {
-  background-color: var(--mantine-color-dark-5);
+	background-color: var(--mantine-color-dark-5);
 }
 .rbc-event:focus {
-  outline: 2px solid var(--mantine-color-dark-4);
+	outline: 2px solid var(--mantine-color-dark-4);
 }
 .rbc-row-segment {
-  padding: 0 3px 1px;
+	padding: 0 3px 1px;
 }
 .rbc-show-more {
-  color: var(--mantine-primary-color-light-color);
-  background: transparent;
+	color: var(--mantine-primary-color-light-color);
+	background: transparent;
 }
 /* Toolbar (month nav + Today) */
 .rbc-toolbar button {
-  color: var(--mantine-color-text);
-  border-color: var(--mantine-color-default-border);
-  background: var(--mantine-color-default);
+	color: var(--mantine-color-text);
+	border-color: var(--mantine-color-default-border);
+	background: var(--mantine-color-default);
 }
 .rbc-toolbar button:hover,
 .rbc-toolbar button:focus {
-  background: var(--mantine-color-dark-5);
-  color: var(--mantine-color-text);
+	background: var(--mantine-color-dark-5);
+	color: var(--mantine-color-text);
 }
 .rbc-toolbar button.rbc-active,
 .rbc-toolbar button.rbc-active:hover {
-  background: var(--mantine-primary-color-filled);
-  color: var(--mantine-color-white);
-  border-color: var(--mantine-primary-color-filled);
+	background: var(--mantine-primary-color-filled);
+	color: var(--mantine-color-white);
+	border-color: var(--mantine-primary-color-filled);
 }
 /* "+N more" overflow popup */
 .rbc-overlay {
-  background: var(--mantine-color-body);
-  border-color: var(--mantine-color-default-border);
-  box-shadow: var(--mantine-shadow-md);
+	background: var(--mantine-color-body);
+	border-color: var(--mantine-color-default-border);
+	box-shadow: var(--mantine-shadow-md);
 }
 .rbc-overlay-header {
-  border-color: var(--mantine-color-default-border);
+	border-color: var(--mantine-color-default-border);
 }

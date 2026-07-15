@@ -33,7 +33,25 @@ export type Category =
   | "other";
 
 export const RUNNING_SUBTYPES = ["road", "treadmill", "trail", "mountain"] as const;
-export const CLIMBING_SUBTYPES = ["rope", "boulder", "board"] as const;
+// Climbing "type" (stored in `subtype`).
+export const CLIMBING_SUBTYPES = ["boulder", "route", "board", "mix"] as const;
+
+// Climbing training focus (stored in `focus`).
+export const CLIMBING_FOCUS = [
+  { value: "general-strength", label: "General strength" },
+  { value: "specific-strength", label: "Specific strength" },
+  { value: "power", label: "Power" },
+  { value: "endurance", label: "Endurance" },
+  { value: "power-endurance", label: "Power-endurance" },
+  { value: "mix", label: "Mix" },
+];
+
+// 1–5 scale rendered as Roman numerals (value stored as the number). Shared by the
+// running and climbing forms for feel & intensity.
+export const SCALE_OPTIONS = ["I", "II", "III", "IV", "V"].map((label, i) => ({
+  value: String(i + 1),
+  label,
+}));
 
 // Garmin activity_type keys we treat as climbing out of the box. (The user's own
 // climbing is often logged as strength_training and reclassified by hand instead.)
@@ -140,7 +158,10 @@ export function needsAnnotation(a: Activity): boolean {
       !a.caffeine
     );
   }
-  if (cat === "climbing") return !a.subtype;
+  if (cat === "climbing") {
+    // Required: type (subtype), focus, feel, intensity. Hard tries & notes optional.
+    return !a.subtype || !a.focus || a.feeling == null || a.effort == null;
+  }
   return false;
 }
 

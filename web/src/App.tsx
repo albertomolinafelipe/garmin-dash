@@ -74,17 +74,17 @@ export default function App() {
         />
         <NavLink
           component={Link}
-          to="/activities"
-          label="Activities"
-          leftSection={<IconActivity size={18} />}
-          active={location.pathname.startsWith("/activities")}
-        />
-        <NavLink
-          component={Link}
           to="/calendar"
           label="Calendar"
           leftSection={<IconCalendar size={18} />}
           active={location.pathname.startsWith("/calendar")}
+        />
+        <NavLink
+          component={Link}
+          to="/activities"
+          label="List"
+          leftSection={<IconActivity size={18} />}
+          active={location.pathname.startsWith("/activities")}
         />
         <NavLink
           component={Link}

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import { api } from "../api/client";
 import { fmtDate, fmtDistance, fmtDuration } from "../format";
-import { needsAnnotation } from "../activityTypes";
+import { categoryColor, categoryOf, needsAnnotation } from "../activityTypes";
 import ActivityTypeLabel from "../components/ActivityTypeLabel";
 
 export default function ActivitiesPage() {
@@ -26,12 +26,13 @@ export default function ActivitiesPage() {
   return (
     <>
       <Title order={3} mb="md">
-        Activities
+        List
       </Title>
       <Card withBorder padding={0}>
         <Table highlightOnHover striped stickyHeader>
           <Table.Thead>
             <Table.Tr>
+              <Table.Th w={12} p={0} />
               <Table.Th>Date</Table.Th>
               <Table.Th>Name</Table.Th>
               <Table.Th>Type</Table.Th>
@@ -48,6 +49,18 @@ export default function ActivitiesPage() {
                 style={{ cursor: "pointer" }}
                 onClick={() => navigate(`/activities/${a.id}`)}
               >
+                <Table.Td w={12} p={0}>
+                  <div
+                    style={{
+                      width: 4,
+                      height: 20,
+                      margin: "0 auto",
+                      borderRadius: 2,
+                      backgroundColor:
+                        categoryColor[categoryOf(a.activity_type, a.subtype)],
+                    }}
+                  />
+                </Table.Td>
                 <Table.Td>{fmtDate(a.start_time)}</Table.Td>
                 <Table.Td>{a.name ?? "—"}</Table.Td>
                 <Table.Td>
