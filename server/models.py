@@ -6,6 +6,7 @@ Each activity row has three column families (see CLAUDE.md > Processing vs annot
                    editable and NEVER clobbered by re-processing.
   - annotation   : purely user-owned, never touched by processing.
 """
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -16,24 +17,52 @@ from sqlmodel import Field, SQLModel
 # Metrics the processing step overwrites on every run. name/subtype are seeded once
 # (see SEEDED_ONCE_FIELDS) and everything else is user-owned annotation.
 ACTIVITY_SYNCED_FIELDS = {
-    "garmin_activity_id", "activity_type", "start_time", "duration_s",
-    "distance_m", "avg_hr", "max_hr", "elevation_gain_m", "calories",
-    "avg_speed_mps", "avg_power_w", "fit_path", "synced_at",
+    "garmin_activity_id",
+    "activity_type",
+    "start_time",
+    "duration_s",
+    "distance_m",
+    "avg_hr",
+    "max_hr",
+    "elevation_gain_m",
+    "calories",
+    "avg_speed_mps",
+    "avg_power_w",
+    "fit_path",
+    "synced_at",
 }
 # Written only on first insert, then owned by the user.
 SEEDED_ONCE_FIELDS = {"name", "subtype"}
 SLEEP_SYNCED_FIELDS = {
-    "calendar_date", "start_time", "end_time", "total_sleep_s", "deep_sleep_s",
-    "light_sleep_s", "rem_sleep_s", "awake_s", "avg_hrv", "resting_hr",
-    "sleep_score", "synced_at",
+    "calendar_date",
+    "start_time",
+    "end_time",
+    "total_sleep_s",
+    "deep_sleep_s",
+    "light_sleep_s",
+    "rem_sleep_s",
+    "awake_s",
+    "avg_hrv",
+    "resting_hr",
+    "sleep_score",
+    "synced_at",
 }
 
 # User-owned annotation fields (never overwritten by processing). `subtype` and `name`
 # are seeded once but then editable, so they behave like annotations after insert.
 ANNOTATION_FIELDS = {
-    "annotated", "subtype", "name", "feeling", "effort",
-    "food_during", "food_after", "caffeine", "weather", "notes",  # running
-    "focus", "hard_tries",                                        # climbing
+    "annotated",
+    "subtype",
+    "name",
+    "feeling",
+    "effort",
+    "food_during",
+    "food_after",
+    "caffeine",
+    "weather",
+    "notes",  # running
+    "focus",
+    "hard_tries",  # climbing
 }
 
 
@@ -53,7 +82,9 @@ class Activity(SQLModel, table=True):
     calories: int | None = None
     avg_speed_mps: float | None = None
     avg_power_w: float | None = None
-    fit_path: str | None = None          # raw .fit on disk (relative to DATA_DIR)
+    fit_path: str | None = None  # raw .fit on disk (relative to DATA_DIR)
+    start_lat: float | None = None  # first GPS fix from the raw .fit, if present
+    start_lng: float | None = None  # first GPS fix from the raw .fit, if present
     synced_at: datetime | None = None
 
     # --- user annotations (never overwritten by processing) ---
@@ -64,16 +95,16 @@ class Activity(SQLModel, table=True):
     # climbing → rope/boulder/board. Seeded at ingest for road/treadmill.
     subtype: str | None = None
     # Running annotations (see CLAUDE.md > Annotations):
-    feeling: int | None = None                 # 1..5, sad → happy
-    effort: int | None = None                  # 1..5, how hard I tried
+    feeling: int | None = None  # 1..5, sad → happy
+    effort: int | None = None  # 1..5, how hard I tried
     food_during: list[str] | None = Field(default=None, sa_column=Column(JSON))
     food_after: list[str] | None = Field(default=None, sa_column=Column(JSON))
-    caffeine: str | None = None                # yes | no | residual
-    weather: str | None = None                 # normal | cold | hot | bad (optional)
-    notes: str | None = None                   # free-text general notes
+    caffeine: str | None = None  # yes | no | residual
+    weather: str | None = None  # normal | cold | hot | bad (optional)
+    notes: str | None = None  # free-text general notes
     # Climbing annotations:
-    focus: str | None = None                   # general/specific strength, power, …
-    hard_tries: int | None = None              # number of hard attempts
+    focus: str | None = None  # general/specific strength, power, …
+    hard_tries: int | None = None  # number of hard attempts
 
 
 class Sleep(SQLModel, table=True):

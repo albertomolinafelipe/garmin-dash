@@ -1,12 +1,18 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import Session, select
+from sqlmodel import Session, col, select
 
 from ..db import get_session
 from ..garmin import fit
 from ..models import Activity
-from ..schemas import ActivityStreams, AnnotationUpdate
+from ..schemas import (
+    ActivityRoute,
+    ActivityStreams,
+    AnnotationUpdate,
+    LatLng,
+    Sample,
+)
 
 router = APIRouter(prefix="/api/activities", tags=["activities"])
 
@@ -24,7 +30,7 @@ def list_activities(
         stmt = stmt.where(Activity.activity_type == activity_type)
     if annotated is not None:
         stmt = stmt.where(Activity.annotated == annotated)
-    stmt = stmt.order_by(Activity.start_time.desc()).offset(offset).limit(limit)
+    stmt = stmt.order_by(col(Activity.start_time).desc()).offset(offset).limit(limit)
     return list(session.exec(stmt))
 
 
@@ -40,10 +46,39 @@ def food_options(session: Session = Depends(get_session)) -> list[str]:
     return sorted(foods)
 
 
+@router.get("/latest-run-routes")
+def latest_run_routes(
+    limit: int = 20, session: Session = Depends(get_session)
+) -> list[ActivityRoute]:
+    """Latest outdoor run tracks for the overview map."""
+    activities = session.exec(
+        select(Activity)
+        .where(col(Activity.activity_type).contains("running"))
+        .order_by(col(Activity.start_time).desc())
+        .limit(limit)
+    )
+    routes: list[ActivityRoute] = []
+    for activity in activities:
+        track = [
+            LatLng(**point) for point in fit.track(activity.fit_path, max_points=180)
+        ]
+        if not track:
+            continue
+        routes.append(
+            ActivityRoute(
+                activity_id=activity.id or 0,
+                name=activity.name,
+                start_time=activity.start_time.isoformat()
+                if activity.start_time
+                else None,
+                track=track,
+            )
+        )
+    return routes
+
+
 @router.get("/{activity_id}")
-def get_activity(
-    activity_id: int, session: Session = Depends(get_session)
-) -> Activity:
+def get_activity(activity_id: int, session: Session = Depends(get_session)) -> Activity:
     activity = session.get(Activity, activity_id)
     if not activity:
         raise HTTPException(404, "Activity not found")
@@ -60,9 +95,9 @@ def activity_streams(
         raise HTTPException(404, "Activity not found")
     return ActivityStreams(
         activity_id=activity_id,
-        heart_rate=fit.heart_rate(activity.fit_path),
-        elevation=fit.elevation(activity.fit_path),
-        track=fit.track(activity.fit_path),
+        heart_rate=[Sample(**sample) for sample in fit.heart_rate(activity.fit_path)],
+        elevation=[Sample(**sample) for sample in fit.elevation(activity.fit_path)],
+        track=[LatLng(**point) for point in fit.track(activity.fit_path)],
     )
 
 

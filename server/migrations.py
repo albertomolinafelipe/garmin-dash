@@ -4,6 +4,7 @@ No Alembic — this is a single-user local app. Each migration is idempotent: it
 checks the current schema and only acts when needed. Called from init_db() after
 SQLModel.create_all (which creates missing tables but never alters existing ones).
 """
+
 from __future__ import annotations
 
 import logging
@@ -32,6 +33,8 @@ def run_migrations() -> None:
     _add_activity_column("hard_tries", "INTEGER")
     _add_activity_column("food_during", "JSON")
     _add_activity_column("food_after", "JSON")
+    _add_activity_column("start_lat", "FLOAT")
+    _add_activity_column("start_lng", "FLOAT")
     _seed_running_subtypes()
 
 
@@ -59,12 +62,16 @@ def _seed_running_subtypes() -> None:
     one yet. Only touches NULLs, so hand-set values are safe."""
     with engine.begin() as conn:
         conn.execute(
-            text("UPDATE activity SET subtype='road' "
-                 "WHERE subtype IS NULL AND activity_type='running'")
+            text(
+                "UPDATE activity SET subtype='road' "
+                "WHERE subtype IS NULL AND activity_type='running'"
+            )
         )
         conn.execute(
-            text("UPDATE activity SET subtype='treadmill' "
-                 "WHERE subtype IS NULL AND activity_type LIKE '%treadmill%'")
+            text(
+                "UPDATE activity SET subtype='treadmill' "
+                "WHERE subtype IS NULL AND activity_type LIKE '%treadmill%'"
+            )
         )
 
 

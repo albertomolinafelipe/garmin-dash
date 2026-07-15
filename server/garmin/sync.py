@@ -4,6 +4,7 @@ Idempotent: matches on garmin_activity_id / calendar_date. On insert, synced fie
 are written and annotation fields are left as their DB defaults (empty). On update,
 ONLY synced fields are touched — user annotations are never overwritten.
 """
+
 from __future__ import annotations
 
 import logging
@@ -11,11 +12,10 @@ from datetime import datetime, timedelta, timezone
 
 from sqlmodel import Session, select
 
-from ..config import get_settings
 from ..models import Activity, Sleep
 from ..schemas import SyncResult
 from .client import get_client
-from .fit import download_fit
+from .fit import download_fit, start_location
 from .process import seed_subtype
 
 log = logging.getLogger(__name__)
@@ -49,7 +49,11 @@ def sync(
     result = SyncResult()
     client = get_client()
     _sync_activities(
-        session, client, result, max_activities=max_activities, download_fits=download_fits
+        session,
+        client,
+        result,
+        max_activities=max_activities,
+        download_fits=download_fits,
     )
     _sync_sleep(session, client, result, days=days)
     session.commit()
@@ -57,7 +61,13 @@ def sync(
 
 
 def _sync_activities(
-    session, client, result, *, max_activities: int | None = 50, download_fits=True, batch=100
+    session,
+    client,
+    result,
+    *,
+    max_activities: int | None = 50,
+    download_fits=True,
+    batch=100,
 ):
     now = datetime.now(timezone.utc)
     start = 0
@@ -85,6 +95,7 @@ def _sync_activities(
                 fit_path = download_fit(client, gid)
 
             activity_type = (a.get("activityType") or {}).get("typeKey")
+            location = start_location(fit_path)
             # Synced metrics — rewritten on every process (never name/subtype).
             synced = dict(
                 garmin_activity_id=gid,
@@ -99,12 +110,16 @@ def _sync_activities(
                 avg_speed_mps=a.get("averageSpeed"),
                 avg_power_w=a.get("avgPower"),
                 fit_path=fit_path,
+                start_lat=location[0] if location else None,
+                start_lng=location[1] if location else None,
                 synced_at=now,
             )
 
             if existing:
                 for k, v in synced.items():
-                    setattr(existing, k, v)  # only synced metrics; name/subtype/annotations kept
+                    setattr(
+                        existing, k, v
+                    )  # only synced metrics; name/subtype/annotations kept
                 session.add(existing)
                 result.activities_updated += 1
             else:
@@ -139,9 +154,7 @@ def _sync_sleep(session, client, result, *, days: int):
             continue  # no sleep recorded that night
 
         now = datetime.now(timezone.utc)
-        existing = session.exec(
-            select(Sleep).where(Sleep.calendar_date == day)
-        ).first()
+        existing = session.exec(select(Sleep).where(Sleep.calendar_date == day)).first()
 
         synced = dict(
             calendar_date=day,
@@ -153,8 +166,12 @@ def _sync_sleep(session, client, result, *, days: int):
             rem_sleep_s=dto.get("remSleepSeconds"),
             awake_s=dto.get("awakeSleepSeconds"),
             avg_hrv=(data.get("avgOvernightHrv") if isinstance(data, dict) else None),
-            resting_hr=(data.get("restingHeartRate") if isinstance(data, dict) else None),
-            sleep_score=((dto.get("sleepScores") or {}).get("overall") or {}).get("value"),
+            resting_hr=(
+                data.get("restingHeartRate") if isinstance(data, dict) else None
+            ),
+            sleep_score=((dto.get("sleepScores") or {}).get("overall") or {}).get(
+                "value"
+            ),
             synced_at=now,
         )
 

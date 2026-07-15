@@ -6,13 +6,16 @@ and the parse-on-demand step that extracts per-record streams (HR now; elevation
 GPS track later) for the activity detail charts. We deliberately do NOT persist the
 time-series — it's cheap to re-parse the raw file when a chart is opened.
 """
+
 from __future__ import annotations
 
 import io
 import logging
 import math
 import zipfile
+from datetime import datetime
 from pathlib import Path
+from typing import Any, cast
 
 import fitdecode
 from garminconnect import Garmin
@@ -45,7 +48,7 @@ def download_fit(client: Garmin, activity_id: int) -> str | None:
 
     try:
         data = client.download_activity(
-            activity_id, dl_fmt=Garmin.ActivityDownloadFormat.ORIGINAL
+            str(activity_id), dl_fmt=Garmin.ActivityDownloadFormat.ORIGINAL
         )
     except Exception as exc:  # noqa: BLE001
         log.warning("Could not download .fit for activity %s: %s", activity_id, exc)
@@ -64,7 +67,10 @@ def _rel(path: Path, base: Path) -> str:
 
 # --- parse-on-demand: per-record time-series ---------------------------------
 
-def heart_rate(fit_rel_path: str | None, max_points: int = DEFAULT_MAX_POINTS) -> list[dict]:
+
+def heart_rate(
+    fit_rel_path: str | None, max_points: int = DEFAULT_MAX_POINTS
+) -> list[dict]:
     """Heart-rate series for a stored activity, downsampled to <= ``max_points``.
 
     Returns ``[{"t": seconds_from_start, "v": bpm}, ...]`` (empty if the file is
@@ -73,14 +79,18 @@ def heart_rate(fit_rel_path: str | None, max_points: int = DEFAULT_MAX_POINTS) -
     return _series(fit_rel_path, ("heart_rate",), max_points)
 
 
-def elevation(fit_rel_path: str | None, max_points: int = DEFAULT_MAX_POINTS) -> list[dict]:
+def elevation(
+    fit_rel_path: str | None, max_points: int = DEFAULT_MAX_POINTS
+) -> list[dict]:
     """Altitude series (metres) over time, downsampled. Prefers the barometric
     ``enhanced_altitude`` and falls back to plain ``altitude``. Empty for indoor
     activities that carry no altitude."""
     return _series(fit_rel_path, ("enhanced_altitude", "altitude"), max_points)
 
 
-def track(fit_rel_path: str | None, max_points: int = DEFAULT_MAX_TRACK_POINTS) -> list[dict]:
+def track(
+    fit_rel_path: str | None, max_points: int = DEFAULT_MAX_TRACK_POINTS
+) -> list[dict]:
     """GPS route as ``[{"lat": .., "lng": ..}, ...]`` in degrees, stride-sampled to
     <= ``max_points`` (endpoints kept). Empty for indoor / GPS-less activities."""
     path = _resolve(fit_rel_path)
@@ -94,6 +104,18 @@ def track(fit_rel_path: str | None, max_points: int = DEFAULT_MAX_TRACK_POINTS) 
     return _stride(pts, max_points)
 
 
+def start_location(fit_rel_path: str | None) -> tuple[float, float] | None:
+    """First GPS fix in degrees for a stored activity, if present."""
+    path = _resolve(fit_rel_path)
+    if path is None:
+        return None
+    try:
+        return _read_first_track_point(path)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("failed to parse start location from %s: %s", path, exc)
+        return None
+
+
 def _resolve(fit_rel_path: str | None) -> Path | None:
     if not fit_rel_path:
         return None
@@ -104,7 +126,9 @@ def _resolve(fit_rel_path: str | None) -> Path | None:
     return path
 
 
-def _series(fit_rel_path: str | None, fields: tuple[str, ...], max_points: int) -> list[dict]:
+def _series(
+    fit_rel_path: str | None, fields: tuple[str, ...], max_points: int
+) -> list[dict]:
     path = _resolve(fit_rel_path)
     if path is None:
         return []
@@ -140,15 +164,21 @@ def _read_record_field(path: Path, field: str) -> list[tuple[int, float]]:
     start = None
     with fitdecode.FitReader(io.BytesIO(_fit_bytes(path))) as fit:
         for frame in fit:
-            if not isinstance(frame, fitdecode.FitDataMessage) or frame.name != "record":
+            if (
+                not isinstance(frame, fitdecode.FitDataMessage)
+                or frame.name != "record"
+            ):
                 continue
             value = frame.get_value(field, fallback=None)
             ts = frame.get_value("timestamp", fallback=None)
-            if value is None or ts is None:
+            if value is None or not isinstance(ts, datetime):
                 continue
             if start is None:
                 start = ts
-            out.append((int((ts - start).total_seconds()), float(value)))
+            try:
+                out.append((int((ts - start).total_seconds()), float(cast(Any, value))))
+            except (TypeError, ValueError):
+                continue
     return out
 
 
@@ -157,14 +187,36 @@ def _read_track(path: Path) -> list[tuple[float, float]]:
     out: list[tuple[float, float]] = []
     with fitdecode.FitReader(io.BytesIO(_fit_bytes(path))) as fit:
         for frame in fit:
-            if not isinstance(frame, fitdecode.FitDataMessage) or frame.name != "record":
-                continue
-            lat = frame.get_value("position_lat", fallback=None)
-            lng = frame.get_value("position_long", fallback=None)
-            if lat is None or lng is None:
-                continue
-            out.append((lat * _SEMICIRCLE_TO_DEG, lng * _SEMICIRCLE_TO_DEG))
+            point = _track_point(frame)
+            if point is not None:
+                out.append(point)
     return out
+
+
+def _read_first_track_point(path: Path) -> tuple[float, float] | None:
+    """(lat, lng) in degrees for the first `record` with a GPS fix."""
+    with fitdecode.FitReader(io.BytesIO(_fit_bytes(path))) as fit:
+        for frame in fit:
+            point = _track_point(frame)
+            if point is not None:
+                return point
+    return None
+
+
+def _track_point(frame) -> tuple[float, float] | None:
+    if not isinstance(frame, fitdecode.FitDataMessage) or frame.name != "record":
+        return None
+    lat = frame.get_value("position_lat", fallback=None)
+    lng = frame.get_value("position_long", fallback=None)
+    if lat is None or lng is None:
+        return None
+    try:
+        return (
+            float(cast(Any, lat)) * _SEMICIRCLE_TO_DEG,
+            float(cast(Any, lng)) * _SEMICIRCLE_TO_DEG,
+        )
+    except (TypeError, ValueError):
+        return None
 
 
 def _stride(points: list[tuple[float, float]], max_points: int) -> list[dict]:
