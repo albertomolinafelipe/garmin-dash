@@ -46,8 +46,6 @@ export const api = {
 	listSleep: (params?: { limit?: number }) =>
 		http.get<Sleep[]>("/sleep", { params }).then((r) => r.data),
 
-	getSleep: (id: number) => http.get<Sleep>(`/sleep/${id}`).then((r) => r.data),
-
 	sync: (params?: {
 		days?: number;
 		download_fits?: boolean;

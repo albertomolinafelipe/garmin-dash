@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import type { Activity } from "../api/types";
 import {
+	type Category,
 	categoryColor,
 	categoryIcon,
 	categoryOf,
@@ -140,9 +141,22 @@ function TotalRow({
 	);
 }
 
+// Canonical order for the category filter buttons.
+const CATEGORY_ORDER: Category[] = [
+	"running",
+	"climbing",
+	"strength",
+	"hiking",
+	"swimming",
+	"cycling",
+	"other",
+];
+
 export default function CalendarPage() {
 	const navigate = useNavigate();
 	const [date, setDate] = useState<Date>(new Date());
+	// Category filter: null = show all. Toggled from the icon buttons.
+	const [catFilter, setCatFilter] = useState<Category | null>(null);
 
 	const { data, isLoading } = useQuery({
 		queryKey: ["activities", "calendar"],
@@ -172,6 +186,25 @@ export default function CalendarPage() {
 	const totals = useMemo(() => weekTotals(data ?? []), [data]);
 	const weeks = useMemo(() => weeksForMonth(date), [date]);
 
+	// Categories actually present in the data, in canonical order.
+	const presentCats = useMemo(() => {
+		const set = new Set<Category>();
+		for (const a of data ?? []) set.add(categoryOf(a.activity_type, a.subtype));
+		return CATEGORY_ORDER.filter((c) => set.has(c));
+	}, [data]);
+
+	const shownEvents = useMemo(
+		() =>
+			catFilter
+				? events.filter(
+						(e) =>
+							categoryOf(e.resource.activity_type, e.resource.subtype) ===
+							catFilter,
+					)
+				: events,
+		[events, catFilter],
+	);
+
 	if (isLoading)
 		return (
 			<Center h={200}>
@@ -190,42 +223,74 @@ export default function CalendarPage() {
 			}}
 		>
 			{/* Icon toolbar (controlled month navigation) */}
-			<Group justify="space-between" mb="sm">
-				<Group gap="xs">
-					<ActionIcon
-						variant="default"
-						size="lg"
-						aria-label="Today"
-						onClick={() => setDate(new Date())}
-					>
-						<IconCalendarEvent size={18} />
-					</ActionIcon>
-					<ActionIcon
-						variant="default"
-						size="lg"
-						aria-label="Previous month"
-						onClick={() => setDate(dayjs(date).subtract(1, "month").toDate())}
-					>
-						<IconChevronLeft size={18} />
-					</ActionIcon>
-					<ActionIcon
-						variant="default"
-						size="lg"
-						aria-label="Next month"
-						onClick={() => setDate(dayjs(date).add(1, "month").toDate())}
-					>
-						<IconChevronRight size={18} />
-					</ActionIcon>
+			<Group justify="space-between" mb="sm" style={{ position: "relative" }}>
+				<Group gap="md">
+					<Group gap="xs">
+						<ActionIcon
+							variant="default"
+							size="lg"
+							aria-label="Today"
+							onClick={() => setDate(new Date())}
+						>
+							<IconCalendarEvent size={18} />
+						</ActionIcon>
+						<ActionIcon
+							variant="default"
+							size="lg"
+							aria-label="Previous month"
+							onClick={() => setDate(dayjs(date).subtract(1, "month").toDate())}
+						>
+							<IconChevronLeft size={18} />
+						</ActionIcon>
+						<ActionIcon
+							variant="default"
+							size="lg"
+							aria-label="Next month"
+							onClick={() => setDate(dayjs(date).add(1, "month").toDate())}
+						>
+							<IconChevronRight size={18} />
+						</ActionIcon>
+					</Group>
+					<Group gap={4}>
+						{presentCats.map((cat) => {
+							const Icon = categoryIcon[cat];
+							const active = catFilter === cat;
+							return (
+								<ActionIcon
+									key={cat}
+									variant={active ? "filled" : "subtle"}
+									size="lg"
+									aria-label={`Filter ${cat}`}
+									aria-pressed={active}
+									onClick={() => setCatFilter(active ? null : cat)}
+									style={{
+										color: active ? "#fff" : categoryColor[cat],
+										backgroundColor: active ? categoryColor[cat] : undefined,
+									}}
+								>
+									<Icon size={18} stroke={2} />
+								</ActionIcon>
+							);
+						})}
+					</Group>
 				</Group>
-				<Text fw={600}>{dayjs(date).format("MMMM YYYY")}</Text>
-				<div style={{ width: 108 }} />
+				<Text
+					fw={600}
+					style={{
+						position: "absolute",
+						left: "50%",
+						transform: "translateX(-50%)",
+					}}
+				>
+					{dayjs(date).format("MMMM YYYY")}
+				</Text>
 			</Group>
 
 			<div className="calendar-body">
 				<div style={{ flex: 1, minWidth: 0 }}>
 					<Calendar<ActivityEvent>
 						localizer={localizer}
-						events={events}
+						events={shownEvents}
 						views={["month"]}
 						defaultView="month"
 						date={date}

@@ -5,8 +5,7 @@ import { api } from "../api/client";
 import { categoryColor, categoryOf } from "../activityTypes";
 import GrafanaLoadPanel from "../components/GrafanaLoadPanel";
 import LatestRunRoutesMap from "../components/LatestRunRoutesMap";
-import SleepRingPanel from "../components/SleepRingPanel";
-import WellbeingPanel from "../components/WellbeingPanel";
+import SleepStagesPanel from "../components/SleepStagesPanel";
 import { chartColors, kanagawa } from "../theme";
 
 export default function OverviewPage() {
@@ -54,7 +53,7 @@ export default function OverviewPage() {
 								label: "Vertical",
 								unit: "m",
 								color: kanagawa.sakuraPink,
-								kind: "line",
+								kind: "area",
 								axis: "right",
 								valueOf: (a) =>
 									a.activity_type?.includes("running") && a.elevation_gain_m
@@ -99,12 +98,8 @@ export default function OverviewPage() {
 					/>
 				</Grid.Col>
 
-				<Grid.Col span={{ base: 12, md: 4 }}>
-					<WellbeingPanel />
-				</Grid.Col>
-
-				<Grid.Col span={{ base: 12, md: 4 }}>
-					<SleepRingPanel />
+				<Grid.Col span={{ base: 12, md: 8 }}>
+					<SleepStagesPanel title="Sleep" days={30} />
 				</Grid.Col>
 
 				<Grid.Col span={{ base: 12, md: 4 }}>

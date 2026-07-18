@@ -4,7 +4,6 @@ import { useMutation } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
 import {
 	IconActivity,
-	IconBed,
 	IconCalendar,
 	IconHistory,
 	IconLayoutDashboard,
@@ -20,7 +19,6 @@ import OverviewPage from "./pages/OverviewPage";
 import ActivitiesPage from "./pages/ActivitiesPage";
 import ActivityDetailPage from "./pages/ActivityDetailPage";
 import CalendarPage from "./pages/CalendarPage";
-import SleepPage from "./pages/SleepPage";
 import SettingsPage from "./pages/SettingsPage";
 
 export default function App() {
@@ -151,13 +149,6 @@ export default function App() {
 				/>
 				<NavLink
 					component={Link}
-					to="/sleep"
-					label="Sleep"
-					leftSection={<IconBed size={18} />}
-					active={location.pathname.startsWith("/sleep")}
-				/>
-				<NavLink
-					component={Link}
 					to="/settings"
 					label="Settings"
 					leftSection={<IconSettings size={18} />}
@@ -171,7 +162,6 @@ export default function App() {
 					<Route path="/activities" element={<ActivitiesPage />} />
 					<Route path="/activities/:id" element={<ActivityDetailPage />} />
 					<Route path="/calendar" element={<CalendarPage />} />
-					<Route path="/sleep" element={<SleepPage />} />
 					<Route path="/settings" element={<SettingsPage />} />
 				</Routes>
 			</AppShell.Main>
