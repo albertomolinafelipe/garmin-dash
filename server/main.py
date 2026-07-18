@@ -1,4 +1,5 @@
 """FastAPI app: JSON API under /api and the built React SPA at everything else."""
+
 from __future__ import annotations
 
 import logging
@@ -9,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .config import get_settings
 from .db import init_db
-from .routers import activities, sleep, sync
+from .routers import activities, exercises, sleep, sync
 
 logging.basicConfig(level=logging.INFO)
 
@@ -27,6 +28,7 @@ def health() -> dict[str, str]:
 
 
 app.include_router(activities.router)
+app.include_router(exercises.router)
 app.include_router(sleep.router)
 app.include_router(sync.router)
 

@@ -63,6 +63,7 @@ ANNOTATION_FIELDS = {
     "notes",  # running
     "focus",
     "hard_tries",  # climbing
+    "strength_exercises",  # strength
 }
 
 
@@ -105,6 +106,10 @@ class Activity(SQLModel, table=True):
     # Climbing annotations:
     focus: str | None = None  # general/specific strength, power, …
     hard_tries: int | None = None  # number of hard attempts
+    # Strength annotations: logged workout as a list of
+    # {exercise, sets, reps, weight} (weight null = bodyweight). Exercise names come
+    # from the user-editable catalog (exercises.yaml); free entries are allowed too.
+    strength_exercises: list[dict] | None = Field(default=None, sa_column=Column(JSON))
 
 
 class Sleep(SQLModel, table=True):

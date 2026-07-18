@@ -1,22 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import {
-	Badge,
-	Card,
-	Center,
-	Grid,
-	Group,
-	Loader,
-	ScrollArea,
-	Stack,
-	Text,
-	Title,
-	UnstyledButton,
-} from "@mantine/core";
-import { useNavigate } from "react-router-dom";
+import { Center, Grid, Loader, Title } from "@mantine/core";
 
 import { api } from "../api/client";
-import { fmtDate, fmtDistance } from "../format";
-import { categoryColor, categoryOf, needsAnnotation } from "../activityTypes";
+import { categoryColor, categoryOf } from "../activityTypes";
 import GrafanaLoadPanel from "../components/GrafanaLoadPanel";
 import LatestRunRoutesMap from "../components/LatestRunRoutesMap";
 import SleepRingPanel from "../components/SleepRingPanel";
@@ -24,8 +10,7 @@ import WellbeingPanel from "../components/WellbeingPanel";
 import { chartColors, kanagawa } from "../theme";
 
 export default function OverviewPage() {
-	const navigate = useNavigate();
-	const { data, isLoading } = useQuery({
+	const { isLoading } = useQuery({
 		queryKey: ["activities", "all"],
 		queryFn: () => api.listActivities({ limit: 500 }),
 	});
@@ -41,60 +26,12 @@ export default function OverviewPage() {
 			</Center>
 		);
 
-	// Derived completeness — activities still missing required annotations.
-	const activities = (data ?? []).filter(needsAnnotation);
-
 	return (
 		<>
 			<Title order={3} mb="md">
 				Overview
 			</Title>
 			<Grid>
-				{activities.length > 0 && (
-					<Grid.Col span={{ base: 12, md: 4 }}>
-						<Card withBorder h={420}>
-							<Group justify="space-between" mb="sm">
-								<Text fw={600}>Needs annotation</Text>
-								<Badge variant="light">{activities.length}</Badge>
-							</Group>
-							<ScrollArea h={340}>
-								<Stack gap={4}>
-									{activities.map((a) => (
-										<UnstyledButton
-											key={a.id}
-											onClick={() => navigate(`/activities/${a.id}`)}
-											p="xs"
-											style={{ borderRadius: "var(--mantine-radius-sm)" }}
-											className="hoverable-row"
-										>
-											<Group justify="space-between" wrap="nowrap">
-												<div style={{ minWidth: 0 }}>
-													<Text size="sm" fw={500} truncate>
-														{a.name ?? "Activity"}
-													</Text>
-													<Text size="xs" c="dimmed">
-														{fmtDate(a.start_time)}
-													</Text>
-												</div>
-												<Group gap="xs" wrap="nowrap">
-													{a.activity_type && (
-														<Badge size="sm" variant="light">
-															{a.activity_type}
-														</Badge>
-													)}
-													<Text size="xs" c="dimmed">
-														{fmtDistance(a.distance_m)}
-													</Text>
-												</Group>
-											</Group>
-										</UnstyledButton>
-									))}
-								</Stack>
-							</ScrollArea>
-						</Card>
-					</Grid.Col>
-				)}
-
 				<Grid.Col span={{ base: 12, md: 8 }}>
 					<GrafanaLoadPanel
 						title="Running load"

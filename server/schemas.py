@@ -5,6 +5,16 @@ from __future__ import annotations
 from pydantic import BaseModel
 
 
+class StrengthEntry(BaseModel):
+    """One logged exercise: a compact sets × reps × weight row. weight is null for
+    bodyweight movements."""
+
+    exercise: str
+    sets: int | None = None
+    reps: int | None = None
+    weight: float | None = None
+
+
 class AnnotationUpdate(BaseModel):
     """Partial update of the user-owned fields. Only fields the client actually sends
     are applied (see routers: model_dump(exclude_unset=True)), so one field can be
@@ -22,6 +32,21 @@ class AnnotationUpdate(BaseModel):
     notes: str | None = None
     focus: str | None = None
     hard_tries: int | None = None
+    strength_exercises: list[StrengthEntry] | None = None
+
+
+class Exercise(BaseModel):
+    """A catalog entry from exercises.yaml. `categories` are free-form tags (e.g.
+    push, calisthenics) used to group/filter exercises."""
+
+    name: str
+    categories: list[str] = []
+
+
+class ExerciseCatalogRaw(BaseModel):
+    """Raw YAML text of the exercise catalog (edited in Settings)."""
+
+    text: str
 
 
 class Sample(BaseModel):
@@ -56,6 +81,8 @@ class ActivityRoute(BaseModel):
 class SyncResult(BaseModel):
     activities_created: int = 0
     activities_updated: int = 0
+    fits_downloaded: int = 0
+    fits_missing: int = 0  # download failed/absent this run — re-run to retry
     sleep_created: int = 0
     sleep_updated: int = 0
     errors: list[str] = []

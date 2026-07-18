@@ -33,6 +33,7 @@ def run_migrations() -> None:
     _add_activity_column("hard_tries", "INTEGER")
     _add_activity_column("food_during", "JSON")
     _add_activity_column("food_after", "JSON")
+    _add_activity_column("strength_exercises", "JSON")
     _add_activity_column("start_lat", "FLOAT")
     _add_activity_column("start_lng", "FLOAT")
     _seed_running_subtypes()

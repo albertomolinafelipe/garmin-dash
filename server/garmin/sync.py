@@ -45,6 +45,11 @@ def sync(
     ``max_activities`` caps how far back activities are pulled; ``None`` paginates
     all the way to the start of history (full backfill). ``days`` bounds the sleep
     look-back (sleep is one API call per day, so a backfill still caps this).
+
+    Idempotent and resumable: progress is committed per batch, so a run that hits a
+    Garmin rate limit or is interrupted keeps what it already pulled. Re-running
+    skips activities that are fully stored and retries only the .fit files that
+    failed to download last time (``fits_missing`` in the result).
     """
     result = SyncResult()
     client = get_client()
@@ -90,9 +95,14 @@ def _sync_activities(
                 select(Activity).where(Activity.garmin_activity_id == gid)
             ).first()
 
+            start_time = _parse_dt(a.get("startTimeLocal"))
             fit_path = existing.fit_path if existing else None
             if download_fits and not fit_path:
                 fit_path = download_fit(client, gid)
+                if fit_path:
+                    result.fits_downloaded += 1
+                else:
+                    result.fits_missing += 1
 
             activity_type = (a.get("activityType") or {}).get("typeKey")
             location = start_location(fit_path)
@@ -100,7 +110,7 @@ def _sync_activities(
             synced = dict(
                 garmin_activity_id=gid,
                 activity_type=activity_type,
-                start_time=_parse_dt(a.get("startTimeLocal")),
+                start_time=start_time,
                 duration_s=a.get("duration"),
                 distance_m=a.get("distance"),
                 avg_hr=a.get("averageHR"),
@@ -133,6 +143,7 @@ def _sync_activities(
                 )
                 result.activities_created += 1
 
+        session.commit()  # persist per batch so an interrupted run keeps progress
         fetched += len(raw)
         start += len(raw)
         if len(raw) < want:

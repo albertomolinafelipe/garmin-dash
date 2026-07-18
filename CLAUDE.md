@@ -52,6 +52,7 @@ If the user asks to change any of these, update this table in the same change.
 ```
 
 ### Suggested layout
+
 ```
 garmin-dash/
   CLAUDE.md
@@ -72,6 +73,7 @@ garmin-dash/
       fit.py                 # .fit parsing (summary/laps only)
     routers/
       activities.py            # list/get + PATCH annotations + GET food suggestions
+      exercises.py             # GET/PUT the strength exercise catalog (exercises.yaml)
       sleep.py                 # list/get
       sync.py                  # POST /api/sync
   web/                       # React + Vite + TS + Mantine SPA
@@ -81,6 +83,7 @@ garmin-dash/
 ```
 
 ### Data model (SQLite)
+
 - Three families of columns per activity (see Processing vs annotation below):
   - **synced** — from Garmin, overwritten on each process/sync (metrics, fit_path).
   - **seeded-once** — machine-decided at first ingest, then user-editable and never
@@ -90,13 +93,16 @@ garmin-dash/
 - `activities`: garmin_activity_id (unique), start_time, sport/type, duration,
   distance, avg/max HR, elevation gain, calories, avg pace/power, fit_path (raw file
   on disk) [synced]; `name`, `subtype` [seeded-once] + annotation fields (see
-  Annotations): `feeling`, `effort`, `food_during[]`, `food_after[]`, `caffeine`.
+  Annotations): `feeling`, `effort`, `food_during[]`, `food_after[]`, `caffeine`,
+  `strength_exercises[]` (JSON list of `{exercise, sets, reps, weight}`, weight null =
+  bodyweight).
 - `sleep`: calendar_date (unique), start/end, total, deep/light/rem/awake, avg HRV,
   resting HR, sleep score, … (no annotation fields yet).
 - Processing/sync is **idempotent**: upsert by garmin id / date; seed name/subtype on
   first insert; never clobber seeded or annotation fields afterward.
 
 ### Processing vs annotation — two discrete, separate steps
+
 Every activity goes through two clearly separated phases. Keep the code paths distinct
 (a processing/ingest step vs. the annotation PATCH surface).
 
@@ -114,6 +120,7 @@ The user is not actively syncing right now, but the design must keep these two s
 discrete regardless.
 
 ### Annotations
+
 The activity detail page is the annotation surface. It must: let the user **edit the
 name**, and have **no "back" button** and **no manual "annotated" toggle**.
 
@@ -132,6 +139,15 @@ Required annotation fields depend on the activity **category** (taxonomy lives i
     both fields share the same suggestion list.
   - `caffeine` — `yes` / `no` / `residual`.
 - **Climbing**: `subtype` must be set by hand — `rope` / `boulder` / `board`.
+- **Strength**: `feeling` + `effort` (1–5), plus an optional **workout log**
+  (`strength_exercises`): a list of compact `{exercise, sets, reps, weight}` rows
+  (weight blank = bodyweight). Exercise names are suggested from a **user-editable
+  catalog** stored as a plain YAML file (`DATA_DIR/exercises.yaml`, top-level
+  `exercises:` list of `{name, categories?}` where `categories` is free-form tags —
+  a string or list, e.g. `[push, calisthenics]`), served by `routers/exercises.py` and
+  edited raw in the **Settings** page. The catalog is the strength analogue of the
+  learned food vocabulary, but managed by hand rather than derived from usage. Only
+  `feeling`/`effort` count toward completeness; the workout log is optional.
 - Other categories: no required fields yet.
 
 **Completeness is derived, not stored.** An activity **needs annotation** when any
@@ -144,13 +160,16 @@ when implementing).
 All annotation fields map 1:1 to the future Obsidian markdown frontmatter.
 
 ### Config (env / `.env`)
+
 `GARMIN_EMAIL`, `GARMIN_PASSWORD`, `DATA_DIR` (default `/data`). Garth token cache
-lives under `DATA_DIR` so re-login isn't needed every start; keep it out of any future
+and the strength exercise catalog (`exercises.yaml`) live under `DATA_DIR` so re-login
+isn't needed every start; keep it out of any future
 exported vault.
 
 ---
 
 ## Later / not yet
+
 - Obsidian markdown export (one `.md` per record, flat YAML frontmatter = synced +
   annotation fields, body = notes).
 - Daily health & body composition ingestion.
@@ -159,6 +178,7 @@ exported vault.
 ---
 
 ## Environment notes
+
 Host is **NixOS**: no global `python`/`pip`. **Docker daemon is up** (`podman` absent) —
 the Docker image is the primary run path. `garth` must be pinned explicitly in
 `requirements.txt` (not pulled transitively by `garminconnect`). See project memory

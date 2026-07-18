@@ -44,6 +44,7 @@
           garminconnect
           garth
           fitdecode # .fit parsing for per-activity time-series
+          pyyaml # strength exercise catalog (exercises.yaml)
         ]
       );
     in

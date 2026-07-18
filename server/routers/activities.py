@@ -50,12 +50,12 @@ def food_options(session: Session = Depends(get_session)) -> list[str]:
 def latest_run_routes(
     limit: int = 20, session: Session = Depends(get_session)
 ) -> list[ActivityRoute]:
-    """Latest outdoor run tracks for the overview map."""
+    """Latest outdoor run tracks for the overview map. Runs without a GPS track
+    (e.g. treadmill) are skipped, so this returns the latest *outdoor* runs."""
     activities = session.exec(
         select(Activity)
         .where(col(Activity.activity_type).contains("running"))
         .order_by(col(Activity.start_time).desc())
-        .limit(limit)
     )
     routes: list[ActivityRoute] = []
     for activity in activities:
@@ -74,6 +74,8 @@ def latest_run_routes(
                 track=track,
             )
         )
+        if len(routes) >= limit:
+            break
     return routes
 
 

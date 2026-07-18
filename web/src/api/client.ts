@@ -4,6 +4,7 @@ import type {
 	ActivityRoute,
 	ActivityStreams,
 	Annotation,
+	Exercise,
 	Sleep,
 	SyncResult,
 } from "./types";
@@ -28,6 +29,14 @@ export const api = {
 
 	foodOptions: () =>
 		http.get<string[]>("/activities/food-options").then((r) => r.data),
+
+	exercises: () => http.get<Exercise[]>("/exercises").then((r) => r.data),
+
+	exercisesRaw: () =>
+		http.get<{ text: string }>("/exercises/raw").then((r) => r.data.text),
+
+	saveExercisesRaw: (text: string) =>
+		http.put<Exercise[]>("/exercises/raw", { text }).then((r) => r.data),
 
 	latestRunRoutes: (params?: { limit?: number }) =>
 		http

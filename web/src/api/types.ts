@@ -28,6 +28,19 @@ export interface Activity {
 	notes: string | null;
 	focus: string | null;
 	hard_tries: number | null;
+	strength_exercises: StrengthEntry[] | null;
+}
+
+export interface StrengthEntry {
+	exercise: string;
+	sets: number | null;
+	reps: number | null;
+	weight: number | null; // null = bodyweight
+}
+
+export interface Exercise {
+	name: string;
+	categories: string[];
 }
 
 export interface Sleep {
@@ -60,6 +73,7 @@ export interface Annotation {
 	notes?: string | null;
 	focus?: string | null;
 	hard_tries?: number | null;
+	strength_exercises?: StrengthEntry[] | null;
 }
 
 export interface Sample {
@@ -89,6 +103,8 @@ export interface ActivityRoute {
 export interface SyncResult {
 	activities_created: number;
 	activities_updated: number;
+	fits_downloaded: number;
+	fits_missing: number; // download failed this run — re-run to retry
 	sleep_created: number;
 	sleep_updated: number;
 	errors: string[];

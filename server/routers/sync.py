@@ -19,12 +19,16 @@ def run_sync(
     session: Session = Depends(get_session),
 ) -> SyncResult:
     """Sync activities + sleep. Pass ``max_activities=0`` (→ unbounded) for a full
-    history backfill; the default caps to the most recent activities."""
+    history backfill; the default caps to the most recent activities. Resumable: safe
+    to re-run to retry .fit downloads that failed (see ``fits_missing``)."""
     # 0 is the natural "no limit" value over a query string (can't pass null easily).
     limit = None if max_activities in (0, None) else max_activities
     try:
         return sync_mod.sync(
-            session, days=days, download_fits=download_fits, max_activities=limit
+            session,
+            days=days,
+            download_fits=download_fits,
+            max_activities=limit,
         )
     except GarminAuthError as exc:
         raise HTTPException(401, str(exc)) from exc

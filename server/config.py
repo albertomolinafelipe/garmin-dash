@@ -1,4 +1,5 @@
 """Runtime configuration, read from environment (.env supported for local dev)."""
+
 from __future__ import annotations
 
 import os
@@ -18,8 +19,9 @@ class Settings:
         # All persistent state lives under DATA_DIR so a single volume covers it.
         self.data_dir: Path = Path(os.getenv("DATA_DIR", "/data"))
         self.db_path: Path = self.data_dir / "garmin_dash.db"
-        self.fit_dir: Path = self.data_dir / "fit"           # raw .fit files
-        self.token_dir: Path = self.data_dir / "garth"       # garth token cache
+        self.fit_dir: Path = self.data_dir / "fit"  # raw .fit files
+        self.token_dir: Path = self.data_dir / "garth"  # garth token cache
+        self.exercises_path: Path = self.data_dir / "exercises.yaml"  # strength catalog
 
         # Where the built SPA lives inside the image (set by Dockerfile copy).
         self.static_dir: Path = Path(os.getenv("STATIC_DIR", "web_dist"))
