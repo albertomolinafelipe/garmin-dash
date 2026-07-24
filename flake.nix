@@ -53,10 +53,10 @@
         packages = [
           pythonEnv
           pkgs.nodejs_22
-          pkgs.just
+          pkgs.gnumake
         ];
         shellHook = ''
-          echo "garmin-dash dev — python ${python.version} · node $(node --version) · run 'just dev'"
+          echo "garmin-dash dev — python ${python.version} · node $(node --version) · run 'make dev'"
         '';
       };
     };

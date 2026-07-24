@@ -149,10 +149,12 @@ export default function SleepStagesPanel({
 		rows.length > 0
 			? `${rows[0].fullDate} → ${rows[rows.length - 1].fullDate}`
 			: "";
-	const bodyH = 340;
-
 	return (
-		<Card withBorder h={420}>
+		<Card
+			withBorder
+			h="100%"
+			style={{ display: "flex", flexDirection: "column" }}
+		>
 			<Group justify="space-between" mb="sm">
 				<Group gap="xs">
 					<Text fw={600}>{title}</Text>
@@ -198,22 +200,23 @@ export default function SleepStagesPanel({
 				</Group>
 			</Group>
 
+			<div style={{ flex: 1, minHeight: 0 }}>
 			{isLoading ? (
-				<Center h={bodyH}>
+				<Center h="100%">
 					<Loader />
 				</Center>
 			) : isError ? (
-				<Center h={bodyH}>
+				<Center h="100%">
 					<Text c="red">Could not load sleep data.</Text>
 				</Center>
 			) : rows.length === 0 ? (
-				<Center h={bodyH}>
+				<Center h="100%">
 					<Text c="dimmed" ta="center">
 						No sleep data yet — hit <b>Sync</b> to pull from Garmin.
 					</Text>
 				</Center>
 			) : (
-				<ResponsiveContainer width="100%" height={bodyH}>
+				<ResponsiveContainer width="100%" height="100%">
 					<ComposedChart
 						data={rows}
 						margin={{ top: 8, right: 8, bottom: 0, left: -8 }}
@@ -281,6 +284,7 @@ export default function SleepStagesPanel({
 					</ComposedChart>
 				</ResponsiveContainer>
 			)}
+			</div>
 		</Card>
 	);
 }

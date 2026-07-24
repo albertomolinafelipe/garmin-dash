@@ -10,7 +10,7 @@ type BaseMapProps = {
 	bounds?: LatLngBoundsExpression;
 	center?: LatLngExpression;
 	zoom?: number;
-	height?: number;
+	height?: number | string;
 	className?: string;
 };
 

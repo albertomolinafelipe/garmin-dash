@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Center, Grid, Loader, Title } from "@mantine/core";
+import { Center, Grid, Loader } from "@mantine/core";
 
 import { api } from "../api/client";
 import { categoryColor, categoryOf } from "../activityTypes";
@@ -25,13 +25,15 @@ export default function OverviewPage() {
 			</Center>
 		);
 
+	// Fill the viewport with two equal rows so the four panels fit without
+	// scrolling: 56px header + 32px Main padding + 16px inter-row gutter = 104px
+	// of chrome, split the rest in two.
+	const rowH = "calc((100vh - 104px) / 2)";
+
 	return (
 		<>
-			<Title order={3} mb="md">
-				Overview
-			</Title>
 			<Grid>
-				<Grid.Col span={{ base: 12, md: 8 }}>
+				<Grid.Col span={{ base: 12, md: 8 }} style={{ height: rowH }}>
 					<GrafanaLoadPanel
 						title="Running load"
 						queryKey="running-load"
@@ -64,7 +66,7 @@ export default function OverviewPage() {
 					/>
 				</Grid.Col>
 
-				<Grid.Col span={{ base: 12, md: 4 }}>
+				<Grid.Col span={{ base: 12, md: 4 }} style={{ height: rowH }}>
 					<GrafanaLoadPanel
 						title="Climbing & weights load"
 						queryKey="strength-load"
@@ -98,11 +100,11 @@ export default function OverviewPage() {
 					/>
 				</Grid.Col>
 
-				<Grid.Col span={{ base: 12, md: 8 }}>
+				<Grid.Col span={{ base: 12, md: 8 }} style={{ height: rowH }}>
 					<SleepStagesPanel title="Sleep" days={30} />
 				</Grid.Col>
 
-				<Grid.Col span={{ base: 12, md: 4 }}>
+				<Grid.Col span={{ base: 12, md: 4 }} style={{ height: rowH }}>
 					<LatestRunRoutesMap routes={latestRunRoutes ?? []} />
 				</Grid.Col>
 			</Grid>

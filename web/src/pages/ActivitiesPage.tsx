@@ -14,7 +14,6 @@ import {
 	Table,
 	Text,
 	TextInput,
-	Title,
 } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 
@@ -200,9 +199,6 @@ function ActivitiesListContent({ activities }: { activities: Activity[] }) {
 
 	return (
 		<>
-			<Title order={3} mb="md">
-				List
-			</Title>
 			<Stack gap="md" mb="md">
 				<Group align="flex-end" wrap="wrap">
 					<TextInput

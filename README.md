@@ -10,18 +10,18 @@ Docker image. See [CLAUDE.md](./CLAUDE.md) for the full design.
 
 ```bash
 cp .env.example .env      # add your Garmin email + password
-just up                   # or: docker compose up --build
+make up                   # or: docker compose up --build
 ```
 
 Open http://localhost:8000 and click **Sync** to pull the last 30 days.
 
-### Recipes (`just`)
+### Targets (`make`)
 
-| Recipe | What it does |
+| Target | What it does |
 |--------|--------------|
-| `just up`   | production app at http://localhost:8000 |
-| `just dev`  | hot-reloading stack (backend reload + Vite HMR) at http://localhost:5173 |
-| `just down` | stop everything (prod + dev); your `./data` is kept |
+| `make up`   | production app at http://localhost:8000 |
+| `make dev`  | hot-reloading stack (backend reload + Vite HMR) at http://localhost:5173 |
+| `make down` | stop everything (prod + dev); your `./data` is kept |
 
 Your Garmin login happens once; the tokens are cached under `./data/garth` so
 restarts don't need to log in again. All state (SQLite db, raw `.fit` files, tokens)

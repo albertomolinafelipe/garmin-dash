@@ -112,7 +112,11 @@ export default function GrafanaLoadPanel({ title, queryKey, series }: Props) {
 	const hrSeries = series.find((s) => axisFor(s) === "hr");
 
 	return (
-		<Card withBorder h={420}>
+		<Card
+			withBorder
+			h="100%"
+			style={{ display: "flex", flexDirection: "column" }}
+		>
 			<Group justify="space-between" mb="sm">
 				<Text fw={600}>{title}</Text>
 				<Group gap="xs">
@@ -127,12 +131,13 @@ export default function GrafanaLoadPanel({ title, queryKey, series }: Props) {
 					))}
 				</Group>
 			</Group>
+			<div style={{ flex: 1, minHeight: 0 }}>
 			{isLoading ? (
-				<Center h={340}>
+				<Center h="100%">
 					<Loader />
 				</Center>
 			) : (
-				<ResponsiveContainer width="100%" height={340}>
+				<ResponsiveContainer width="100%" height="100%">
 					<ComposedChart
 						data={rows}
 						margin={{ top: 8, right: 8, bottom: 0, left: -8 }}
@@ -235,6 +240,7 @@ export default function GrafanaLoadPanel({ title, queryKey, series }: Props) {
 					</ComposedChart>
 				</ResponsiveContainer>
 			)}
+			</div>
 		</Card>
 	);
 }

@@ -20,7 +20,16 @@ export default function LatestRunRoutesMap({
 		positions.length > 0 ? (positions as LatLngBoundsExpression) : undefined;
 
 	return (
-		<Card withBorder padding={0} style={{ overflow: "hidden" }} h={420}>
+		<Card
+			withBorder
+			padding={0}
+			style={{
+				overflow: "hidden",
+				height: "100%",
+				display: "flex",
+				flexDirection: "column",
+			}}
+		>
 			<Group justify="space-between" p="sm" pb="xs">
 				<Text fw={600}>Latest run</Text>
 				{route && (
@@ -33,15 +42,16 @@ export default function LatestRunRoutesMap({
 					</Anchor>
 				)}
 			</Group>
+			<div style={{ flex: 1, minHeight: 0 }}>
 			{!route ? (
-				<Center h={360}>
+				<Center h="100%">
 					<Text c="dimmed" size="sm">
 						No latest outdoor run route yet. Sync FIT files to populate this
 						map.
 					</Text>
 				</Center>
 			) : (
-				<BaseMap bounds={bounds} height={360}>
+				<BaseMap bounds={bounds} height="100%">
 					<Polyline
 						positions={positions}
 						pathOptions={{
@@ -52,6 +62,7 @@ export default function LatestRunRoutesMap({
 					/>
 				</BaseMap>
 			)}
+			</div>
 		</Card>
 	);
 }

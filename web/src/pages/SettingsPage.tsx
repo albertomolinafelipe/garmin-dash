@@ -9,7 +9,6 @@ import {
 	Stack,
 	Text,
 	Textarea,
-	Title,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IconDeviceFloppy } from "@tabler/icons-react";
@@ -50,7 +49,6 @@ export default function SettingsPage() {
 
 	return (
 		<Stack>
-			<Title order={3}>Settings</Title>
 			<Card withBorder>
 				<Stack gap="sm">
 					<div>
