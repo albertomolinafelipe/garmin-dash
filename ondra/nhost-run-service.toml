@@ -22,7 +22,7 @@ value = '{{ secrets.HASURA_GRAPHQL_URL }}'
 
 [[environment]]
 name = 'ONDRA_GARTH_DIR'
-value = '/tmp/garth'
+value = '/var/lib/ondra/garth'
 
 # Seed tokens from a local login (base64 JSON of the garth token files) so ondra
 # resumes a pre-authenticated session — no headless MFA/device-verification.
@@ -41,6 +41,12 @@ replicas = 1
 [resources.compute]
 cpu = 125
 memory = 256
+
+# Persist refreshed Garmin OAuth tokens across pod restarts and rescheduling.
+[[resources.storage]]
+name = 'garth-tokens'
+capacity = 1
+path = '/var/lib/ondra/garth'
 
 [healthCheck]
 port = 8000
