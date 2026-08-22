@@ -2,7 +2,7 @@ name = 'dashboard'
 
 # Public multi-architecture image built by dashboard-image.yml.
 [image]
-image = 'ghcr.io/albertomolinafelipe/garmin-dash-dashboard:latest'
+image = 'ghcr.io/albertomolinafelipe/garmin-dash-dashboard:sha-b0fa077'
 
 [[ports]]
 port = 8080

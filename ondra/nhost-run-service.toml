@@ -4,7 +4,7 @@ command = ['uvicorn', 'app.main:app', '--host', '0.0.0.0', '--port', '8000']
 # Public image built & pushed by .github/workflows/ondra-image.yml (GHCR).
 # No pullCredentials needed while the package is public.
 [image]
-image = 'ghcr.io/albertomolinafelipe/garmin-dash-ondra:latest'
+image = 'ghcr.io/albertomolinafelipe/garmin-dash-ondra:sha-b0fa077'
 
 # ondra fails fast at startup unless all three are present.
 [[environment]]
@@ -19,14 +19,6 @@ value = '{{ secrets.HASURA_GRAPHQL_ADMIN_SECRET }}'
 [[environment]]
 name = 'HASURA_GRAPHQL_URL'
 value = '{{ secrets.HASURA_GRAPHQL_URL }}'
-
-[[environment]]
-name = 'GARMIN_EMAIL'
-value = '{{ secrets.GARMIN_EMAIL }}'
-
-[[environment]]
-name = 'GARMIN_PASSWORD'
-value = '{{ secrets.GARMIN_PASSWORD }}'
 
 [[environment]]
 name = 'ONDRA_GARTH_DIR'
