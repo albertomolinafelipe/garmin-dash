@@ -6,6 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+const UNAUTHORIZED_REDIRECT_URL =
+	"https://youtu.be/8QxIIz1yEsA?si=aKlDcIzuWnKclwgj&t=44";
+
+export function isUnauthorizedEmailError(reason: unknown): boolean {
+	if (!(reason instanceof Error)) return false;
+	return /sign\s*up is disabled|user not found/i.test(reason.message);
+}
+
 export function LoginDialog({
 	open,
 	onAuthenticated,
@@ -41,6 +49,10 @@ export function LoginDialog({
 			});
 			onAuthenticated();
 		} catch (reason) {
+			if (!codeSent && isUnauthorizedEmailError(reason)) {
+				window.location.replace(UNAUTHORIZED_REDIRECT_URL);
+				return;
+			}
 			setError(
 				reason instanceof Error ? reason.message : "Authentication failed",
 			);

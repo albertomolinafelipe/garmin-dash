@@ -9,3 +9,24 @@ array_relationships:
         table:
           name: activity_streams
           schema: public
+select_permissions:
+  - role: user
+    permission:
+      columns: "*"
+      filter: {}
+      allow_aggregations: true
+insert_permissions:
+  - role: user
+    permission:
+      check: {}
+      columns: "*"
+update_permissions:
+  - role: user
+    permission:
+      columns: "*"
+      filter: {}
+      check: {}
+delete_permissions:
+  - role: user
+    permission:
+      filter: {}
