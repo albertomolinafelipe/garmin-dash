@@ -1,0 +1,5 @@
+table:
+  name: users
+  schema: auth
+configuration:
+  custom_name: users

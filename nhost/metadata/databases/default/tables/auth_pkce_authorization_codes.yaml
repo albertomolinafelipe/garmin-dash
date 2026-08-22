@@ -1,0 +1,3 @@
+table:
+  name: pkce_authorization_codes
+  schema: auth

@@ -1,0 +1,3 @@
+table:
+  name: oauth2_clients
+  schema: auth

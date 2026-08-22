@@ -1,11 +1,8 @@
 [global]
-
-# Public ondra Run service URL; consumed by the remote schema (url_from_env).
 [[global.environment]]
 name = 'ONDRA_GRAPHQL_URL'
 value = '{{ secrets.ONDRA_GRAPHQL_URL }}'
 
-# Shared secret Hasura forwards to ondra (remote schema header value_from_env).
 [[global.environment]]
 name = 'ONDRA_REMOTE_SCHEMA_SECRET'
 value = '{{ secrets.ONDRA_REMOTE_SCHEMA_SECRET }}'
@@ -38,7 +35,6 @@ level = 'warn'
 [hasura.events]
 httpPoolSize = 100
 
-# Email OTP is available only to users created by an administrator.
 [auth]
 version = '0.49.1'
 

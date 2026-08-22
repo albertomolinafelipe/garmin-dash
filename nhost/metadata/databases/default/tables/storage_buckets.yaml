@@ -1,0 +1,5 @@
+table:
+  name: buckets
+  schema: storage
+configuration:
+  custom_name: buckets
