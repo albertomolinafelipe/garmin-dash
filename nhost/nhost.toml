@@ -1,0 +1,57 @@
+[global]
+
+# Public ondra Run service URL; consumed by the remote schema (url_from_env).
+# Configure it after the first Run deployment creates the service endpoint.
+[[global.environment]]
+name = 'ONDRA_GRAPHQL_URL'
+value = '{{ secrets.ONDRA_GRAPHQL_URL }}'
+
+# Shared secret Hasura forwards to ondra (remote schema header value_from_env).
+# Exposed as a real env var so value_from_env resolves; same value ondra reads.
+[[global.environment]]
+name = 'ONDRA_REMOTE_SCHEMA_SECRET'
+value = '{{ secrets.ONDRA_REMOTE_SCHEMA_SECRET }}'
+
+[hasura]
+version = 'v2.48.5-ce'
+adminSecret = '{{ secrets.HASURA_GRAPHQL_ADMIN_SECRET }}'
+webhookSecret = '{{ secrets.NHOST_WEBHOOK_SECRET }}'
+
+[[hasura.jwtSecrets]]
+type = 'RS256'
+key = '{{ secrets.NHOST_JWT_PUBLIC_KEY }}'
+signingKey = '{{ secrets.NHOST_JWT_PRIVATE_KEY }}'
+kid = '{{ secrets.NHOST_JWT_KID }}'
+
+[hasura.settings]
+corsDomain = ['*']
+devMode = true
+enableAllowList = false
+enableConsole = true
+enableRemoteSchemaPermissions = false
+enabledAPIs = ['metadata', 'graphql', 'pgdump', 'config']
+inferFunctionPermissions = true
+liveQueriesMultiplexedRefetchInterval = 1000
+stringifyNumericTypes = false
+
+[hasura.logs]
+level = 'warn'
+
+[hasura.events]
+httpPoolSize = 100
+
+[postgres]
+version = '14.20-20251217-1'
+
+[postgres.resources]
+[postgres.resources.storage]
+capacity = 1
+
+[provider]
+
+[observability]
+[observability.grafana]
+adminPassword = '{{ secrets.GRAFANA_ADMIN_PASSWORD }}'
+
+[observability.grafana.alerting]
+enabled = false

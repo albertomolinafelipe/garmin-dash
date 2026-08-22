@@ -1,0 +1,56 @@
+name = 'ondra'
+command = ['uvicorn', 'app.main:app', '--host', '0.0.0.0', '--port', '8000']
+
+# Public image built & pushed by .github/workflows/ondra-image.yml (GHCR).
+# No pullCredentials needed while the package is public.
+[image]
+image = 'ghcr.io/albertomolinafelipe/garmin-dash-ondra:latest'
+
+# ondra fails fast at startup unless all three are present.
+[[environment]]
+name = 'ONDRA_REMOTE_SCHEMA_SECRET'
+value = '{{ secrets.ONDRA_REMOTE_SCHEMA_SECRET }}'
+
+[[environment]]
+name = 'ONDRA_HASURA_GRAPHQL_ADMIN_SECRET'
+value = '{{ secrets.HASURA_GRAPHQL_ADMIN_SECRET }}'
+
+# Set this after the first project deployment exposes the GraphQL endpoint.
+[[environment]]
+name = 'HASURA_GRAPHQL_URL'
+value = '{{ secrets.HASURA_GRAPHQL_URL }}'
+
+[[environment]]
+name = 'GARMIN_EMAIL'
+value = '{{ secrets.GARMIN_EMAIL }}'
+
+[[environment]]
+name = 'GARMIN_PASSWORD'
+value = '{{ secrets.GARMIN_PASSWORD }}'
+
+[[environment]]
+name = 'ONDRA_GARTH_DIR'
+value = '/tmp/garth'
+
+# Seed tokens from a local login (base64 JSON of the garth token files) so ondra
+# resumes a pre-authenticated session — no headless MFA/device-verification.
+[[environment]]
+name = 'GARTH_TOKENS_B64'
+value = '{{ secrets.GARTH_TOKENS_B64 }}'
+
+[[ports]]
+port = 8000
+type = 'http'
+publish = true
+
+[resources]
+replicas = 1
+
+[resources.compute]
+cpu = 125
+memory = 256
+
+[healthCheck]
+port = 8000
+initialDelaySeconds = 10
+probePeriodSeconds = 20
