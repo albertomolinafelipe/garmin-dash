@@ -4,7 +4,7 @@ command = ['uvicorn', 'app.main:app', '--host', '0.0.0.0', '--port', '8000']
 # Public image built & pushed by .github/workflows/ondra-image.yml (GHCR).
 # No pullCredentials needed while the package is public.
 [image]
-image = 'ghcr.io/albertomolinafelipe/garmin-dash-ondra:sha-b0fa077'
+image = 'ghcr.io/albertomolinafelipe/garmin-dash-ondra:sha-8b8af69'
 
 # ondra fails fast at startup unless all three are present.
 [[environment]]
