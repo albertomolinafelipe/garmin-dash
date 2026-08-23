@@ -49,8 +49,9 @@ def get_client(settings: Settings) -> Garmin:
         return _client
 
     token_dir = Path(settings.garth_dir)
+    # The persistent-volume mount root is platform-managed and may reject chmod
+    # even though the application user can write to it.
     token_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
-    token_dir.chmod(0o700)
     _materialize_tokens(token_dir, settings.garth_tokens_b64)
 
     client = Garmin()
