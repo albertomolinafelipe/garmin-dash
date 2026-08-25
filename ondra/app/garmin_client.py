@@ -25,6 +25,10 @@ class GarminAuthError(RuntimeError):
     """Garmin authentication could not be established."""
 
 
+class GarminRateLimitError(GarminAuthError):
+    """Garmin temporarily rejected authentication due to rate limiting."""
+
+
 def _materialize_tokens(token_dir: Path, tokens_b64: str | None) -> None:
     """Seed the garth token cache from a base64 secret produced by a local login.
 
@@ -88,7 +92,10 @@ def get_client(settings: Settings) -> Garmin:
     except GarminConnectConnectionError as exc:
         client = _credential_login(settings, token_dir, exc)
     except GarminConnectTooManyRequestsError as exc:
-        client = _credential_login(settings, token_dir, exc)
+        raise GarminRateLimitError(
+            "Garmin rate limit exceeded while refreshing the cached session; "
+            "retry later"
+        ) from exc
     else:
         # Persist any OAuth2 token garth refreshed during resume back to the volume.
         client.garth.dump(str(token_dir))

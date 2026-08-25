@@ -18,12 +18,20 @@ set +a
 TOKEN_DIR="$(mktemp -d)"
 trap 'rm -rf "$TOKEN_DIR"' EXIT
 
+# The Nix shell's Python does not include the Ondra dependencies. Prefer the
+# project virtualenv, which contains garth/garminconnect.
+PYTHON="$PWD/.venv/bin/python"
+if [[ ! -x "$PYTHON" ]]; then
+	echo "Missing $PYTHON; create the project virtualenv first." >&2
+	exit 1
+fi
+
 read -rp "Garmin email: " GARMIN_EMAIL
 read -rsp "Garmin password: " GARMIN_PASSWORD
 echo
 export GARMIN_EMAIL GARMIN_PASSWORD TOKEN_DIR
 
-python - <<'PY'
+"$PYTHON" - <<'PY'
 import os
 import garth
 
@@ -33,7 +41,7 @@ print("Garmin login OK; tokens dumped.")
 PY
 
 BLOB="$(
-	python - <<'PY'
+	"$PYTHON" - <<'PY'
 import base64, json, os, pathlib
 d = pathlib.Path(os.environ["TOKEN_DIR"])
 payload = {name: (d / name).read_text()
