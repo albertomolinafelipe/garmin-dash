@@ -438,13 +438,13 @@ function EditableName({
 			{isDirty && (
 				<Button
 					type="button"
-					variant="outline"
-					size="icon"
+					size="sm"
 					aria-label="Confirm name"
 					onClick={() => void confirm()}
-					className="shrink-0 border-green-600/30 text-green-600 hover:bg-green-600/10 hover:text-green-600"
+					className="shrink-0"
 				>
-					<Check />
+					<Check className="size-4" />
+					Save
 				</Button>
 			)}
 		</div>

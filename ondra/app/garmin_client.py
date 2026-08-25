@@ -8,7 +8,12 @@ import json
 import logging
 from pathlib import Path
 
-from garminconnect import Garmin
+from garminconnect import (
+    Garmin,
+    GarminConnectAuthenticationError,
+    GarminConnectConnectionError,
+    GarminConnectTooManyRequestsError,
+)
 
 from .main import Settings
 
@@ -42,6 +47,25 @@ def _materialize_tokens(token_dir: Path, tokens_b64: str | None) -> None:
     log.info("Seeded garth token cache from GARTH_TOKENS_B64")
 
 
+def _credential_login(
+    settings: Settings, token_dir: Path, cache_error: Exception
+) -> Garmin:
+    """Log the cache failure and use credentials only when configured."""
+    log.warning(
+        "Could not resume Garmin session from token cache", exc_info=cache_error
+    )
+    if not settings.garmin_email or not settings.garmin_password:
+        raise GarminAuthError(
+            "No usable Garmin token cache and GARMIN_EMAIL/GARMIN_PASSWORD are unset"
+        ) from cache_error
+
+    log.info("Garmin token cache unavailable; performing credential login")
+    client = Garmin(settings.garmin_email, settings.garmin_password)
+    client.login()
+    client.garth.dump(str(token_dir))
+    return client
+
+
 def get_client(settings: Settings) -> Garmin:
     """Return a process-cached, logged-in Garmin client."""
     global _client
@@ -57,18 +81,18 @@ def get_client(settings: Settings) -> Garmin:
     client = Garmin()
     try:
         client.login(str(token_dir))
+    except FileNotFoundError as exc:
+        client = _credential_login(settings, token_dir, exc)
+    except GarminConnectAuthenticationError as exc:
+        client = _credential_login(settings, token_dir, exc)
+    except GarminConnectConnectionError as exc:
+        client = _credential_login(settings, token_dir, exc)
+    except GarminConnectTooManyRequestsError as exc:
+        client = _credential_login(settings, token_dir, exc)
+    else:
         # Persist any OAuth2 token garth refreshed during resume back to the volume.
         client.garth.dump(str(token_dir))
         log.info("Garmin session resumed from token cache")
-    except Exception:  # noqa: BLE001 -- garminconnect exposes several auth errors
-        if not settings.garmin_email or not settings.garmin_password:
-            raise GarminAuthError(
-                "No usable Garmin token cache and GARMIN_EMAIL/GARMIN_PASSWORD are unset"
-            ) from None
-        log.info("Garmin token cache unavailable; performing credential login")
-        client = Garmin(settings.garmin_email, settings.garmin_password)
-        client.login()
-        client.garth.dump(str(token_dir))
 
     _client = client
     return client
