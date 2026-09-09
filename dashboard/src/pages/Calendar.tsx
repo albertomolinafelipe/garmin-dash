@@ -1,9 +1,35 @@
-import { useMemo, useState } from "react";
+import {
+	type ComponentProps,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { useSearchParams } from "react-router-dom";
-import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { CalendarDays, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import {
+	Sheet,
+	SheetContent,
+	SheetDescription,
+	SheetFooter,
+	SheetHeader,
+	SheetTitle,
+} from "@/components/ui/sheet";
+import { Textarea } from "@/components/ui/textarea";
 import {
 	addDays,
 	computeWeekTotals,
@@ -25,9 +51,11 @@ import {
 import {
 	useAllPlanRequirementsQuery,
 	useAllPlanWorkoutsQuery,
+	useInsertPlanWorkoutMutation,
+	usePlansQuery,
 	useRacesQuery,
 } from "@/graphql/hooks";
-import { toIsoWeek } from "@/lib/plans";
+import { dayToken, sportIcon, SPORTS, toIsoWeek } from "@/lib/plans";
 import {
 	type Category,
 	CATEGORY_ORDER,
@@ -59,6 +87,207 @@ function parseMonthToken(token: string | null): Date | null {
 	return new Date(Number(match[1]), Number(match[2]) - 1, 1);
 }
 
+function ScrollableDayCell({
+	children,
+	className,
+	contentClassName,
+	...props
+}: ComponentProps<"div"> & { contentClassName?: string }) {
+	const scrollRef = useRef<HTMLDivElement>(null);
+	const [hasMoreBelow, setHasMoreBelow] = useState(false);
+	const updateShadow = useCallback(() => {
+		const element = scrollRef.current;
+		if (!element) return;
+		setHasMoreBelow(
+			element.scrollHeight - element.scrollTop - element.clientHeight > 1,
+		);
+	}, []);
+
+	useEffect(() => {
+		updateShadow();
+		const element = scrollRef.current;
+		if (!element) return;
+		const observer = new ResizeObserver(updateShadow);
+		observer.observe(element);
+		return () => observer.disconnect();
+	});
+
+	return (
+		<div className={cn("relative min-h-0 min-w-0", className)} {...props}>
+			<div
+				ref={scrollRef}
+				onScroll={updateShadow}
+				className={cn(
+					"flex h-full flex-col overflow-x-hidden overflow-y-auto overscroll-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+					contentClassName,
+				)}
+			>
+				{children}
+			</div>
+			{hasMoreBelow ? (
+				<div className="pointer-events-none absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-black/20 to-transparent dark:from-black/40" />
+			) : null}
+		</div>
+	);
+}
+
+type PlanOption = {
+	id: unknown;
+	name: string;
+	start_week: string;
+	end_week: string;
+};
+
+function AddWorkoutSheet({
+	day,
+	plans,
+	onClose,
+}: {
+	day: Date | null;
+	plans: PlanOption[];
+	onClose: () => void;
+}) {
+	const queryClient = useQueryClient();
+	const insert = useInsertPlanWorkoutMutation();
+	const week = day ? toIsoWeek(day) : "";
+	const eligiblePlans = plans.filter(
+		(plan) => plan.start_week <= week && plan.end_week >= week,
+	);
+	const [planId, setPlanId] = useState("");
+	const [sport, setSport] = useState<string>(SPORTS[0]);
+	const [title, setTitle] = useState("");
+	const [description, setDescription] = useState("");
+	const SportIcon = sportIcon(sport);
+
+	const resetAndClose = () => {
+		setPlanId("");
+		setSport(SPORTS[0]);
+		setTitle("");
+		setDescription("");
+		onClose();
+	};
+
+	const save = async () => {
+		if (!day || !planId || !title.trim() || insert.isPending) return;
+		try {
+			await insert.mutateAsync({
+				object: {
+					plan_id: planId,
+					week,
+					day_of_week: dayToken(day),
+					sport,
+					title: title.trim(),
+					description: description.trim() || null,
+				},
+			});
+			await queryClient.invalidateQueries({ queryKey: ["plan-workouts"] });
+			resetAndClose();
+		} catch {
+			toast.error("Could not add workout");
+		}
+	};
+
+	return (
+		<Sheet
+			open={day !== null}
+			onOpenChange={(open) => !open && resetAndClose()}
+		>
+			<SheetContent side="right" className="gap-5 sm:max-w-md">
+				<SheetHeader>
+					<SheetTitle>Add workout</SheetTitle>
+					<SheetDescription>
+						{day
+							? day.toLocaleDateString(undefined, {
+									weekday: "long",
+									month: "long",
+									day: "numeric",
+								})
+							: "Select a calendar day"}
+					</SheetDescription>
+				</SheetHeader>
+				<div className="flex flex-col gap-4 px-4">
+					<div className="flex flex-col gap-2">
+						<Label>Plan</Label>
+						<Select value={planId} onValueChange={setPlanId}>
+							<SelectTrigger className="w-full">
+								<span>
+									{eligiblePlans.find((plan) => String(plan.id) === planId)
+										?.name ?? "Select plan"}
+								</span>
+							</SelectTrigger>
+							<SelectContent>
+								{eligiblePlans.map((plan) => (
+									<SelectItem key={String(plan.id)} value={String(plan.id)}>
+										{plan.name}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+						{eligiblePlans.length === 0 ? (
+							<p className="text-muted-foreground text-sm">
+								No plan covers ISO week {week}.
+							</p>
+						) : null}
+					</div>
+					<div className="flex flex-col gap-2">
+						<Label>Sport</Label>
+						<Select value={sport} onValueChange={setSport}>
+							<SelectTrigger className="w-full">
+								<span className="flex items-center gap-2">
+									<SportIcon className="size-4" />
+									{sport}
+								</span>
+							</SelectTrigger>
+							<SelectContent>
+								{SPORTS.map((value) => {
+									const Icon = sportIcon(value);
+									return (
+										<SelectItem key={value} value={value}>
+											<span className="flex items-center gap-2">
+												<Icon className="size-4" />
+												{value}
+											</span>
+										</SelectItem>
+									);
+								})}
+							</SelectContent>
+						</Select>
+					</div>
+					<div className="flex flex-col gap-2">
+						<Label htmlFor="calendar-workout-title">Title</Label>
+						<Input
+							id="calendar-workout-title"
+							value={title}
+							onChange={(event) => setTitle(event.target.value)}
+							placeholder="Easy run"
+						/>
+					</div>
+					<div className="flex flex-col gap-2">
+						<Label htmlFor="calendar-workout-description">Description</Label>
+						<Textarea
+							id="calendar-workout-description"
+							value={description}
+							onChange={(event) => setDescription(event.target.value)}
+							placeholder="Optional details"
+						/>
+					</div>
+				</div>
+				<SheetFooter>
+					<Button
+						disabled={!planId || !title.trim() || insert.isPending}
+						onClick={() => void save()}
+					>
+						{insert.isPending ? "Saving…" : "Add workout"}
+					</Button>
+					<Button variant="ghost" onClick={resetAndClose}>
+						Cancel
+					</Button>
+				</SheetFooter>
+			</SheetContent>
+		</Sheet>
+	);
+}
+
 function CalendarInner() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const cursor = parseMonthToken(searchParams.get("month")) ?? new Date();
@@ -76,6 +305,8 @@ function CalendarInner() {
 	const { data: workouts } = useAllPlanWorkoutsQuery();
 	const { data: requirements } = useAllPlanRequirementsQuery();
 	const { data: races } = useRacesQuery();
+	const { data: plansData } = usePlansQuery();
+	const [workoutDay, setWorkoutDay] = useState<Date | null>(null);
 
 	const activities = data?.activities ?? [];
 	const workoutsByWeekDay = useMemo(
@@ -136,6 +367,11 @@ function CalendarInner() {
 
 	return (
 		<div className="flex h-full min-h-[520px] flex-col gap-4 p-4">
+			<AddWorkoutSheet
+				day={workoutDay}
+				plans={(plansData ?? []) as PlanOption[]}
+				onClose={() => setWorkoutDay(null)}
+			/>
 			{/* Toolbar */}
 			<div className="relative flex flex-wrap items-center justify-between gap-3">
 				<div className="flex flex-wrap items-center gap-4">
@@ -229,40 +465,63 @@ function CalendarInner() {
 										const offMonth = day.getMonth() !== cursor.getMonth();
 										const events = byDay.get(dayKey(day)) ?? [];
 										return (
-											<div
+											<ScrollableDayCell
 												key={dayKey(day)}
 												{...dayDropProps(dnd, day)}
 												className={cn(
-													"flex min-w-0 flex-col overflow-hidden border-r p-1 last:border-r-0",
-													offMonth && "bg-muted/30",
+													"border-r last:border-r-0",
+													offMonth &&
+														"bg-[color-mix(in_oklab,var(--muted)_30%,var(--card))]",
 												)}
 											>
 												<div
 													className={cn(
-														"text-muted-foreground text-right text-xs",
-														offMonth && "opacity-50",
+														"bg-card sticky top-0 z-10 flex items-center justify-end gap-0.5 px-1 pt-1 pb-0.5",
+														offMonth &&
+															"bg-[color-mix(in_oklab,var(--muted)_30%,var(--card))]",
 													)}
 												>
-													{day.getDate()}
+													<Button
+														variant="ghost"
+														size="icon"
+														className="text-muted-foreground size-5 opacity-50 hover:opacity-100"
+														aria-label={`Add workout on ${day.toLocaleDateString()}`}
+														onClick={() => setWorkoutDay(day)}
+													>
+														<Plus className="size-3" />
+													</Button>
+													<div
+														className={cn(
+															"text-muted-foreground text-right text-xs",
+															offMonth && "opacity-50",
+														)}
+													>
+														{day.getDate()}
+													</div>
 												</div>
-												<div className="mt-2 flex flex-col gap-1">
-													<DayRaces
-														day={day}
-														byDay={racesByDay}
-														activitiesByDay={byDay}
-													/>
-													{events.map((a) => (
-														<DayEvent
-															key={a.id}
-															a={a}
-															isRace={
-																(racesByDay.get(dayKey(day))?.length ?? 0) > 0
-															}
+												<div className="flex min-h-0 flex-1 flex-col p-1 pt-0">
+													<div className="mt-2 flex flex-col gap-1">
+														<DayRaces
+															day={day}
+															byDay={racesByDay}
+															activitiesByDay={byDay}
 														/>
-													))}
+														{events.map((a) => (
+															<DayEvent
+																key={a.id}
+																a={a}
+																isRace={
+																	(racesByDay.get(dayKey(day))?.length ?? 0) > 0
+																}
+															/>
+														))}
+													</div>
+													<DayWorkouts
+														day={day}
+														byWeekDay={workoutsByWeekDay}
+													/>
 												</div>
-												<DayWorkouts day={day} byWeekDay={workoutsByWeekDay} />
-											</div>
+											</ScrollableDayCell>
 										);
 									},
 								)}
@@ -280,9 +539,10 @@ function CalendarInner() {
 						{weeks.map((w) => {
 							const t = totals.get(dayKey(w));
 							return (
-								<div
+								<ScrollableDayCell
 									key={dayKey(w)}
-									className="flex min-h-0 flex-1 flex-col gap-1 border-b p-2 last:border-b-0"
+									className="min-h-0 flex-1 border-b last:border-b-0"
+									contentClassName="gap-1 p-2"
 								>
 									<div className="flex items-start gap-1.5">
 										<categoryIcon.running
@@ -290,19 +550,19 @@ function CalendarInner() {
 											className="mt-0.5 shrink-0"
 											style={{ color: categoryColor.running }}
 										/>
-										<div className="leading-tight">
-											<div
+										<div className="flex min-w-0 items-baseline gap-1 whitespace-nowrap leading-tight">
+											<span
 												className={cn(
 													"text-xs font-semibold",
 													!t?.runKm && "text-muted-foreground font-normal",
 												)}
 											>
 												{(t?.runKm ?? 0).toFixed(1)} km
-											</div>
-											<div className="text-muted-foreground text-[11px]">
-												{(t?.runH ?? 0).toFixed(1)} h ·{" "}
+											</span>
+											<span className="text-muted-foreground text-[11px]">
+												· {(t?.runH ?? 0).toFixed(1)} h ·{" "}
 												{Math.round(t?.runVert ?? 0)} m
-											</div>
+											</span>
 										</div>
 									</div>
 									<TotalRow
@@ -319,7 +579,7 @@ function CalendarInner() {
 										requirements={requirementsByWeek.get(toIsoWeek(w)) ?? []}
 										activities={activitiesByWeek.get(toIsoWeek(w)) ?? []}
 									/>
-								</div>
+								</ScrollableDayCell>
 							);
 						})}
 					</div>

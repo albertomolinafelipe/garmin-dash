@@ -22,7 +22,6 @@ import {
 	sportColor,
 } from "@/lib/activity-types";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import {
 	Sheet,
 	SheetContent,
@@ -31,7 +30,11 @@ import {
 	SheetHeader,
 	SheetTitle,
 } from "@/components/ui/sheet";
-import { usePlansQuery, useUpdatePlanWorkoutMutation } from "@/graphql/hooks";
+import {
+	useDeletePlanWorkoutMutation,
+	usePlansQuery,
+	useUpdatePlanWorkoutMutation,
+} from "@/graphql/hooks";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { dayKey, fmtDistance, fmtDuration } from "@/lib/format";
 import {
@@ -94,22 +97,40 @@ export function WeekRequirements({
 		(a, b) => sortKey(a.sport) - sortKey(b.sport),
 	);
 	return (
-		<div className="mt-1 flex flex-col gap-1.5">
+		<div className="mt-1 flex flex-col gap-1">
 			{ordered.map((r) => {
 				const meta = METRIC_META[r.metric as Metric];
 				const target = Number(r.target);
 				const actual = requirementActual(activities, r.metric, r.sport);
-				const pct = target > 0 ? Math.min(100, (actual / target) * 100) : 0;
+				const scale = Math.max(target, actual);
+				const targetFill =
+					scale > 0 ? (Math.min(actual, target) / scale) * 100 : 0;
+				const extraFill =
+					actual > target && scale > 0 ? ((actual - target) / scale) * 100 : 0;
 				const SportIcon = sportIcon(r.sport);
 				const MetricIcon = meta?.icon;
 				const color = sportColor(r.sport);
 				return (
 					<div key={String(r.id)} className="flex items-center gap-1.5">
-						<Progress
-							value={pct}
-							className="h-1"
-							indicatorStyle={{ backgroundColor: color }}
-						/>
+						<div
+							role="progressbar"
+							aria-label={`${r.sport ?? "Workout"} ${r.metric} progress`}
+							aria-valuemin={0}
+							aria-valuenow={actual}
+							aria-valuemax={scale}
+							className="bg-primary/20 flex h-1 min-w-0 flex-1 overflow-hidden rounded-full"
+						>
+							<div
+								className="h-full transition-[width]"
+								style={{ width: `${targetFill}%`, backgroundColor: color }}
+							/>
+							{extraFill > 0 ? (
+								<div
+									className="h-full bg-[var(--plan)] transition-[width]"
+									style={{ width: `${extraFill}%` }}
+								/>
+							) : null}
+						</div>
 						<span className="text-muted-foreground flex w-20 shrink-0 items-center gap-1 text-[10px] tabular-nums">
 							<SportIcon size={11} className="shrink-0" />
 							{MetricIcon ? (
@@ -305,34 +326,31 @@ export function DayRaces({
 	);
 }
 
-const WorkoutDoneIcon = iconifyIcon("mdi:check-circle");
-const WorkoutTodoIcon = iconifyIcon("mdi:checkbox-blank-circle-outline");
+const WorkoutDeleteIcon = iconifyIcon("mdi:close");
+const WorkoutDragIcon = iconifyIcon("akar-icons:drag-vertical-fill");
 
 function WorkoutChip({ w, isPast }: { w: PlanWorkout; isPast: boolean }) {
 	const navigate = useNavigate();
 	const isMobile = useIsMobile();
 	const dnd = useWorkoutDnd();
-	const update = useUpdatePlanWorkoutMutation();
+	const remove = useDeletePlanWorkoutMutation();
 	const queryClient = useQueryClient();
 	const [open, setOpen] = useState(false);
 	const Icon = sportIcon(w.sport);
 	const color = sportColor(w.sport);
-	const isDone = Boolean(w.completed_at);
 	const goToPlan = () => navigate(`/plans?plan=${w.plan_id}`);
 
-	const toggleDone = () => {
-		const completed_at = isDone ? null : new Date().toISOString();
+	const deleteWorkout = () => {
+		if (remove.isPending) return;
 		void (async () => {
 			try {
-				await update.mutateAsync({ id: w.id, set: { completed_at } });
+				await remove.mutateAsync({ id: w.id });
 				await queryClient.invalidateQueries({ queryKey: ["plan-workouts"] });
 			} catch {
-				toast.error("Could not update the workout");
+				toast.error("Could not delete the workout");
 			}
 		})();
 	};
-
-	const DoneIcon = isDone ? WorkoutDoneIcon : WorkoutTodoIcon;
 
 	const chip = (
 		<div
@@ -342,7 +360,7 @@ function WorkoutChip({ w, isPast }: { w: PlanWorkout; isPast: boolean }) {
 				dnd ? "md:cursor-grab md:active:cursor-grabbing" : "",
 				isPast ? "bg-accent/40 text-muted-foreground" : "bg-muted",
 			)}
-			style={isPast || isDone ? undefined : { color }}
+			style={isPast ? undefined : { color }}
 			title={w.title}
 		>
 			<button
@@ -351,29 +369,26 @@ function WorkoutChip({ w, isPast }: { w: PlanWorkout; isPast: boolean }) {
 				className="flex min-w-0 flex-1 items-center justify-center gap-1 hover:opacity-80 md:justify-start"
 			>
 				<Icon size={14} className="shrink-0" />
-				<span
-					className={cn(
-						"hidden truncate text-xs font-medium md:inline",
-						isDone && "text-muted-foreground line-through",
-					)}
-				>
+				<span className="hidden truncate text-xs font-medium md:inline">
 					{w.title}
 				</span>
 			</button>
 			<button
 				type="button"
-				onClick={toggleDone}
-				aria-label={isDone ? "Mark workout not done" : "Mark workout done"}
-				aria-pressed={isDone}
-				className={cn(
-					"shrink-0 transition-opacity",
-					isDone
-						? "text-emerald-500"
-						: "text-muted-foreground opacity-40 md:opacity-0 md:group-hover/chip:opacity-100",
-				)}
+				onClick={deleteWorkout}
+				disabled={remove.isPending}
+				aria-label={`Delete ${w.title}`}
+				className="text-destructive hidden shrink-0 opacity-0 transition-opacity hover:opacity-100 disabled:cursor-wait md:block md:group-hover/chip:opacity-70"
 			>
-				<DoneIcon size={14} className="shrink-0" />
+				<WorkoutDeleteIcon size={14} className="shrink-0" />
 			</button>
+			{dnd ? (
+				<WorkoutDragIcon
+					size={14}
+					aria-hidden="true"
+					className="text-muted-foreground hidden shrink-0 opacity-0 transition-opacity md:block md:group-hover/chip:opacity-70"
+				/>
+			) : null}
 		</div>
 	);
 
@@ -402,12 +417,6 @@ function WorkoutChip({ w, isPast }: { w: PlanWorkout; isPast: boolean }) {
 						</p>
 					) : null}
 					<SheetFooter>
-						<Button
-							variant={isDone ? "outline" : "default"}
-							onClick={toggleDone}
-						>
-							{isDone ? "Mark as not done" : "Mark as done"}
-						</Button>
 						<Button variant="ghost" onClick={goToPlan}>
 							Go to plan
 						</Button>
