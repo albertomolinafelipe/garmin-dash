@@ -15,7 +15,6 @@ import { NavLink } from "react-router-dom";
 
 import { LoginDialog } from "@/components/login-dialog";
 import { NhostLogo } from "@/components/nhost-logo";
-import { SyncButton } from "@/components/sync-button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -155,7 +154,6 @@ function AppSidebar({
 				) : null}
 			</SidebarContent>
 			<SidebarFooter>
-				{authenticated ? <SyncButton /> : null}
 				<ThemeToggle />
 				{authenticated ? (
 					<Button

@@ -217,6 +217,7 @@ mutation DeletePlanRequirement($id: bigint!) {
 query AllPlanRequirements {
   plan_requirements(order_by: {week: asc}) {
     id
+    plan_id
     week
     sport
     metric
@@ -252,17 +253,5 @@ mutation UpdatePlanWorkout($id: bigint!, $set: plan_workouts_set_input!) {
 mutation DeletePlanWorkout($id: bigint!) {
   delete_plan_workouts_by_pk(id: $id) {
     id
-  }
-}
-
-mutation SyncActivities($days: Int = 7, $maxActivities: Int = 20) {
-  syncActivities(days: $days, maxActivities: $maxActivities) {
-    activities_created
-    activities_updated
-    sleep_created
-    sleep_updated
-    streams_written
-    activities_failed
-    errors
   }
 }

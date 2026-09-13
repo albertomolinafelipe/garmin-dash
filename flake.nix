@@ -16,22 +16,11 @@
             packages = with pkgs; [
               nhost-cli
               nodejs_22
-              python312
-              python312Packages.pip
-              python312Packages.venvShellHook
-              ruff
               docker-client
-              nodejs
             ];
 
-            venvDir = ".venv";
-            postVenvCreation = ''
-              unset SOURCE_DATE_EPOCH
-              pip install -r ondra/requirements-dev.txt
-            '';
-            postShellHook = ''
-              unset SOURCE_DATE_EPOCH
-              echo "garmin-nhost shell: nhost $(nhost --version | tail -n1), node $(node --version), python $(python --version)"
+            shellHook = ''
+              echo "garmin-nhost shell: nhost $(nhost --version | tail -n1), node $(node --version)"
             '';
           };
         });

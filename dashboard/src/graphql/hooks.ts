@@ -12,8 +12,6 @@ import {
 	FoodOptionsDocument,
 	InsertExerciseDocument,
 	type GeneratedInsertExerciseMutationVariables,
-	SyncActivitiesDocument,
-	type GeneratedSyncActivitiesMutationVariables,
 	PlansDocument,
 	PlanDocument,
 	AllPlanWorkoutsDocument,
@@ -122,13 +120,6 @@ export function useDeleteExerciseMutation() {
 	return useMutation({
 		mutationFn: (variables: GeneratedDeleteExerciseMutationVariables) =>
 			graphQLClient.request(DeleteExerciseDocument, variables),
-	});
-}
-
-export function useSyncActivitiesMutation() {
-	return useMutation({
-		mutationFn: (variables: GeneratedSyncActivitiesMutationVariables = {}) =>
-			graphQLClient.request(SyncActivitiesDocument, variables),
 	});
 }
 

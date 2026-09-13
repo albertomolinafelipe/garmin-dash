@@ -1,11 +1,4 @@
 [global]
-[[global.environment]]
-name = 'ONDRA_GRAPHQL_URL'
-value = '{{ secrets.ONDRA_GRAPHQL_URL }}'
-
-[[global.environment]]
-name = 'ONDRA_REMOTE_SCHEMA_SECRET'
-value = '{{ secrets.ONDRA_REMOTE_SCHEMA_SECRET }}'
 
 [hasura]
 version = 'v2.48.10-ce'
@@ -48,7 +41,7 @@ disableNewUsers = true
 enabled = true
 
 [postgres]
-version = '15.12-20250530-1'
+version = '16.8-20250530-1'
 
 [postgres.resources]
 [postgres.resources.storage]
