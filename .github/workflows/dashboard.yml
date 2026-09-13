@@ -15,6 +15,8 @@ permissions:
 env:
   IMAGE: ghcr.io/${{ github.repository_owner }}/garmin-dash-dashboard
   SERVICE_ID: e0da2106-aaa8-46ac-9d81-a6ec097d009a
+  NHOST_CLI_AUTH_URL: https://mytpiiwxeyrvlqrxuknp.auth.eu-central-1.nhost.run/v1
+  NHOST_CLI_GRAPHQL_URL: https://mytpiiwxeyrvlqrxuknp.graphql.eu-central-1.nhost.run/v1
 
 jobs:
   build-deploy:
