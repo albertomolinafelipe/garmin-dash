@@ -7,29 +7,15 @@ import {
 	useState,
 } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
 import { CalendarDays, ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import { toast } from "sonner";
 
+import { AddRequirementSheet } from "@/components/add-requirement-sheet";
+import {
+	AddWorkoutSheet,
+	type PlanOption,
+} from "@/components/add-workout-sheet";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import {
-	Sheet,
-	SheetContent,
-	SheetDescription,
-	SheetFooter,
-	SheetHeader,
-	SheetTitle,
-} from "@/components/ui/sheet";
-import { Textarea } from "@/components/ui/textarea";
 import {
 	addDays,
 	computeWeekTotals,
@@ -51,11 +37,10 @@ import {
 import {
 	useAllPlanRequirementsQuery,
 	useAllPlanWorkoutsQuery,
-	useInsertPlanWorkoutMutation,
 	usePlansQuery,
 	useRacesQuery,
 } from "@/graphql/hooks";
-import { dayToken, sportIcon, SPORTS, toIsoWeek } from "@/lib/plans";
+import { toIsoWeek } from "@/lib/plans";
 import {
 	type Category,
 	CATEGORY_ORDER,
@@ -131,163 +116,6 @@ function ScrollableDayCell({
 	);
 }
 
-type PlanOption = {
-	id: unknown;
-	name: string;
-	start_week: string;
-	end_week: string;
-};
-
-function AddWorkoutSheet({
-	day,
-	plans,
-	onClose,
-}: {
-	day: Date | null;
-	plans: PlanOption[];
-	onClose: () => void;
-}) {
-	const queryClient = useQueryClient();
-	const insert = useInsertPlanWorkoutMutation();
-	const week = day ? toIsoWeek(day) : "";
-	const eligiblePlans = plans.filter(
-		(plan) => plan.start_week <= week && plan.end_week >= week,
-	);
-	const [planId, setPlanId] = useState("");
-	const [sport, setSport] = useState<string>(SPORTS[0]);
-	const [title, setTitle] = useState("");
-	const [description, setDescription] = useState("");
-	const SportIcon = sportIcon(sport);
-
-	const resetAndClose = () => {
-		setPlanId("");
-		setSport(SPORTS[0]);
-		setTitle("");
-		setDescription("");
-		onClose();
-	};
-
-	const save = async () => {
-		if (!day || !planId || !title.trim() || insert.isPending) return;
-		try {
-			await insert.mutateAsync({
-				object: {
-					plan_id: planId,
-					week,
-					day_of_week: dayToken(day),
-					sport,
-					title: title.trim(),
-					description: description.trim() || null,
-				},
-			});
-			await queryClient.invalidateQueries({ queryKey: ["plan-workouts"] });
-			resetAndClose();
-		} catch {
-			toast.error("Could not add workout");
-		}
-	};
-
-	return (
-		<Sheet
-			open={day !== null}
-			onOpenChange={(open) => !open && resetAndClose()}
-		>
-			<SheetContent side="right" className="gap-5 sm:max-w-md">
-				<SheetHeader>
-					<SheetTitle>Add workout</SheetTitle>
-					<SheetDescription>
-						{day
-							? day.toLocaleDateString(undefined, {
-									weekday: "long",
-									month: "long",
-									day: "numeric",
-								})
-							: "Select a calendar day"}
-					</SheetDescription>
-				</SheetHeader>
-				<div className="flex flex-col gap-4 px-4">
-					<div className="flex flex-col gap-2">
-						<Label>Plan</Label>
-						<Select value={planId} onValueChange={setPlanId}>
-							<SelectTrigger className="w-full">
-								<span>
-									{eligiblePlans.find((plan) => String(plan.id) === planId)
-										?.name ?? "Select plan"}
-								</span>
-							</SelectTrigger>
-							<SelectContent>
-								{eligiblePlans.map((plan) => (
-									<SelectItem key={String(plan.id)} value={String(plan.id)}>
-										{plan.name}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-						{eligiblePlans.length === 0 ? (
-							<p className="text-muted-foreground text-sm">
-								No plan covers ISO week {week}.
-							</p>
-						) : null}
-					</div>
-					<div className="flex flex-col gap-2">
-						<Label>Sport</Label>
-						<Select value={sport} onValueChange={setSport}>
-							<SelectTrigger className="w-full">
-								<span className="flex items-center gap-2">
-									<SportIcon className="size-4" />
-									{sport}
-								</span>
-							</SelectTrigger>
-							<SelectContent>
-								{SPORTS.map((value) => {
-									const Icon = sportIcon(value);
-									return (
-										<SelectItem key={value} value={value}>
-											<span className="flex items-center gap-2">
-												<Icon className="size-4" />
-												{value}
-											</span>
-										</SelectItem>
-									);
-								})}
-							</SelectContent>
-						</Select>
-					</div>
-					<div className="flex flex-col gap-2">
-						<Label htmlFor="calendar-workout-title">Title</Label>
-						<Input
-							id="calendar-workout-title"
-							value={title}
-							onChange={(event) => setTitle(event.target.value)}
-							placeholder="Easy run"
-						/>
-					</div>
-					<div className="flex flex-col gap-2">
-						<Label htmlFor="calendar-workout-description">Description</Label>
-						<Textarea
-							id="calendar-workout-description"
-							value={description}
-							onChange={(event) => setDescription(event.target.value)}
-							placeholder="Optional details"
-						/>
-					</div>
-				</div>
-				<SheetFooter>
-					<Button
-						disabled={!planId || !title.trim() || insert.isPending}
-						onClick={() => void save()}
-					>
-						{insert.isPending ? "Saving…" : "Add workout"}
-					</Button>
-					<Button variant="ghost" onClick={resetAndClose}>
-						Cancel
-					</Button>
-				</SheetFooter>
-			</SheetContent>
-		</Sheet>
-	);
-}
-
 function CalendarInner() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const cursor = parseMonthToken(searchParams.get("month")) ?? new Date();
@@ -307,6 +135,7 @@ function CalendarInner() {
 	const { data: races } = useRacesQuery();
 	const { data: plansData } = usePlansQuery();
 	const [workoutDay, setWorkoutDay] = useState<Date | null>(null);
+	const [requirementWeek, setRequirementWeek] = useState<string | null>(null);
 
 	const activities = data?.activities ?? [];
 	const workoutsByWeekDay = useMemo(
@@ -371,6 +200,11 @@ function CalendarInner() {
 				day={workoutDay}
 				plans={(plansData ?? []) as PlanOption[]}
 				onClose={() => setWorkoutDay(null)}
+			/>
+			<AddRequirementSheet
+				week={requirementWeek}
+				plans={(plansData ?? []) as PlanOption[]}
+				onClose={() => setRequirementWeek(null)}
 			/>
 			{/* Toolbar */}
 			<div className="relative flex flex-wrap items-center justify-between gap-3">
@@ -535,6 +369,7 @@ function CalendarInner() {
 					<div className="text-muted-foreground flex h-9 items-center justify-center border-b text-[11px] font-semibold tracking-wide uppercase">
 						Week totals
 					</div>
+
 					<div className="flex min-h-0 flex-1 flex-col">
 						{weeks.map((w) => {
 							const t = totals.get(dayKey(w));
@@ -544,6 +379,15 @@ function CalendarInner() {
 									className="min-h-0 flex-1 border-b last:border-b-0"
 									contentClassName="gap-1 p-2"
 								>
+									<Button
+										variant="ghost"
+										size="icon"
+										className="text-muted-foreground absolute top-1 right-1 size-5 opacity-50 hover:opacity-100"
+										aria-label={`Add requirement for ${toIsoWeek(w)}`}
+										onClick={() => setRequirementWeek(toIsoWeek(w))}
+									>
+										<Plus className="size-3" />
+									</Button>
 									<div className="flex items-start gap-1.5">
 										<categoryIcon.running
 											size={12}

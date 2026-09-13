@@ -67,7 +67,7 @@ export function indexRequirements(
 	return map;
 }
 
-function requirementActual(
+export function requirementActual(
 	acts: CalendarActivity[],
 	metric: string,
 	sport: string | null,
@@ -81,6 +81,46 @@ function requirementActual(
 		else if (metric === "duration") total += num(a.duration_s);
 	}
 	return total;
+}
+
+// Two-segment bar: the sport-coloured part is progress towards the target, the
+// `--plan` part is the overshoot beyond it.
+export function RequirementBar({
+	sport,
+	metric,
+	target,
+	actual,
+}: {
+	sport: string | null;
+	metric: string;
+	target: number;
+	actual: number;
+}) {
+	const scale = Math.max(target, actual);
+	const targetFill = scale > 0 ? (Math.min(actual, target) / scale) * 100 : 0;
+	const extraFill =
+		actual > target && scale > 0 ? ((actual - target) / scale) * 100 : 0;
+	return (
+		<div
+			role="progressbar"
+			aria-label={`${sport ?? "Workout"} ${metric} progress`}
+			aria-valuemin={0}
+			aria-valuenow={actual}
+			aria-valuemax={scale}
+			className="bg-primary/20 flex h-1 min-w-0 flex-1 overflow-hidden rounded-full"
+		>
+			<div
+				className="h-full transition-[width]"
+				style={{ width: `${targetFill}%`, backgroundColor: sportColor(sport) }}
+			/>
+			{extraFill > 0 ? (
+				<div
+					className="h-full bg-[var(--plan)] transition-[width]"
+					style={{ width: `${extraFill}%` }}
+				/>
+			) : null}
+		</div>
+	);
 }
 
 export function WeekRequirements({
@@ -102,35 +142,16 @@ export function WeekRequirements({
 				const meta = METRIC_META[r.metric as Metric];
 				const target = Number(r.target);
 				const actual = requirementActual(activities, r.metric, r.sport);
-				const scale = Math.max(target, actual);
-				const targetFill =
-					scale > 0 ? (Math.min(actual, target) / scale) * 100 : 0;
-				const extraFill =
-					actual > target && scale > 0 ? ((actual - target) / scale) * 100 : 0;
 				const SportIcon = sportIcon(r.sport);
 				const MetricIcon = meta?.icon;
-				const color = sportColor(r.sport);
 				return (
 					<div key={String(r.id)} className="flex items-center gap-1.5">
-						<div
-							role="progressbar"
-							aria-label={`${r.sport ?? "Workout"} ${r.metric} progress`}
-							aria-valuemin={0}
-							aria-valuenow={actual}
-							aria-valuemax={scale}
-							className="bg-primary/20 flex h-1 min-w-0 flex-1 overflow-hidden rounded-full"
-						>
-							<div
-								className="h-full transition-[width]"
-								style={{ width: `${targetFill}%`, backgroundColor: color }}
-							/>
-							{extraFill > 0 ? (
-								<div
-									className="h-full bg-[var(--plan)] transition-[width]"
-									style={{ width: `${extraFill}%` }}
-								/>
-							) : null}
-						</div>
+						<RequirementBar
+							sport={r.sport}
+							metric={r.metric}
+							target={target}
+							actual={actual}
+						/>
 						<span className="text-muted-foreground flex w-20 shrink-0 items-center gap-1 text-[10px] tabular-nums">
 							<SportIcon size={11} className="shrink-0" />
 							{MetricIcon ? (
@@ -337,8 +358,8 @@ function WorkoutChip({ w, isPast }: { w: PlanWorkout; isPast: boolean }) {
 	const queryClient = useQueryClient();
 	const [open, setOpen] = useState(false);
 	const Icon = sportIcon(w.sport);
-	const color = sportColor(w.sport);
 	const goToPlan = () => navigate(`/plans?plan=${w.plan_id}`);
+	const subtitle = w.description?.trim() || w.sport;
 
 	const deleteWorkout = () => {
 		if (remove.isPending) return;
@@ -356,21 +377,25 @@ function WorkoutChip({ w, isPast }: { w: PlanWorkout; isPast: boolean }) {
 		<div
 			{...workoutDragProps(dnd, w)}
 			className={cn(
-				"group/chip hover:bg-accent flex items-center gap-1 rounded-md px-1.5 py-1 leading-tight transition-colors",
+				"group/chip border-muted-foreground/40 bg-accent/40 hover:bg-accent text-muted-foreground flex items-start gap-1 rounded-md border-l-2 px-1.5 py-1 leading-tight transition-colors",
 				dnd ? "md:cursor-grab md:active:cursor-grabbing" : "",
-				isPast ? "bg-accent/40 text-muted-foreground" : "bg-muted",
+				isPast && "opacity-70",
 			)}
-			style={isPast ? undefined : { color }}
 			title={w.title}
 		>
 			<button
 				type="button"
 				onClick={() => (isMobile ? setOpen(true) : goToPlan())}
-				className="flex min-w-0 flex-1 items-center justify-center gap-1 hover:opacity-80 md:justify-start"
+				className="flex min-w-0 flex-1 flex-col hover:opacity-80"
 			>
-				<Icon size={14} className="shrink-0" />
-				<span className="hidden truncate text-xs font-medium md:inline">
-					{w.title}
+				<span className="flex w-full items-center justify-center gap-1 md:justify-start">
+					<Icon size={14} className="shrink-0" />
+					<span className="hidden truncate text-xs font-medium md:inline">
+						{w.title}
+					</span>
+				</span>
+				<span className="hidden w-full truncate text-left text-xs md:block">
+					{subtitle}
 				</span>
 			</button>
 			<button
@@ -511,16 +536,58 @@ export function eventInfo(a: CalendarActivity): string {
 	return parts.join(" · ");
 }
 
+// Icon plus the numbers that matter: duration for everything, distance and
+// vertical too when the activity is a run.
+function compactInfo(a: CalendarActivity): string {
+	const parts: string[] = [];
+	if (num(a.duration_s)) parts.push(fmtDuration(num(a.duration_s)));
+	if (categoryOf(a.activity_type, a.subtype) === "running") {
+		if (num(a.distance_m)) parts.push(fmtDistance(num(a.distance_m)));
+		if (num(a.elevation_gain_m))
+			parts.push(`${Math.round(num(a.elevation_gain_m))} m`);
+	}
+	return parts.join(" · ");
+}
+
 export function DayEvent({
 	a,
 	isRace,
+	compact,
 }: {
 	a: CalendarActivity;
 	isRace?: boolean;
+	compact?: boolean;
 }) {
 	const category = categoryOf(a.activity_type, a.subtype);
 	const Icon = isRace ? RaceIcon : categoryIcon[category];
 	const color = categoryColor[category];
+
+	if (compact) {
+		return (
+			<Link
+				to={`/activities/${a.id}`}
+				title={a.name ?? a.activity_type ?? "Activity"}
+				className={cn(
+					"focus-visible:ring-ring flex items-center gap-1 rounded-md px-1.5 py-1 leading-tight transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:outline-none",
+					isRace && "text-race bg-race/10",
+				)}
+				style={
+					isRace
+						? undefined
+						: {
+								color,
+								backgroundColor: `color-mix(in oklab, ${color} 18%, transparent)`,
+							}
+				}
+			>
+				<Icon size={14} className="shrink-0" />
+				<span className="hidden truncate text-xs font-medium tabular-nums md:inline">
+					{compactInfo(a)}
+				</span>
+			</Link>
+		);
+	}
+
 	return (
 		<Link
 			to={`/activities/${a.id}`}

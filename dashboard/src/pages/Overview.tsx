@@ -6,7 +6,7 @@ import {
 	useMemo,
 	useState,
 } from "react";
-import { ChevronLeft, ChevronRight, ChevronsRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsRight, Target } from "lucide-react";
 import {
 	Area,
 	Bar,
@@ -37,6 +37,7 @@ import {
 	computeWeekTotals,
 	indexRaces,
 	indexWorkouts,
+	type PlanRequirement,
 	PlanWorkoutDndProvider,
 	type Race,
 	startOfWeek,
@@ -57,7 +58,7 @@ import {
 	useAllPlanWorkoutsQuery,
 	useRacesQuery,
 } from "@/graphql/hooks";
-import { toIsoWeek } from "@/lib/plans";
+import { type Metric, METRIC_META, type Sport, toIsoWeek } from "@/lib/plans";
 import { cn } from "@/lib/utils";
 
 const WINDOW_DAYS = 7; // trailing window each daily point aggregates
@@ -324,45 +325,93 @@ interface LoadSeries {
 	color: string;
 	axis: "left" | "right";
 	contribution: (a: CalendarActivity) => number | null;
+	// When set, the panel can overlay this series' weekly plan target.
+	objective?: { metric: Metric; sport: Sport };
+}
+
+// Per-day plan target for a series, flat across each ISO week (Mon–Sun) so it
+// reads as a level line to compare the rolling total against. Requirements for
+// the series' sport and "all sports" ones both count; days in weeks without a
+// requirement are null so the line breaks instead of sloping to zero.
+function objectiveByDay(
+	requirements: PlanRequirement[],
+	objective: { metric: Metric; sport: Sport },
+	end: Date,
+): (number | null)[] {
+	const perWeek = new Map<string, number>();
+	for (const r of requirements) {
+		if (r.metric !== objective.metric) continue;
+		if (r.sport !== null && r.sport !== objective.sport) continue;
+		perWeek.set(r.week, (perWeek.get(r.week) ?? 0) + Number(r.target));
+	}
+	const fromBase = METRIC_META[objective.metric].fromBase;
+	const out: (number | null)[] = [];
+	for (let i = SPAN_DAYS - 1; i >= 0; i--) {
+		const day = new Date(end);
+		day.setDate(end.getDate() - i);
+		const target = perWeek.get(toIsoWeek(day));
+		out.push(target === undefined ? null : +fromBase(target).toFixed(1));
+	}
+	return out;
 }
 
 function LoadPanel({
 	title,
 	series,
-	windowDays = WINDOW_DAYS,
 	variant = "area",
 	className,
 }: {
 	title: string;
 	series: LoadSeries[];
-	windowDays?: number;
 	variant?: "area" | "bar";
 	className?: string;
 }) {
 	const { data, isPending } = useActivities();
 	const activities = data?.activities ?? [];
 	const { end } = useWindowNav();
+	const { data: requirements } = useAllPlanRequirementsQuery();
+	const [showObjectives, setShowObjectives] = useState(false);
+	const objectiveSeries = useMemo(
+		() =>
+			series.flatMap((s) =>
+				s.objective ? [{ ...s, objective: s.objective }] : [],
+			),
+		[series],
+	);
 
 	const rows = useMemo(() => {
 		const labels = dayLabels(end);
 		const cols = series.map((s) =>
-			rolling(activities, s.contribution, windowDays, end),
+			rolling(activities, s.contribution, WINDOW_DAYS, end),
+		);
+		const objectiveCols = new Map(
+			objectiveSeries.map((s) => [
+				s.key,
+				objectiveByDay(requirements ?? [], s.objective, end),
+			]),
 		);
 		return labels.map((date, i) => {
-			const row: Record<string, string | number> = { date };
+			const row: Record<string, string | number | null> = { date };
 			series.forEach((s, si) => {
 				row[s.key] = cols[si][i];
 			});
+			for (const [key, col] of objectiveCols) {
+				row[`${key}-objective`] = col[i];
+			}
 			return row;
 		});
-	}, [activities, series, windowDays, end]);
+	}, [activities, series, end, requirements, objectiveSeries]);
 
 	const config = useMemo(
 		() =>
-			Object.fromEntries(
-				series.map((s) => [s.key, { label: s.label, color: s.color }]),
-			) satisfies ChartConfig,
-		[series],
+			Object.fromEntries([
+				...series.map((s) => [s.key, { label: s.label, color: s.color }]),
+				...objectiveSeries.map((s) => [
+					`${s.key}-objective`,
+					{ label: `${s.label} objective`, color: s.color },
+				]),
+			]) satisfies ChartConfig,
+		[series, objectiveSeries],
 	);
 
 	const usesRight = series.some((s) => s.axis === "right");
@@ -372,14 +421,31 @@ function LoadPanel({
 		rows.length ? rows[rows.length - 1][s.key] : null;
 
 	const badges = (
-		<div className="flex gap-1.5">
+		<div className="flex items-center gap-1.5">
+			{objectiveSeries.length > 0 ? (
+				<Button
+					variant="ghost"
+					size="icon"
+					className="size-7"
+					aria-label="Toggle objectives"
+					aria-pressed={showObjectives}
+					onClick={() => setShowObjectives((shown) => !shown)}
+				>
+					<Target
+						className={cn(
+							"size-4",
+							showObjectives ? "text-foreground" : "text-muted-foreground",
+						)}
+					/>
+				</Button>
+			) : null}
 			{series.map((s) => (
 				<Badge
 					key={s.key}
 					variant="outline"
 					style={{ color: s.color, borderColor: s.color }}
 				>
-					{current(s) ?? "—"} {s.unit} / {windowDays}d
+					{current(s) ?? "—"} {s.unit} / {WINDOW_DAYS}d
 				</Badge>
 			))}
 		</div>
@@ -459,6 +525,24 @@ function LoadPanel({
 								/>
 							),
 						)}
+						{showObjectives
+							? objectiveSeries.map((s) => (
+									<Line
+										key={`${s.key}-objective`}
+										yAxisId={s.axis}
+										type="stepAfter"
+										dataKey={`${s.key}-objective`}
+										stroke={s.color}
+										strokeWidth={2}
+										strokeOpacity={0.4}
+										strokeDasharray="4 4"
+										dot={false}
+										activeDot={false}
+										connectNulls={false}
+										isAnimationActive={animate}
+									/>
+								))
+							: null}
 					</ComposedChart>
 				</ChartContainer>
 			</PanelBody>
@@ -477,6 +561,7 @@ const RUNNING_SERIES: LoadSeries[] = [
 			a.activity_type?.includes("running") && num(a.distance_m)
 				? num(a.distance_m) / 1000
 				: null,
+		objective: { metric: "distance", sport: "running" },
 	},
 	{
 		key: "vert",
@@ -488,6 +573,7 @@ const RUNNING_SERIES: LoadSeries[] = [
 			a.activity_type?.includes("running") && num(a.elevation_gain_m)
 				? num(a.elevation_gain_m)
 				: null,
+		objective: { metric: "elevation", sport: "running" },
 	},
 ];
 
@@ -1085,14 +1171,6 @@ function OverviewPanels() {
 			</div>
 			<div className={cn("flex flex-col gap-4 md:flex-row", ROW)}>
 				<ReadinessPanel />
-			</div>
-			<div className={cn("flex flex-col gap-4 md:flex-row", ROW)}>
-				<LoadPanel
-					title="Daily running"
-					series={RUNNING_SERIES}
-					windowDays={1}
-					className="h-[280px] md:h-full md:flex-1"
-				/>
 			</div>
 		</div>
 	);

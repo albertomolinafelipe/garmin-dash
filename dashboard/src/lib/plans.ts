@@ -151,7 +151,8 @@ export function planIsActive(
 	return plan.start_week <= week && week <= plan.end_week;
 }
 
-function isoWeekToDate(value: string): Date {
+// '2026-W02' -> the Monday starting that ISO week.
+export function isoWeekStart(value: string): Date {
 	const [year, week] = value.split("-W");
 	return startOfISOWeek(
 		setISOWeek(setISOWeekYear(new Date(), Number(year)), Number(week)),
@@ -162,7 +163,7 @@ function isoWeekToDate(value: string): Date {
 export function weeksInRange(start: string, end: string): string[] {
 	if (!isIsoWeek(start) || !isIsoWeek(end) || end < start) return [];
 	const weeks: string[] = [];
-	let date = isoWeekToDate(start);
+	let date = isoWeekStart(start);
 	for (let i = 0; i < 260; i++) {
 		const week = toIsoWeek(date);
 		weeks.push(week);
