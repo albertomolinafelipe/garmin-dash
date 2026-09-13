@@ -1,0 +1,24 @@
+table:
+  name: sports
+  schema: public
+array_relationships:
+  - name: day_plans
+    using:
+      foreign_key_constraint_on:
+        column: sport
+        table:
+          name: day_plans
+          schema: public
+  - name: week_objectives
+    using:
+      foreign_key_constraint_on:
+        column: sport
+        table:
+          name: week_objectives
+          schema: public
+select_permissions:
+  - role: user
+    permission:
+      columns: "*"
+      filter: {}
+      allow_aggregations: true

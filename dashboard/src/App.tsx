@@ -7,7 +7,6 @@ import { Activities } from "@/pages/Activities";
 import { ActivityDetail } from "@/pages/ActivityDetail";
 import { Calendar } from "@/pages/Calendar";
 import { Overview } from "@/pages/Overview";
-import { Plans } from "@/pages/Plans";
 import { Settings } from "@/pages/Settings";
 import { queryClient } from "@/queryClient";
 
@@ -48,7 +47,6 @@ export default function App() {
 				<Route path="/calendar" element={<Calendar />} />
 				<Route path="/activities" element={<Activities />} />
 				<Route path="/activities/:id" element={<ActivityDetail />} />
-				<Route path="/plans" element={<Plans />} />
 				<Route path="/settings" element={<Settings />} />
 				<Route path="*" element={<Navigate to="/overview" replace />} />
 			</Routes>

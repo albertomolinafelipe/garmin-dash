@@ -36,9 +36,10 @@ import {
 	addDays,
 	computeWeekTotals,
 	indexRaces,
-	indexWorkouts,
-	type PlanRequirement,
-	PlanWorkoutDndProvider,
+	indexDayPlans,
+	type DayPlan,
+	type WeekObjective,
+	DayPlanDndProvider,
 	type Race,
 	startOfWeek,
 	WeekStrip,
@@ -54,8 +55,8 @@ import {
 	useSleep,
 } from "@/lib/queries";
 import {
-	useAllPlanRequirementsQuery,
-	useAllPlanWorkoutsQuery,
+	useDayPlansQuery,
+	useWeekObjectivesQuery,
 	useRacesQuery,
 } from "@/graphql/hooks";
 import { type Metric, METRIC_META, type Sport, toIsoWeek } from "@/lib/plans";
@@ -330,16 +331,16 @@ interface LoadSeries {
 }
 
 // Per-day plan target for a series, flat across each ISO week (Mon–Sun) so it
-// reads as a level line to compare the rolling total against. Requirements for
-// the series' sport and "all sports" ones both count; days in weeks without a
-// requirement are null so the line breaks instead of sloping to zero.
+// reads as a level line to compare the rolling total against. Objectives for
+// the series' sport and "all sports" ones both count; days in weeks without an
+// objective are null so the line breaks instead of sloping to zero.
 function objectiveByDay(
-	requirements: PlanRequirement[],
+	objectives: WeekObjective[],
 	objective: { metric: Metric; sport: Sport },
 	end: Date,
 ): (number | null)[] {
 	const perWeek = new Map<string, number>();
-	for (const r of requirements) {
+	for (const r of objectives) {
 		if (r.metric !== objective.metric) continue;
 		if (r.sport !== null && r.sport !== objective.sport) continue;
 		perWeek.set(r.week, (perWeek.get(r.week) ?? 0) + Number(r.target));
@@ -369,7 +370,7 @@ function LoadPanel({
 	const { data, isPending } = useActivities();
 	const activities = data?.activities ?? [];
 	const { end } = useWindowNav();
-	const { data: requirements } = useAllPlanRequirementsQuery();
+	const { data: objectives } = useWeekObjectivesQuery();
 	const [showObjectives, setShowObjectives] = useState(false);
 	const objectiveSeries = useMemo(
 		() =>
@@ -387,7 +388,7 @@ function LoadPanel({
 		const objectiveCols = new Map(
 			objectiveSeries.map((s) => [
 				s.key,
-				objectiveByDay(requirements ?? [], s.objective, end),
+				objectiveByDay(objectives ?? [], s.objective, end),
 			]),
 		);
 		return labels.map((date, i) => {
@@ -400,7 +401,7 @@ function LoadPanel({
 			}
 			return row;
 		});
-	}, [activities, series, end, requirements, objectiveSeries]);
+	}, [activities, series, end, objectives, objectiveSeries]);
 
 	const config = useMemo(
 		() =>
@@ -1083,23 +1084,23 @@ function ReadinessPanel() {
 // Deliberately ignores WindowNav: this is a fixed "this week" snapshot.
 function WeekPanel({ className }: { className?: string }) {
 	const { data } = useActivities();
-	const { data: workouts } = useAllPlanWorkoutsQuery();
-	const { data: requirements } = useAllPlanRequirementsQuery();
+	const { data: dayPlans } = useDayPlansQuery();
+	const { data: objectives } = useWeekObjectivesQuery();
 	const { data: races } = useRacesQuery();
 	const activities = data?.activities ?? [];
 	const weekStart = useMemo(() => startOfWeek(new Date()), []);
-	const workoutsByWeekDay = useMemo(
-		() => indexWorkouts(workouts ?? []),
-		[workouts],
+	const dayPlansByDay = useMemo(
+		() => indexDayPlans((dayPlans ?? []) as DayPlan[]),
+		[dayPlans],
 	);
 	const racesByDay = useMemo(
 		() => indexRaces((races ?? []) as Race[]),
 		[races],
 	);
-	const weekRequirements = useMemo(() => {
+	const weekObjectives = useMemo(() => {
 		const iso = toIsoWeek(weekStart);
-		return (requirements ?? []).filter((r) => r.week === iso);
-	}, [requirements, weekStart]);
+		return (objectives ?? []).filter((o) => o.week === iso);
+	}, [objectives, weekStart]);
 
 	const byDay = useMemo(() => {
 		const map = new Map<string, CalendarActivity[]>();
@@ -1121,16 +1122,16 @@ function WeekPanel({ className }: { className?: string }) {
 
 	return (
 		<div className={cn("min-h-0", className)}>
-			<PlanWorkoutDndProvider>
+			<DayPlanDndProvider>
 				<WeekStrip
 					weekStart={weekStart}
 					byDay={byDay}
-					workoutsByWeekDay={workoutsByWeekDay}
+					dayPlansByDay={dayPlansByDay}
 					racesByDay={racesByDay}
 					totals={totals}
-					requirements={weekRequirements}
+					objectives={weekObjectives}
 				/>
-			</PlanWorkoutDndProvider>
+			</DayPlanDndProvider>
 		</div>
 	);
 }

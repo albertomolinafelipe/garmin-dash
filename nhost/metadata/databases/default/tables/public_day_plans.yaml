@@ -1,10 +1,10 @@
 table:
-  name: plan_workouts
+  name: day_plans
   schema: public
 object_relationships:
-  - name: plan
+  - name: sportBySport
     using:
-      foreign_key_constraint_on: plan_id
+      foreign_key_constraint_on: sport
 select_permissions:
   - role: user
     permission:

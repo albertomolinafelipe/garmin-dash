@@ -7,7 +7,7 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -31,25 +31,21 @@ import {
 	SheetTitle,
 } from "@/components/ui/sheet";
 import {
-	useDeletePlanWorkoutMutation,
-	usePlansQuery,
-	useUpdatePlanWorkoutMutation,
+	useDeleteDayPlanMutation,
+	useUpdateDayPlanMutation,
 } from "@/graphql/hooks";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { dayKey, fmtDistance, fmtDuration } from "@/lib/format";
 import {
-	DAY_LABEL,
-	dayToken,
 	type Metric,
 	METRIC_META,
 	raceIcon,
 	sportIcon,
-	toIsoWeek,
 } from "@/lib/plans";
 import { type CalendarActivity, num } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 
-export interface PlanRequirement {
+export interface WeekObjective {
 	id: unknown;
 	week: string;
 	sport: string | null;
@@ -57,17 +53,17 @@ export interface PlanRequirement {
 	target: unknown;
 }
 
-export function indexRequirements(
-	reqs: PlanRequirement[],
-): Map<string, PlanRequirement[]> {
-	const map = new Map<string, PlanRequirement[]>();
-	for (const r of reqs) {
-		(map.get(r.week) ?? map.set(r.week, []).get(r.week))?.push(r);
+export function indexObjectives(
+	objectives: WeekObjective[],
+): Map<string, WeekObjective[]> {
+	const map = new Map<string, WeekObjective[]>();
+	for (const o of objectives) {
+		(map.get(o.week) ?? map.set(o.week, []).get(o.week))?.push(o);
 	}
 	return map;
 }
 
-export function requirementActual(
+export function objectiveActual(
 	acts: CalendarActivity[],
 	metric: string,
 	sport: string | null,
@@ -85,7 +81,7 @@ export function requirementActual(
 
 // Two-segment bar: the sport-coloured part is progress towards the target, the
 // `--plan` part is the overshoot beyond it.
-export function RequirementBar({
+export function ObjectiveBar({
 	sport,
 	metric,
 	target,
@@ -103,7 +99,7 @@ export function RequirementBar({
 	return (
 		<div
 			role="progressbar"
-			aria-label={`${sport ?? "Workout"} ${metric} progress`}
+			aria-label={`${sport ?? "All sports"} ${metric} progress`}
 			aria-valuemin={0}
 			aria-valuenow={actual}
 			aria-valuemax={scale}
@@ -123,17 +119,17 @@ export function RequirementBar({
 	);
 }
 
-export function WeekRequirements({
-	requirements,
+export function WeekObjectives({
+	objectives,
 	activities,
 }: {
-	requirements: PlanRequirement[];
+	objectives: WeekObjective[];
 	activities: CalendarActivity[];
 }) {
-	if (requirements.length === 0) return null;
+	if (objectives.length === 0) return null;
 	const sortKey = (sport: string | null) =>
 		sport ? CATEGORY_ORDER.indexOf(sport as Category) : -1;
-	const ordered = [...requirements].sort(
+	const ordered = [...objectives].sort(
 		(a, b) => sortKey(a.sport) - sortKey(b.sport),
 	);
 	return (
@@ -141,12 +137,12 @@ export function WeekRequirements({
 			{ordered.map((r) => {
 				const meta = METRIC_META[r.metric as Metric];
 				const target = Number(r.target);
-				const actual = requirementActual(activities, r.metric, r.sport);
+				const actual = objectiveActual(activities, r.metric, r.sport);
 				const SportIcon = sportIcon(r.sport);
 				const MetricIcon = meta?.icon;
 				return (
 					<div key={String(r.id)} className="flex items-center gap-1.5">
-						<RequirementBar
+						<ObjectiveBar
 							sport={r.sport}
 							metric={r.metric}
 							target={target}
@@ -168,90 +164,72 @@ export function WeekRequirements({
 	);
 }
 
-export interface PlanWorkout {
+export interface DayPlan {
 	id: unknown;
-	plan_id: unknown;
-	week: string;
-	day_of_week: string;
-	sport: string;
-	title: string;
-	description?: string | null;
-	completed_at?: unknown;
+	date: string;
+	sport: string | null;
+	note: string;
 }
 
-// Drag-and-drop: dragging a workout chip onto a day cell reschedules it to that
-// day's ISO week + weekday, provided the day still falls inside the plan's week
-// range. Shared by the month calendar and the week strip via context so the
-// drop targets (page-owned day cells) and drag source (WorkoutChip) coordinate
+// Drag-and-drop: dragging a day-plan chip onto a day cell moves it to that date.
+// Shared by the month calendar and the week strip via context so the drop
+// targets (page-owned day cells) and the drag source (DayPlanChip) coordinate
 // without prop drilling.
-interface WorkoutDndValue {
-	onDragStartWorkout: (w: PlanWorkout, e: React.DragEvent) => void;
+interface DayPlanDndValue {
+	onDragStartDayPlan: (p: DayPlan, e: React.DragEvent) => void;
 	onDropDay: (day: Date, e: React.DragEvent) => void;
 }
 
-const WorkoutDndContext = createContext<WorkoutDndValue | null>(null);
+const DayPlanDndContext = createContext<DayPlanDndValue | null>(null);
 
-export function PlanWorkoutDndProvider({ children }: { children: ReactNode }) {
-	const dragged = useRef<PlanWorkout | null>(null);
-	const plans = usePlansQuery();
-	const update = useUpdatePlanWorkoutMutation();
+export function DayPlanDndProvider({ children }: { children: ReactNode }) {
+	const dragged = useRef<DayPlan | null>(null);
+	const update = useUpdateDayPlanMutation();
 	const queryClient = useQueryClient();
 
-	const onDragStartWorkout = useCallback(
-		(w: PlanWorkout, e: React.DragEvent) => {
-			dragged.current = w;
-			e.dataTransfer.effectAllowed = "move";
-			e.dataTransfer.setData("text/plain", String(w.id));
-		},
-		[],
-	);
+	const onDragStartDayPlan = useCallback((p: DayPlan, e: React.DragEvent) => {
+		dragged.current = p;
+		e.dataTransfer.effectAllowed = "move";
+		e.dataTransfer.setData("text/plain", String(p.id));
+	}, []);
 
 	const onDropDay = useCallback(
 		(day: Date, e: React.DragEvent) => {
 			e.preventDefault();
-			const w = dragged.current;
+			const p = dragged.current;
 			dragged.current = null;
-			if (!w) return;
-			const week = toIsoWeek(day);
-			const dow = dayToken(day);
-			if (w.week === week && w.day_of_week === dow) return;
-			const plan = plans.data?.find((p) => String(p.id) === String(w.plan_id));
-			if (!plan || week < plan.start_week || week > plan.end_week) {
-				toast.error("That day is outside the plan's range");
-				return;
-			}
+			if (!p) return;
+			const date = dayKey(day);
+			if (p.date === date) return;
 			void (async () => {
 				try {
-					await update.mutateAsync({
-						id: w.id,
-						set: { week, day_of_week: dow },
-					});
-					await queryClient.invalidateQueries({ queryKey: ["plan-workouts"] });
+					await update.mutateAsync({ id: p.id, set: { date } });
+					await queryClient.invalidateQueries({ queryKey: ["day-plans"] });
 				} catch {
-					toast.error("Could not move the workout");
+					toast.error("Could not move the plan");
 				}
 			})();
 		},
-		[plans.data, update, queryClient],
+		[update, queryClient],
 	);
 
 	const value = useMemo(
-		() => ({ onDragStartWorkout, onDropDay }),
-		[onDragStartWorkout, onDropDay],
+		() => ({ onDragStartDayPlan, onDropDay }),
+		[onDragStartDayPlan, onDropDay],
 	);
 	return (
-		<WorkoutDndContext.Provider value={value}>
+		<DayPlanDndContext.Provider value={value}>
 			{children}
-		</WorkoutDndContext.Provider>
+		</DayPlanDndContext.Provider>
 	);
 }
 
-export function useWorkoutDnd(): WorkoutDndValue | null {
-	return useContext(WorkoutDndContext);
+export function useDayPlanDnd(): DayPlanDndValue | null {
+	return useContext(DayPlanDndContext);
 }
 
 // Plain helpers (not hooks) so they can be used inside `.map` day loops.
-export function dayDropProps(dnd: WorkoutDndValue | null, day: Date) {
+export function dayDropProps(dnd: DayPlanDndValue | null, day: Date) {
 	if (!dnd) return {};
 	return {
 		onDragOver: (e: React.DragEvent) => e.preventDefault(),
@@ -259,22 +237,19 @@ export function dayDropProps(dnd: WorkoutDndValue | null, day: Date) {
 	};
 }
 
-export function workoutDragProps(dnd: WorkoutDndValue | null, w: PlanWorkout) {
+export function dayPlanDragProps(dnd: DayPlanDndValue | null, p: DayPlan) {
 	if (!dnd) return {};
 	return {
 		draggable: true,
-		onDragStart: (e: React.DragEvent) => dnd.onDragStartWorkout(w, e),
+		onDragStart: (e: React.DragEvent) => dnd.onDragStartDayPlan(p, e),
 	};
 }
 
-// Index workouts by `${isoWeek}|${dayOfWeek}` for O(1) per-day lookup.
-export function indexWorkouts(
-	workouts: PlanWorkout[],
-): Map<string, PlanWorkout[]> {
-	const map = new Map<string, PlanWorkout[]>();
-	for (const w of workouts) {
-		const key = `${w.week}|${w.day_of_week}`;
-		(map.get(key) ?? map.set(key, []).get(key))?.push(w);
+// Index day plans by their YYYY-MM-DD date for O(1) per-day lookup.
+export function indexDayPlans(plans: DayPlan[]): Map<string, DayPlan[]> {
+	const map = new Map<string, DayPlan[]>();
+	for (const p of plans) {
+		(map.get(p.date) ?? map.set(p.date, []).get(p.date))?.push(p);
 	}
 	return map;
 }
@@ -347,68 +322,62 @@ export function DayRaces({
 	);
 }
 
-const WorkoutDeleteIcon = iconifyIcon("mdi:close");
-const WorkoutDragIcon = iconifyIcon("akar-icons:drag-vertical-fill");
+const DayPlanDeleteIcon = iconifyIcon("mdi:close");
+const DayPlanDragIcon = iconifyIcon("akar-icons:drag-vertical-fill");
 
-function WorkoutChip({ w, isPast }: { w: PlanWorkout; isPast: boolean }) {
-	const navigate = useNavigate();
+function DayPlanChip({ p, isPast }: { p: DayPlan; isPast: boolean }) {
 	const isMobile = useIsMobile();
-	const dnd = useWorkoutDnd();
-	const remove = useDeletePlanWorkoutMutation();
+	const dnd = useDayPlanDnd();
+	const remove = useDeleteDayPlanMutation();
 	const queryClient = useQueryClient();
 	const [open, setOpen] = useState(false);
-	const Icon = sportIcon(w.sport);
-	const goToPlan = () => navigate(`/plans?plan=${w.plan_id}`);
-	const subtitle = w.description?.trim() || w.sport;
+	const Icon = sportIcon(p.sport);
 
-	const deleteWorkout = () => {
+	const deleteDayPlan = () => {
 		if (remove.isPending) return;
 		void (async () => {
 			try {
-				await remove.mutateAsync({ id: w.id });
-				await queryClient.invalidateQueries({ queryKey: ["plan-workouts"] });
+				await remove.mutateAsync({ id: p.id });
+				await queryClient.invalidateQueries({ queryKey: ["day-plans"] });
 			} catch {
-				toast.error("Could not delete the workout");
+				toast.error("Could not delete the plan");
 			}
 		})();
 	};
 
 	const chip = (
 		<div
-			{...workoutDragProps(dnd, w)}
+			{...dayPlanDragProps(dnd, p)}
 			className={cn(
 				"group/chip border-muted-foreground/40 bg-accent/40 hover:bg-accent text-muted-foreground flex items-start gap-1 rounded-md border-l-2 px-1.5 py-1 leading-tight transition-colors",
 				dnd ? "md:cursor-grab md:active:cursor-grabbing" : "",
 				isPast && "opacity-70",
 			)}
-			title={w.title}
+			title={p.note}
 		>
 			<button
 				type="button"
-				onClick={() => (isMobile ? setOpen(true) : goToPlan())}
+				onClick={() => setOpen(true)}
 				className="flex min-w-0 flex-1 flex-col hover:opacity-80"
 			>
 				<span className="flex w-full items-center justify-center gap-1 md:justify-start">
 					<Icon size={14} className="shrink-0" />
 					<span className="hidden truncate text-xs font-medium md:inline">
-						{w.title}
+						{p.note}
 					</span>
-				</span>
-				<span className="hidden w-full truncate text-left text-xs md:block">
-					{subtitle}
 				</span>
 			</button>
 			<button
 				type="button"
-				onClick={deleteWorkout}
+				onClick={deleteDayPlan}
 				disabled={remove.isPending}
-				aria-label={`Delete ${w.title}`}
+				aria-label={`Delete ${p.note}`}
 				className="text-destructive hidden shrink-0 opacity-0 transition-opacity hover:opacity-100 disabled:cursor-wait md:block md:group-hover/chip:opacity-70"
 			>
-				<WorkoutDeleteIcon size={14} className="shrink-0" />
+				<DayPlanDeleteIcon size={14} className="shrink-0" />
 			</button>
 			{dnd ? (
-				<WorkoutDragIcon
+				<DayPlanDragIcon
 					size={14}
 					aria-hidden="true"
 					className="text-muted-foreground hidden shrink-0 opacity-0 transition-opacity md:block md:group-hover/chip:opacity-70"
@@ -417,33 +386,27 @@ function WorkoutChip({ w, isPast }: { w: PlanWorkout; isPast: boolean }) {
 		</div>
 	);
 
-	if (!isMobile) return chip;
-
 	return (
 		<>
 			{chip}
 			<Sheet open={open} onOpenChange={setOpen}>
-				<SheetContent side="bottom" className="gap-0">
+				<SheetContent side={isMobile ? "bottom" : "right"} className="gap-0">
 					<SheetHeader>
 						<SheetTitle className="flex items-center gap-2">
 							<Icon size={18} className="shrink-0" />
-							{w.title}
+							{p.sport ? cap(p.sport) : "Plan"}
 						</SheetTitle>
-						<SheetDescription>
-							{w.sport} ·{" "}
-							{DAY_LABEL[w.day_of_week as keyof typeof DAY_LABEL] ??
-								w.day_of_week}{" "}
-							· {w.week}
-						</SheetDescription>
+						<SheetDescription>{p.date}</SheetDescription>
 					</SheetHeader>
-					{w.description ? (
-						<p className="text-muted-foreground px-4 text-sm">
-							{w.description}
-						</p>
-					) : null}
+					<p className="text-muted-foreground px-4 text-sm">{p.note}</p>
 					<SheetFooter>
-						<Button variant="ghost" onClick={goToPlan}>
-							Go to plan
+						<Button
+							variant="ghost"
+							className="text-destructive"
+							disabled={remove.isPending}
+							onClick={deleteDayPlan}
+						>
+							Delete
 						</Button>
 					</SheetFooter>
 				</SheetContent>
@@ -452,25 +415,25 @@ function WorkoutChip({ w, isPast }: { w: PlanWorkout; isPast: boolean }) {
 	);
 }
 
-export function DayWorkouts({
+export function DayPlans({
 	day,
-	byWeekDay,
+	byDay,
 }: {
 	day: Date;
-	byWeekDay: Map<string, PlanWorkout[]>;
+	byDay: Map<string, DayPlan[]>;
 }) {
-	const workouts = byWeekDay.get(`${toIsoWeek(day)}|${dayToken(day)}`) ?? [];
-	if (workouts.length === 0) return null;
+	const plans = byDay.get(dayKey(day)) ?? [];
+	if (plans.length === 0) return null;
 	const isPast = dayKey(day) < dayKey(new Date());
 	const sortKey = (sport: string | null) =>
 		sport ? CATEGORY_ORDER.indexOf(sport as Category) : -1;
-	const ordered = [...workouts].sort(
+	const ordered = [...plans].sort(
 		(a, b) => sortKey(a.sport) - sortKey(b.sport),
 	);
 	return (
 		<div className="mt-auto flex flex-col gap-1 pt-1">
-			{ordered.map((w) => (
-				<WorkoutChip key={String(w.id)} w={w} isPast={isPast} />
+			{ordered.map((p) => (
+				<DayPlanChip key={String(p.id)} p={p} isPast={isPast} />
 			))}
 		</div>
 	);
@@ -689,21 +652,21 @@ export function WeekTotalsBlock({ totals }: { totals?: WeekTotals }) {
 export function WeekStrip({
 	weekStart,
 	byDay,
-	workoutsByWeekDay,
+	dayPlansByDay,
 	racesByDay,
 	totals,
-	requirements,
+	objectives,
 }: {
 	weekStart: Date;
 	byDay: Map<string, CalendarActivity[]>;
-	workoutsByWeekDay?: Map<string, PlanWorkout[]>;
+	dayPlansByDay?: Map<string, DayPlan[]>;
 	racesByDay?: Map<string, Race[]>;
 	totals?: WeekTotals;
-	requirements?: PlanRequirement[];
+	objectives?: WeekObjective[];
 }) {
 	const today = dayKey(new Date());
-	const dnd = useWorkoutDnd();
-	const showTotals = totals !== undefined || requirements !== undefined;
+	const dnd = useDayPlanDnd();
+	const showTotals = totals !== undefined || objectives !== undefined;
 	const weekActivities = showTotals ? Array.from(byDay.values()).flat() : [];
 	return (
 		<div className="bg-card flex h-full overflow-hidden rounded-lg border">
@@ -750,8 +713,8 @@ export function WeekStrip({
 										isRace={(racesByDay?.get(key)?.length ?? 0) > 0}
 									/>
 								))}
-								{workoutsByWeekDay ? (
-									<DayWorkouts day={day} byWeekDay={workoutsByWeekDay} />
+								{dayPlansByDay ? (
+									<DayPlans day={day} byDay={dayPlansByDay} />
 								) : null}
 							</div>
 						</div>
@@ -767,9 +730,9 @@ export function WeekStrip({
 					</div>
 					<div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-2">
 						<WeekTotalsBlock totals={totals} />
-						{requirements ? (
-							<WeekRequirements
-								requirements={requirements}
+						{objectives ? (
+							<WeekObjectives
+								objectives={objectives}
 								activities={weekActivities}
 							/>
 						) : null}

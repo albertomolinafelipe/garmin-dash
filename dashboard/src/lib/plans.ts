@@ -27,6 +27,11 @@ export const raceIcon = iconifyIcon("tabler:laurel-wreath");
 export type Sport = Category;
 export const SPORTS: readonly Sport[] = CATEGORY_ORDER;
 
+// Radix Select has no value for "nothing selected", so the sport pickers use a
+// sentinel that maps to a NULL sport column on save.
+export const ANY_SPORT = "any";
+export const ALL_SPORTS = "all";
+
 // Icon for a requirement/workout sport; null means "all sports".
 export function sportIcon(sport: string | null): IconComponent {
 	if (!sport) return allSportsIcon;
@@ -140,15 +145,6 @@ export function currentIsoWeek(): string {
 // Date -> ISO weekday token ('mon'..'sun').
 export function dayToken(date: Date): Day {
 	return DAYS[(date.getDay() + 6) % 7];
-}
-
-// ISO week tokens are zero-padded and year-prefixed, so lexicographic order
-// matches chronological order. A plan is active when its range spans the week.
-export function planIsActive(
-	plan: { start_week: string; end_week: string },
-	week: string,
-): boolean {
-	return plan.start_week <= week && week <= plan.end_week;
 }
 
 // '2026-W02' -> the Monday starting that ISO week.

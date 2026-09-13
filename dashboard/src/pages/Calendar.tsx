@@ -9,36 +9,33 @@ import {
 import { useSearchParams } from "react-router-dom";
 import { CalendarDays, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 
-import { AddRequirementSheet } from "@/components/add-requirement-sheet";
-import {
-	AddWorkoutSheet,
-	type PlanOption,
-} from "@/components/add-workout-sheet";
+import { AddObjectiveSheet } from "@/components/add-objective-sheet";
+import { AddDayPlanSheet } from "@/components/add-day-plan-sheet";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
 	addDays,
 	computeWeekTotals,
 	DayEvent,
+	type DayPlan,
 	DayRaces,
 	dayDropProps,
-	DayWorkouts,
+	DayPlans,
 	indexRaces,
-	indexRequirements,
-	indexWorkouts,
-	PlanWorkoutDndProvider,
+	indexObjectives,
+	indexDayPlans,
+	DayPlanDndProvider,
 	type Race,
-	useWorkoutDnd,
+	useDayPlanDnd,
 	startOfWeek,
 	TotalRow,
-	WeekRequirements,
+	WeekObjectives,
 	WEEKDAYS,
 } from "@/components/calendar-week";
 import {
-	useAllPlanRequirementsQuery,
-	useAllPlanWorkoutsQuery,
-	usePlansQuery,
+	useDayPlansQuery,
 	useRacesQuery,
+	useWeekObjectivesQuery,
 } from "@/graphql/hooks";
 import { toIsoWeek } from "@/lib/plans";
 import {
@@ -54,9 +51,9 @@ import { cn } from "@/lib/utils";
 
 export function Calendar() {
 	return (
-		<PlanWorkoutDndProvider>
+		<DayPlanDndProvider>
 			<CalendarInner />
-		</PlanWorkoutDndProvider>
+		</DayPlanDndProvider>
 	);
 }
 
@@ -128,27 +125,26 @@ function CalendarInner() {
 			{ replace: true },
 		);
 	const [filter, setFilter] = useState<Category | null>(null);
-	const dnd = useWorkoutDnd();
+	const dnd = useDayPlanDnd();
 	const { data, isLoading } = useActivities();
-	const { data: workouts } = useAllPlanWorkoutsQuery();
-	const { data: requirements } = useAllPlanRequirementsQuery();
+	const { data: dayPlans } = useDayPlansQuery();
+	const { data: objectives } = useWeekObjectivesQuery();
 	const { data: races } = useRacesQuery();
-	const { data: plansData } = usePlansQuery();
-	const [workoutDay, setWorkoutDay] = useState<Date | null>(null);
-	const [requirementWeek, setRequirementWeek] = useState<string | null>(null);
+	const [planDay, setPlanDay] = useState<Date | null>(null);
+	const [objectiveWeek, setObjectiveWeek] = useState<string | null>(null);
 
 	const activities = data?.activities ?? [];
-	const workoutsByWeekDay = useMemo(
-		() => indexWorkouts(workouts ?? []),
-		[workouts],
+	const dayPlansByDay = useMemo(
+		() => indexDayPlans((dayPlans ?? []) as DayPlan[]),
+		[dayPlans],
 	);
 	const racesByDay = useMemo(
 		() => indexRaces((races ?? []) as Race[]),
 		[races],
 	);
-	const requirementsByWeek = useMemo(
-		() => indexRequirements(requirements ?? []),
-		[requirements],
+	const objectivesByWeek = useMemo(
+		() => indexObjectives(objectives ?? []),
+		[objectives],
 	);
 	const activitiesByWeek = useMemo(() => {
 		const map = new Map<string, CalendarActivity[]>();
@@ -196,15 +192,10 @@ function CalendarInner() {
 
 	return (
 		<div className="flex h-full min-h-[520px] flex-col gap-4 p-4">
-			<AddWorkoutSheet
-				day={workoutDay}
-				plans={(plansData ?? []) as PlanOption[]}
-				onClose={() => setWorkoutDay(null)}
-			/>
-			<AddRequirementSheet
-				week={requirementWeek}
-				plans={(plansData ?? []) as PlanOption[]}
-				onClose={() => setRequirementWeek(null)}
+			<AddDayPlanSheet day={planDay} onClose={() => setPlanDay(null)} />
+			<AddObjectiveSheet
+				week={objectiveWeek}
+				onClose={() => setObjectiveWeek(null)}
 			/>
 			{/* Toolbar */}
 			<div className="relative flex flex-wrap items-center justify-between gap-3">
@@ -319,8 +310,8 @@ function CalendarInner() {
 														variant="ghost"
 														size="icon"
 														className="text-muted-foreground size-5 opacity-50 hover:opacity-100"
-														aria-label={`Add workout on ${day.toLocaleDateString()}`}
-														onClick={() => setWorkoutDay(day)}
+														aria-label={`Add plan on ${day.toLocaleDateString()}`}
+														onClick={() => setPlanDay(day)}
 													>
 														<Plus className="size-3" />
 													</Button>
@@ -350,10 +341,7 @@ function CalendarInner() {
 															/>
 														))}
 													</div>
-													<DayWorkouts
-														day={day}
-														byWeekDay={workoutsByWeekDay}
-													/>
+													<DayPlans day={day} byDay={dayPlansByDay} />
 												</div>
 											</ScrollableDayCell>
 										);
@@ -383,8 +371,8 @@ function CalendarInner() {
 										variant="ghost"
 										size="icon"
 										className="text-muted-foreground absolute top-1 right-1 size-5 opacity-50 hover:opacity-100"
-										aria-label={`Add requirement for ${toIsoWeek(w)}`}
-										onClick={() => setRequirementWeek(toIsoWeek(w))}
+										aria-label={`Add objective for ${toIsoWeek(w)}`}
+										onClick={() => setObjectiveWeek(toIsoWeek(w))}
 									>
 										<Plus className="size-3" />
 									</Button>
@@ -419,8 +407,8 @@ function CalendarInner() {
 										value={`${(t?.weightsH ?? 0).toFixed(1)} h`}
 										zero={!t?.weightsH}
 									/>
-									<WeekRequirements
-										requirements={requirementsByWeek.get(toIsoWeek(w)) ?? []}
+									<WeekObjectives
+										objectives={objectivesByWeek.get(toIsoWeek(w)) ?? []}
 										activities={activitiesByWeek.get(toIsoWeek(w)) ?? []}
 									/>
 								</ScrollableDayCell>

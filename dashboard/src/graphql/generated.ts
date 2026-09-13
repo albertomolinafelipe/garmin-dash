@@ -99,21 +99,6 @@ export type String_Comparison_Exp = {
   _similar?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type SyncResult = {
-  __typename?: 'SyncResult';
-  activities_created: Scalars['Int']['output'];
-  activities_failed: Scalars['Int']['output'];
-  activities_updated: Scalars['Int']['output'];
-  errors: Array<Scalars['String']['output']>;
-  hrv_created: Scalars['Int']['output'];
-  hrv_updated: Scalars['Int']['output'];
-  readiness_created: Scalars['Int']['output'];
-  readiness_updated: Scalars['Int']['output'];
-  sleep_created: Scalars['Int']['output'];
-  sleep_updated: Scalars['Int']['output'];
-  streams_written: Scalars['Int']['output'];
-};
-
 /** columns and relationships of "activities" */
 export type Activities = {
   __typename?: 'activities';
@@ -4232,6 +4217,202 @@ export type AuthUserSecurityKeys_Variance_Order_By = {
   counter?: InputMaybe<Order_By>;
 };
 
+/** columns and relationships of "auth.pkce_authorization_codes" */
+export type Auth_Pkce_Authorization_Codes = {
+  __typename?: 'auth_pkce_authorization_codes';
+  code_challenge: Scalars['String']['output'];
+  code_hash: Scalars['String']['output'];
+  created_at: Scalars['timestamptz']['output'];
+  expires_at: Scalars['timestamptz']['output'];
+  id: Scalars['uuid']['output'];
+  redirect_to?: Maybe<Scalars['String']['output']>;
+  user_id: Scalars['uuid']['output'];
+};
+
+/** aggregated selection of "auth.pkce_authorization_codes" */
+export type Auth_Pkce_Authorization_Codes_Aggregate = {
+  __typename?: 'auth_pkce_authorization_codes_aggregate';
+  aggregate?: Maybe<Auth_Pkce_Authorization_Codes_Aggregate_Fields>;
+  nodes: Array<Auth_Pkce_Authorization_Codes>;
+};
+
+/** aggregate fields of "auth.pkce_authorization_codes" */
+export type Auth_Pkce_Authorization_Codes_Aggregate_Fields = {
+  __typename?: 'auth_pkce_authorization_codes_aggregate_fields';
+  count: Scalars['Int']['output'];
+  max?: Maybe<Auth_Pkce_Authorization_Codes_Max_Fields>;
+  min?: Maybe<Auth_Pkce_Authorization_Codes_Min_Fields>;
+};
+
+
+/** aggregate fields of "auth.pkce_authorization_codes" */
+export type Auth_Pkce_Authorization_Codes_Aggregate_FieldsCountArgs = {
+  columns?: InputMaybe<Array<Auth_Pkce_Authorization_Codes_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+/** Boolean expression to filter rows from the table "auth.pkce_authorization_codes". All fields are combined with a logical 'AND'. */
+export type Auth_Pkce_Authorization_Codes_Bool_Exp = {
+  _and?: InputMaybe<Array<Auth_Pkce_Authorization_Codes_Bool_Exp>>;
+  _not?: InputMaybe<Auth_Pkce_Authorization_Codes_Bool_Exp>;
+  _or?: InputMaybe<Array<Auth_Pkce_Authorization_Codes_Bool_Exp>>;
+  code_challenge?: InputMaybe<String_Comparison_Exp>;
+  code_hash?: InputMaybe<String_Comparison_Exp>;
+  created_at?: InputMaybe<Timestamptz_Comparison_Exp>;
+  expires_at?: InputMaybe<Timestamptz_Comparison_Exp>;
+  id?: InputMaybe<Uuid_Comparison_Exp>;
+  redirect_to?: InputMaybe<String_Comparison_Exp>;
+  user_id?: InputMaybe<Uuid_Comparison_Exp>;
+};
+
+/** unique or primary key constraints on table "auth.pkce_authorization_codes" */
+export enum Auth_Pkce_Authorization_Codes_Constraint {
+  /** unique or primary key constraint on columns "code_hash" */
+  PkceAuthorizationCodesCodeHashKey = 'pkce_authorization_codes_code_hash_key',
+  /** unique or primary key constraint on columns "id" */
+  PkceAuthorizationCodesPkey = 'pkce_authorization_codes_pkey'
+}
+
+/** input type for inserting data into table "auth.pkce_authorization_codes" */
+export type Auth_Pkce_Authorization_Codes_Insert_Input = {
+  code_challenge?: InputMaybe<Scalars['String']['input']>;
+  code_hash?: InputMaybe<Scalars['String']['input']>;
+  created_at?: InputMaybe<Scalars['timestamptz']['input']>;
+  expires_at?: InputMaybe<Scalars['timestamptz']['input']>;
+  id?: InputMaybe<Scalars['uuid']['input']>;
+  redirect_to?: InputMaybe<Scalars['String']['input']>;
+  user_id?: InputMaybe<Scalars['uuid']['input']>;
+};
+
+/** aggregate max on columns */
+export type Auth_Pkce_Authorization_Codes_Max_Fields = {
+  __typename?: 'auth_pkce_authorization_codes_max_fields';
+  code_challenge?: Maybe<Scalars['String']['output']>;
+  code_hash?: Maybe<Scalars['String']['output']>;
+  created_at?: Maybe<Scalars['timestamptz']['output']>;
+  expires_at?: Maybe<Scalars['timestamptz']['output']>;
+  id?: Maybe<Scalars['uuid']['output']>;
+  redirect_to?: Maybe<Scalars['String']['output']>;
+  user_id?: Maybe<Scalars['uuid']['output']>;
+};
+
+/** aggregate min on columns */
+export type Auth_Pkce_Authorization_Codes_Min_Fields = {
+  __typename?: 'auth_pkce_authorization_codes_min_fields';
+  code_challenge?: Maybe<Scalars['String']['output']>;
+  code_hash?: Maybe<Scalars['String']['output']>;
+  created_at?: Maybe<Scalars['timestamptz']['output']>;
+  expires_at?: Maybe<Scalars['timestamptz']['output']>;
+  id?: Maybe<Scalars['uuid']['output']>;
+  redirect_to?: Maybe<Scalars['String']['output']>;
+  user_id?: Maybe<Scalars['uuid']['output']>;
+};
+
+/** response of any mutation on the table "auth.pkce_authorization_codes" */
+export type Auth_Pkce_Authorization_Codes_Mutation_Response = {
+  __typename?: 'auth_pkce_authorization_codes_mutation_response';
+  /** number of rows affected by the mutation */
+  affected_rows: Scalars['Int']['output'];
+  /** data from the rows affected by the mutation */
+  returning: Array<Auth_Pkce_Authorization_Codes>;
+};
+
+/** on_conflict condition type for table "auth.pkce_authorization_codes" */
+export type Auth_Pkce_Authorization_Codes_On_Conflict = {
+  constraint: Auth_Pkce_Authorization_Codes_Constraint;
+  update_columns?: Array<Auth_Pkce_Authorization_Codes_Update_Column>;
+  where?: InputMaybe<Auth_Pkce_Authorization_Codes_Bool_Exp>;
+};
+
+/** Ordering options when selecting data from "auth.pkce_authorization_codes". */
+export type Auth_Pkce_Authorization_Codes_Order_By = {
+  code_challenge?: InputMaybe<Order_By>;
+  code_hash?: InputMaybe<Order_By>;
+  created_at?: InputMaybe<Order_By>;
+  expires_at?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  redirect_to?: InputMaybe<Order_By>;
+  user_id?: InputMaybe<Order_By>;
+};
+
+/** primary key columns input for table: auth.pkce_authorization_codes */
+export type Auth_Pkce_Authorization_Codes_Pk_Columns_Input = {
+  id: Scalars['uuid']['input'];
+};
+
+/** select columns of table "auth.pkce_authorization_codes" */
+export enum Auth_Pkce_Authorization_Codes_Select_Column {
+  /** column name */
+  CodeChallenge = 'code_challenge',
+  /** column name */
+  CodeHash = 'code_hash',
+  /** column name */
+  CreatedAt = 'created_at',
+  /** column name */
+  ExpiresAt = 'expires_at',
+  /** column name */
+  Id = 'id',
+  /** column name */
+  RedirectTo = 'redirect_to',
+  /** column name */
+  UserId = 'user_id'
+}
+
+/** input type for updating data in table "auth.pkce_authorization_codes" */
+export type Auth_Pkce_Authorization_Codes_Set_Input = {
+  code_challenge?: InputMaybe<Scalars['String']['input']>;
+  code_hash?: InputMaybe<Scalars['String']['input']>;
+  created_at?: InputMaybe<Scalars['timestamptz']['input']>;
+  expires_at?: InputMaybe<Scalars['timestamptz']['input']>;
+  id?: InputMaybe<Scalars['uuid']['input']>;
+  redirect_to?: InputMaybe<Scalars['String']['input']>;
+  user_id?: InputMaybe<Scalars['uuid']['input']>;
+};
+
+/** Streaming cursor of the table "auth_pkce_authorization_codes" */
+export type Auth_Pkce_Authorization_Codes_Stream_Cursor_Input = {
+  /** Stream column input with initial value */
+  initial_value: Auth_Pkce_Authorization_Codes_Stream_Cursor_Value_Input;
+  /** cursor ordering */
+  ordering?: InputMaybe<Cursor_Ordering>;
+};
+
+/** Initial value of the column from where the streaming should start */
+export type Auth_Pkce_Authorization_Codes_Stream_Cursor_Value_Input = {
+  code_challenge?: InputMaybe<Scalars['String']['input']>;
+  code_hash?: InputMaybe<Scalars['String']['input']>;
+  created_at?: InputMaybe<Scalars['timestamptz']['input']>;
+  expires_at?: InputMaybe<Scalars['timestamptz']['input']>;
+  id?: InputMaybe<Scalars['uuid']['input']>;
+  redirect_to?: InputMaybe<Scalars['String']['input']>;
+  user_id?: InputMaybe<Scalars['uuid']['input']>;
+};
+
+/** update columns of table "auth.pkce_authorization_codes" */
+export enum Auth_Pkce_Authorization_Codes_Update_Column {
+  /** column name */
+  CodeChallenge = 'code_challenge',
+  /** column name */
+  CodeHash = 'code_hash',
+  /** column name */
+  CreatedAt = 'created_at',
+  /** column name */
+  ExpiresAt = 'expires_at',
+  /** column name */
+  Id = 'id',
+  /** column name */
+  RedirectTo = 'redirect_to',
+  /** column name */
+  UserId = 'user_id'
+}
+
+export type Auth_Pkce_Authorization_Codes_Updates = {
+  /** sets the columns of the filtered rows to the given values */
+  _set?: InputMaybe<Auth_Pkce_Authorization_Codes_Set_Input>;
+  /** filter the rows which have to be updated */
+  where: Auth_Pkce_Authorization_Codes_Bool_Exp;
+};
+
 /** Boolean expression to compare columns of type "bigint". All fields are combined with logical 'AND'. */
 export type Bigint_Comparison_Exp = {
   _eq?: InputMaybe<Scalars['bigint']['input']>;
@@ -5082,6 +5263,310 @@ export type Date_Comparison_Exp = {
   _lte?: InputMaybe<Scalars['date']['input']>;
   _neq?: InputMaybe<Scalars['date']['input']>;
   _nin?: InputMaybe<Array<Scalars['date']['input']>>;
+};
+
+/** columns and relationships of "day_plans" */
+export type Day_Plans = {
+  __typename?: 'day_plans';
+  date: Scalars['date']['output'];
+  id: Scalars['bigint']['output'];
+  note: Scalars['String']['output'];
+  sport?: Maybe<Scalars['String']['output']>;
+  /** An object relationship */
+  sportBySport?: Maybe<Sports>;
+};
+
+/** aggregated selection of "day_plans" */
+export type Day_Plans_Aggregate = {
+  __typename?: 'day_plans_aggregate';
+  aggregate?: Maybe<Day_Plans_Aggregate_Fields>;
+  nodes: Array<Day_Plans>;
+};
+
+export type Day_Plans_Aggregate_Bool_Exp = {
+  count?: InputMaybe<Day_Plans_Aggregate_Bool_Exp_Count>;
+};
+
+export type Day_Plans_Aggregate_Bool_Exp_Count = {
+  arguments?: InputMaybe<Array<Day_Plans_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+  filter?: InputMaybe<Day_Plans_Bool_Exp>;
+  predicate: Int_Comparison_Exp;
+};
+
+/** aggregate fields of "day_plans" */
+export type Day_Plans_Aggregate_Fields = {
+  __typename?: 'day_plans_aggregate_fields';
+  avg?: Maybe<Day_Plans_Avg_Fields>;
+  count: Scalars['Int']['output'];
+  max?: Maybe<Day_Plans_Max_Fields>;
+  min?: Maybe<Day_Plans_Min_Fields>;
+  stddev?: Maybe<Day_Plans_Stddev_Fields>;
+  stddev_pop?: Maybe<Day_Plans_Stddev_Pop_Fields>;
+  stddev_samp?: Maybe<Day_Plans_Stddev_Samp_Fields>;
+  sum?: Maybe<Day_Plans_Sum_Fields>;
+  var_pop?: Maybe<Day_Plans_Var_Pop_Fields>;
+  var_samp?: Maybe<Day_Plans_Var_Samp_Fields>;
+  variance?: Maybe<Day_Plans_Variance_Fields>;
+};
+
+
+/** aggregate fields of "day_plans" */
+export type Day_Plans_Aggregate_FieldsCountArgs = {
+  columns?: InputMaybe<Array<Day_Plans_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+/** order by aggregate values of table "day_plans" */
+export type Day_Plans_Aggregate_Order_By = {
+  avg?: InputMaybe<Day_Plans_Avg_Order_By>;
+  count?: InputMaybe<Order_By>;
+  max?: InputMaybe<Day_Plans_Max_Order_By>;
+  min?: InputMaybe<Day_Plans_Min_Order_By>;
+  stddev?: InputMaybe<Day_Plans_Stddev_Order_By>;
+  stddev_pop?: InputMaybe<Day_Plans_Stddev_Pop_Order_By>;
+  stddev_samp?: InputMaybe<Day_Plans_Stddev_Samp_Order_By>;
+  sum?: InputMaybe<Day_Plans_Sum_Order_By>;
+  var_pop?: InputMaybe<Day_Plans_Var_Pop_Order_By>;
+  var_samp?: InputMaybe<Day_Plans_Var_Samp_Order_By>;
+  variance?: InputMaybe<Day_Plans_Variance_Order_By>;
+};
+
+/** input type for inserting array relation for remote table "day_plans" */
+export type Day_Plans_Arr_Rel_Insert_Input = {
+  data: Array<Day_Plans_Insert_Input>;
+  /** upsert condition */
+  on_conflict?: InputMaybe<Day_Plans_On_Conflict>;
+};
+
+/** aggregate avg on columns */
+export type Day_Plans_Avg_Fields = {
+  __typename?: 'day_plans_avg_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by avg() on columns of table "day_plans" */
+export type Day_Plans_Avg_Order_By = {
+  id?: InputMaybe<Order_By>;
+};
+
+/** Boolean expression to filter rows from the table "day_plans". All fields are combined with a logical 'AND'. */
+export type Day_Plans_Bool_Exp = {
+  _and?: InputMaybe<Array<Day_Plans_Bool_Exp>>;
+  _not?: InputMaybe<Day_Plans_Bool_Exp>;
+  _or?: InputMaybe<Array<Day_Plans_Bool_Exp>>;
+  date?: InputMaybe<Date_Comparison_Exp>;
+  id?: InputMaybe<Bigint_Comparison_Exp>;
+  note?: InputMaybe<String_Comparison_Exp>;
+  sport?: InputMaybe<String_Comparison_Exp>;
+  sportBySport?: InputMaybe<Sports_Bool_Exp>;
+};
+
+/** unique or primary key constraints on table "day_plans" */
+export enum Day_Plans_Constraint {
+  /** unique or primary key constraint on columns "id" */
+  DayPlansPkey = 'day_plans_pkey'
+}
+
+/** input type for inserting data into table "day_plans" */
+export type Day_Plans_Insert_Input = {
+  date?: InputMaybe<Scalars['date']['input']>;
+  note?: InputMaybe<Scalars['String']['input']>;
+  sport?: InputMaybe<Scalars['String']['input']>;
+  sportBySport?: InputMaybe<Sports_Obj_Rel_Insert_Input>;
+};
+
+/** aggregate max on columns */
+export type Day_Plans_Max_Fields = {
+  __typename?: 'day_plans_max_fields';
+  date?: Maybe<Scalars['date']['output']>;
+  id?: Maybe<Scalars['bigint']['output']>;
+  note?: Maybe<Scalars['String']['output']>;
+  sport?: Maybe<Scalars['String']['output']>;
+};
+
+/** order by max() on columns of table "day_plans" */
+export type Day_Plans_Max_Order_By = {
+  date?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  note?: InputMaybe<Order_By>;
+  sport?: InputMaybe<Order_By>;
+};
+
+/** aggregate min on columns */
+export type Day_Plans_Min_Fields = {
+  __typename?: 'day_plans_min_fields';
+  date?: Maybe<Scalars['date']['output']>;
+  id?: Maybe<Scalars['bigint']['output']>;
+  note?: Maybe<Scalars['String']['output']>;
+  sport?: Maybe<Scalars['String']['output']>;
+};
+
+/** order by min() on columns of table "day_plans" */
+export type Day_Plans_Min_Order_By = {
+  date?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  note?: InputMaybe<Order_By>;
+  sport?: InputMaybe<Order_By>;
+};
+
+/** response of any mutation on the table "day_plans" */
+export type Day_Plans_Mutation_Response = {
+  __typename?: 'day_plans_mutation_response';
+  /** number of rows affected by the mutation */
+  affected_rows: Scalars['Int']['output'];
+  /** data from the rows affected by the mutation */
+  returning: Array<Day_Plans>;
+};
+
+/** on_conflict condition type for table "day_plans" */
+export type Day_Plans_On_Conflict = {
+  constraint: Day_Plans_Constraint;
+  update_columns?: Array<Day_Plans_Update_Column>;
+  where?: InputMaybe<Day_Plans_Bool_Exp>;
+};
+
+/** Ordering options when selecting data from "day_plans". */
+export type Day_Plans_Order_By = {
+  date?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  note?: InputMaybe<Order_By>;
+  sport?: InputMaybe<Order_By>;
+  sportBySport?: InputMaybe<Sports_Order_By>;
+};
+
+/** primary key columns input for table: day_plans */
+export type Day_Plans_Pk_Columns_Input = {
+  id: Scalars['bigint']['input'];
+};
+
+/** select columns of table "day_plans" */
+export enum Day_Plans_Select_Column {
+  /** column name */
+  Date = 'date',
+  /** column name */
+  Id = 'id',
+  /** column name */
+  Note = 'note',
+  /** column name */
+  Sport = 'sport'
+}
+
+/** input type for updating data in table "day_plans" */
+export type Day_Plans_Set_Input = {
+  date?: InputMaybe<Scalars['date']['input']>;
+  note?: InputMaybe<Scalars['String']['input']>;
+  sport?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** aggregate stddev on columns */
+export type Day_Plans_Stddev_Fields = {
+  __typename?: 'day_plans_stddev_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by stddev() on columns of table "day_plans" */
+export type Day_Plans_Stddev_Order_By = {
+  id?: InputMaybe<Order_By>;
+};
+
+/** aggregate stddev_pop on columns */
+export type Day_Plans_Stddev_Pop_Fields = {
+  __typename?: 'day_plans_stddev_pop_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by stddev_pop() on columns of table "day_plans" */
+export type Day_Plans_Stddev_Pop_Order_By = {
+  id?: InputMaybe<Order_By>;
+};
+
+/** aggregate stddev_samp on columns */
+export type Day_Plans_Stddev_Samp_Fields = {
+  __typename?: 'day_plans_stddev_samp_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by stddev_samp() on columns of table "day_plans" */
+export type Day_Plans_Stddev_Samp_Order_By = {
+  id?: InputMaybe<Order_By>;
+};
+
+/** Streaming cursor of the table "day_plans" */
+export type Day_Plans_Stream_Cursor_Input = {
+  /** Stream column input with initial value */
+  initial_value: Day_Plans_Stream_Cursor_Value_Input;
+  /** cursor ordering */
+  ordering?: InputMaybe<Cursor_Ordering>;
+};
+
+/** Initial value of the column from where the streaming should start */
+export type Day_Plans_Stream_Cursor_Value_Input = {
+  date?: InputMaybe<Scalars['date']['input']>;
+  id?: InputMaybe<Scalars['bigint']['input']>;
+  note?: InputMaybe<Scalars['String']['input']>;
+  sport?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** aggregate sum on columns */
+export type Day_Plans_Sum_Fields = {
+  __typename?: 'day_plans_sum_fields';
+  id?: Maybe<Scalars['bigint']['output']>;
+};
+
+/** order by sum() on columns of table "day_plans" */
+export type Day_Plans_Sum_Order_By = {
+  id?: InputMaybe<Order_By>;
+};
+
+/** update columns of table "day_plans" */
+export enum Day_Plans_Update_Column {
+  /** column name */
+  Date = 'date',
+  /** column name */
+  Note = 'note',
+  /** column name */
+  Sport = 'sport'
+}
+
+export type Day_Plans_Updates = {
+  /** sets the columns of the filtered rows to the given values */
+  _set?: InputMaybe<Day_Plans_Set_Input>;
+  /** filter the rows which have to be updated */
+  where: Day_Plans_Bool_Exp;
+};
+
+/** aggregate var_pop on columns */
+export type Day_Plans_Var_Pop_Fields = {
+  __typename?: 'day_plans_var_pop_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by var_pop() on columns of table "day_plans" */
+export type Day_Plans_Var_Pop_Order_By = {
+  id?: InputMaybe<Order_By>;
+};
+
+/** aggregate var_samp on columns */
+export type Day_Plans_Var_Samp_Fields = {
+  __typename?: 'day_plans_var_samp_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by var_samp() on columns of table "day_plans" */
+export type Day_Plans_Var_Samp_Order_By = {
+  id?: InputMaybe<Order_By>;
+};
+
+/** aggregate variance on columns */
+export type Day_Plans_Variance_Fields = {
+  __typename?: 'day_plans_variance_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by variance() on columns of table "day_plans" */
+export type Day_Plans_Variance_Order_By = {
+  id?: InputMaybe<Order_By>;
 };
 
 /** columns and relationships of "exercises" */
@@ -5953,26 +6438,22 @@ export type Mutation_Root = {
   delete_activity_streams?: Maybe<Activity_Streams_Mutation_Response>;
   /** delete single row from the table: "activity_streams" */
   delete_activity_streams_by_pk?: Maybe<Activity_Streams>;
+  /** delete data from the table: "auth.pkce_authorization_codes" */
+  delete_auth_pkce_authorization_codes?: Maybe<Auth_Pkce_Authorization_Codes_Mutation_Response>;
+  /** delete single row from the table: "auth.pkce_authorization_codes" */
+  delete_auth_pkce_authorization_codes_by_pk?: Maybe<Auth_Pkce_Authorization_Codes>;
   /** delete data from the table: "daily_hrv" */
   delete_daily_hrv?: Maybe<Daily_Hrv_Mutation_Response>;
   /** delete single row from the table: "daily_hrv" */
   delete_daily_hrv_by_pk?: Maybe<Daily_Hrv>;
+  /** delete data from the table: "day_plans" */
+  delete_day_plans?: Maybe<Day_Plans_Mutation_Response>;
+  /** delete single row from the table: "day_plans" */
+  delete_day_plans_by_pk?: Maybe<Day_Plans>;
   /** delete data from the table: "exercises" */
   delete_exercises?: Maybe<Exercises_Mutation_Response>;
   /** delete single row from the table: "exercises" */
   delete_exercises_by_pk?: Maybe<Exercises>;
-  /** delete data from the table: "plan_requirements" */
-  delete_plan_requirements?: Maybe<Plan_Requirements_Mutation_Response>;
-  /** delete single row from the table: "plan_requirements" */
-  delete_plan_requirements_by_pk?: Maybe<Plan_Requirements>;
-  /** delete data from the table: "plan_workouts" */
-  delete_plan_workouts?: Maybe<Plan_Workouts_Mutation_Response>;
-  /** delete single row from the table: "plan_workouts" */
-  delete_plan_workouts_by_pk?: Maybe<Plan_Workouts>;
-  /** delete data from the table: "plans" */
-  delete_plans?: Maybe<Plans_Mutation_Response>;
-  /** delete single row from the table: "plans" */
-  delete_plans_by_pk?: Maybe<Plans>;
   /** delete data from the table: "races" */
   delete_races?: Maybe<Races_Mutation_Response>;
   /** delete single row from the table: "races" */
@@ -5981,10 +6462,22 @@ export type Mutation_Root = {
   delete_sleep?: Maybe<Sleep_Mutation_Response>;
   /** delete single row from the table: "sleep" */
   delete_sleep_by_pk?: Maybe<Sleep>;
+  /** delete data from the table: "sports" */
+  delete_sports?: Maybe<Sports_Mutation_Response>;
+  /** delete single row from the table: "sports" */
+  delete_sports_by_pk?: Maybe<Sports>;
   /** delete data from the table: "training_readiness" */
   delete_training_readiness?: Maybe<Training_Readiness_Mutation_Response>;
   /** delete single row from the table: "training_readiness" */
   delete_training_readiness_by_pk?: Maybe<Training_Readiness>;
+  /** delete data from the table: "week_notes" */
+  delete_week_notes?: Maybe<Week_Notes_Mutation_Response>;
+  /** delete single row from the table: "week_notes" */
+  delete_week_notes_by_pk?: Maybe<Week_Notes>;
+  /** delete data from the table: "week_objectives" */
+  delete_week_objectives?: Maybe<Week_Objectives_Mutation_Response>;
+  /** delete single row from the table: "week_objectives" */
+  delete_week_objectives_by_pk?: Maybe<Week_Objectives>;
   /** insert a single row into the table: "auth.oauth2_auth_requests" */
   insertAuthOauth2AuthRequest?: Maybe<AuthOauth2AuthRequests>;
   /** insert data into the table: "auth.oauth2_auth_requests" */
@@ -6057,26 +6550,22 @@ export type Mutation_Root = {
   insert_activity_streams?: Maybe<Activity_Streams_Mutation_Response>;
   /** insert a single row into the table: "activity_streams" */
   insert_activity_streams_one?: Maybe<Activity_Streams>;
+  /** insert data into the table: "auth.pkce_authorization_codes" */
+  insert_auth_pkce_authorization_codes?: Maybe<Auth_Pkce_Authorization_Codes_Mutation_Response>;
+  /** insert a single row into the table: "auth.pkce_authorization_codes" */
+  insert_auth_pkce_authorization_codes_one?: Maybe<Auth_Pkce_Authorization_Codes>;
   /** insert data into the table: "daily_hrv" */
   insert_daily_hrv?: Maybe<Daily_Hrv_Mutation_Response>;
   /** insert a single row into the table: "daily_hrv" */
   insert_daily_hrv_one?: Maybe<Daily_Hrv>;
+  /** insert data into the table: "day_plans" */
+  insert_day_plans?: Maybe<Day_Plans_Mutation_Response>;
+  /** insert a single row into the table: "day_plans" */
+  insert_day_plans_one?: Maybe<Day_Plans>;
   /** insert data into the table: "exercises" */
   insert_exercises?: Maybe<Exercises_Mutation_Response>;
   /** insert a single row into the table: "exercises" */
   insert_exercises_one?: Maybe<Exercises>;
-  /** insert data into the table: "plan_requirements" */
-  insert_plan_requirements?: Maybe<Plan_Requirements_Mutation_Response>;
-  /** insert a single row into the table: "plan_requirements" */
-  insert_plan_requirements_one?: Maybe<Plan_Requirements>;
-  /** insert data into the table: "plan_workouts" */
-  insert_plan_workouts?: Maybe<Plan_Workouts_Mutation_Response>;
-  /** insert a single row into the table: "plan_workouts" */
-  insert_plan_workouts_one?: Maybe<Plan_Workouts>;
-  /** insert data into the table: "plans" */
-  insert_plans?: Maybe<Plans_Mutation_Response>;
-  /** insert a single row into the table: "plans" */
-  insert_plans_one?: Maybe<Plans>;
   /** insert data into the table: "races" */
   insert_races?: Maybe<Races_Mutation_Response>;
   /** insert a single row into the table: "races" */
@@ -6085,12 +6574,22 @@ export type Mutation_Root = {
   insert_sleep?: Maybe<Sleep_Mutation_Response>;
   /** insert a single row into the table: "sleep" */
   insert_sleep_one?: Maybe<Sleep>;
+  /** insert data into the table: "sports" */
+  insert_sports?: Maybe<Sports_Mutation_Response>;
+  /** insert a single row into the table: "sports" */
+  insert_sports_one?: Maybe<Sports>;
   /** insert data into the table: "training_readiness" */
   insert_training_readiness?: Maybe<Training_Readiness_Mutation_Response>;
   /** insert a single row into the table: "training_readiness" */
   insert_training_readiness_one?: Maybe<Training_Readiness>;
-  /** Run one bounded sync. Omitted arguments use small defaults; values outside their documented positive bounds are rejected. */
-  syncActivities: SyncResult;
+  /** insert data into the table: "week_notes" */
+  insert_week_notes?: Maybe<Week_Notes_Mutation_Response>;
+  /** insert a single row into the table: "week_notes" */
+  insert_week_notes_one?: Maybe<Week_Notes>;
+  /** insert data into the table: "week_objectives" */
+  insert_week_objectives?: Maybe<Week_Objectives_Mutation_Response>;
+  /** insert a single row into the table: "week_objectives" */
+  insert_week_objectives_one?: Maybe<Week_Objectives>;
   /** update single row of the table: "auth.oauth2_auth_requests" */
   updateAuthOauth2AuthRequest?: Maybe<AuthOauth2AuthRequests>;
   /** update data of the table: "auth.oauth2_auth_requests" */
@@ -6191,6 +6690,12 @@ export type Mutation_Root = {
   update_authUserRoles_many?: Maybe<Array<Maybe<AuthUserRoles_Mutation_Response>>>;
   /** update multiples rows of table: "auth.user_security_keys" */
   update_authUserSecurityKeys_many?: Maybe<Array<Maybe<AuthUserSecurityKeys_Mutation_Response>>>;
+  /** update data of the table: "auth.pkce_authorization_codes" */
+  update_auth_pkce_authorization_codes?: Maybe<Auth_Pkce_Authorization_Codes_Mutation_Response>;
+  /** update single row of the table: "auth.pkce_authorization_codes" */
+  update_auth_pkce_authorization_codes_by_pk?: Maybe<Auth_Pkce_Authorization_Codes>;
+  /** update multiples rows of table: "auth.pkce_authorization_codes" */
+  update_auth_pkce_authorization_codes_many?: Maybe<Array<Maybe<Auth_Pkce_Authorization_Codes_Mutation_Response>>>;
   /** update multiples rows of table: "storage.buckets" */
   update_buckets_many?: Maybe<Array<Maybe<Buckets_Mutation_Response>>>;
   /** update data of the table: "daily_hrv" */
@@ -6199,6 +6704,12 @@ export type Mutation_Root = {
   update_daily_hrv_by_pk?: Maybe<Daily_Hrv>;
   /** update multiples rows of table: "daily_hrv" */
   update_daily_hrv_many?: Maybe<Array<Maybe<Daily_Hrv_Mutation_Response>>>;
+  /** update data of the table: "day_plans" */
+  update_day_plans?: Maybe<Day_Plans_Mutation_Response>;
+  /** update single row of the table: "day_plans" */
+  update_day_plans_by_pk?: Maybe<Day_Plans>;
+  /** update multiples rows of table: "day_plans" */
+  update_day_plans_many?: Maybe<Array<Maybe<Day_Plans_Mutation_Response>>>;
   /** update data of the table: "exercises" */
   update_exercises?: Maybe<Exercises_Mutation_Response>;
   /** update single row of the table: "exercises" */
@@ -6207,24 +6718,6 @@ export type Mutation_Root = {
   update_exercises_many?: Maybe<Array<Maybe<Exercises_Mutation_Response>>>;
   /** update multiples rows of table: "storage.files" */
   update_files_many?: Maybe<Array<Maybe<Files_Mutation_Response>>>;
-  /** update data of the table: "plan_requirements" */
-  update_plan_requirements?: Maybe<Plan_Requirements_Mutation_Response>;
-  /** update single row of the table: "plan_requirements" */
-  update_plan_requirements_by_pk?: Maybe<Plan_Requirements>;
-  /** update multiples rows of table: "plan_requirements" */
-  update_plan_requirements_many?: Maybe<Array<Maybe<Plan_Requirements_Mutation_Response>>>;
-  /** update data of the table: "plan_workouts" */
-  update_plan_workouts?: Maybe<Plan_Workouts_Mutation_Response>;
-  /** update single row of the table: "plan_workouts" */
-  update_plan_workouts_by_pk?: Maybe<Plan_Workouts>;
-  /** update multiples rows of table: "plan_workouts" */
-  update_plan_workouts_many?: Maybe<Array<Maybe<Plan_Workouts_Mutation_Response>>>;
-  /** update data of the table: "plans" */
-  update_plans?: Maybe<Plans_Mutation_Response>;
-  /** update single row of the table: "plans" */
-  update_plans_by_pk?: Maybe<Plans>;
-  /** update multiples rows of table: "plans" */
-  update_plans_many?: Maybe<Array<Maybe<Plans_Mutation_Response>>>;
   /** update data of the table: "races" */
   update_races?: Maybe<Races_Mutation_Response>;
   /** update single row of the table: "races" */
@@ -6237,6 +6730,12 @@ export type Mutation_Root = {
   update_sleep_by_pk?: Maybe<Sleep>;
   /** update multiples rows of table: "sleep" */
   update_sleep_many?: Maybe<Array<Maybe<Sleep_Mutation_Response>>>;
+  /** update data of the table: "sports" */
+  update_sports?: Maybe<Sports_Mutation_Response>;
+  /** update single row of the table: "sports" */
+  update_sports_by_pk?: Maybe<Sports>;
+  /** update multiples rows of table: "sports" */
+  update_sports_many?: Maybe<Array<Maybe<Sports_Mutation_Response>>>;
   /** update data of the table: "training_readiness" */
   update_training_readiness?: Maybe<Training_Readiness_Mutation_Response>;
   /** update single row of the table: "training_readiness" */
@@ -6247,6 +6746,18 @@ export type Mutation_Root = {
   update_users_many?: Maybe<Array<Maybe<Users_Mutation_Response>>>;
   /** update multiples rows of table: "storage.virus" */
   update_virus_many?: Maybe<Array<Maybe<Virus_Mutation_Response>>>;
+  /** update data of the table: "week_notes" */
+  update_week_notes?: Maybe<Week_Notes_Mutation_Response>;
+  /** update single row of the table: "week_notes" */
+  update_week_notes_by_pk?: Maybe<Week_Notes>;
+  /** update multiples rows of table: "week_notes" */
+  update_week_notes_many?: Maybe<Array<Maybe<Week_Notes_Mutation_Response>>>;
+  /** update data of the table: "week_objectives" */
+  update_week_objectives?: Maybe<Week_Objectives_Mutation_Response>;
+  /** update single row of the table: "week_objectives" */
+  update_week_objectives_by_pk?: Maybe<Week_Objectives>;
+  /** update multiples rows of table: "week_objectives" */
+  update_week_objectives_many?: Maybe<Array<Maybe<Week_Objectives_Mutation_Response>>>;
 };
 
 
@@ -6467,6 +6978,18 @@ export type Mutation_RootDelete_Activity_Streams_By_PkArgs = {
 
 
 /** mutation root */
+export type Mutation_RootDelete_Auth_Pkce_Authorization_CodesArgs = {
+  where: Auth_Pkce_Authorization_Codes_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_Auth_Pkce_Authorization_Codes_By_PkArgs = {
+  id: Scalars['uuid']['input'];
+};
+
+
+/** mutation root */
 export type Mutation_RootDelete_Daily_HrvArgs = {
   where: Daily_Hrv_Bool_Exp;
 };
@@ -6479,6 +7002,18 @@ export type Mutation_RootDelete_Daily_Hrv_By_PkArgs = {
 
 
 /** mutation root */
+export type Mutation_RootDelete_Day_PlansArgs = {
+  where: Day_Plans_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_Day_Plans_By_PkArgs = {
+  id: Scalars['bigint']['input'];
+};
+
+
+/** mutation root */
 export type Mutation_RootDelete_ExercisesArgs = {
   where: Exercises_Bool_Exp;
 };
@@ -6486,42 +7021,6 @@ export type Mutation_RootDelete_ExercisesArgs = {
 
 /** mutation root */
 export type Mutation_RootDelete_Exercises_By_PkArgs = {
-  id: Scalars['bigint']['input'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Plan_RequirementsArgs = {
-  where: Plan_Requirements_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Plan_Requirements_By_PkArgs = {
-  id: Scalars['bigint']['input'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Plan_WorkoutsArgs = {
-  where: Plan_Workouts_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Plan_Workouts_By_PkArgs = {
-  id: Scalars['bigint']['input'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_PlansArgs = {
-  where: Plans_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Plans_By_PkArgs = {
   id: Scalars['bigint']['input'];
 };
 
@@ -6551,6 +7050,18 @@ export type Mutation_RootDelete_Sleep_By_PkArgs = {
 
 
 /** mutation root */
+export type Mutation_RootDelete_SportsArgs = {
+  where: Sports_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_Sports_By_PkArgs = {
+  value: Scalars['String']['input'];
+};
+
+
+/** mutation root */
 export type Mutation_RootDelete_Training_ReadinessArgs = {
   where: Training_Readiness_Bool_Exp;
 };
@@ -6558,6 +7069,30 @@ export type Mutation_RootDelete_Training_ReadinessArgs = {
 
 /** mutation root */
 export type Mutation_RootDelete_Training_Readiness_By_PkArgs = {
+  id: Scalars['bigint']['input'];
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_Week_NotesArgs = {
+  where: Week_Notes_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_Week_Notes_By_PkArgs = {
+  week: Scalars['String']['input'];
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_Week_ObjectivesArgs = {
+  where: Week_Objectives_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_Week_Objectives_By_PkArgs = {
   id: Scalars['bigint']['input'];
 };
 
@@ -6815,6 +7350,20 @@ export type Mutation_RootInsert_Activity_Streams_OneArgs = {
 
 
 /** mutation root */
+export type Mutation_RootInsert_Auth_Pkce_Authorization_CodesArgs = {
+  objects: Array<Auth_Pkce_Authorization_Codes_Insert_Input>;
+  on_conflict?: InputMaybe<Auth_Pkce_Authorization_Codes_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_Auth_Pkce_Authorization_Codes_OneArgs = {
+  object: Auth_Pkce_Authorization_Codes_Insert_Input;
+  on_conflict?: InputMaybe<Auth_Pkce_Authorization_Codes_On_Conflict>;
+};
+
+
+/** mutation root */
 export type Mutation_RootInsert_Daily_HrvArgs = {
   objects: Array<Daily_Hrv_Insert_Input>;
   on_conflict?: InputMaybe<Daily_Hrv_On_Conflict>;
@@ -6829,6 +7378,20 @@ export type Mutation_RootInsert_Daily_Hrv_OneArgs = {
 
 
 /** mutation root */
+export type Mutation_RootInsert_Day_PlansArgs = {
+  objects: Array<Day_Plans_Insert_Input>;
+  on_conflict?: InputMaybe<Day_Plans_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_Day_Plans_OneArgs = {
+  object: Day_Plans_Insert_Input;
+  on_conflict?: InputMaybe<Day_Plans_On_Conflict>;
+};
+
+
+/** mutation root */
 export type Mutation_RootInsert_ExercisesArgs = {
   objects: Array<Exercises_Insert_Input>;
   on_conflict?: InputMaybe<Exercises_On_Conflict>;
@@ -6839,48 +7402,6 @@ export type Mutation_RootInsert_ExercisesArgs = {
 export type Mutation_RootInsert_Exercises_OneArgs = {
   object: Exercises_Insert_Input;
   on_conflict?: InputMaybe<Exercises_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Plan_RequirementsArgs = {
-  objects: Array<Plan_Requirements_Insert_Input>;
-  on_conflict?: InputMaybe<Plan_Requirements_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Plan_Requirements_OneArgs = {
-  object: Plan_Requirements_Insert_Input;
-  on_conflict?: InputMaybe<Plan_Requirements_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Plan_WorkoutsArgs = {
-  objects: Array<Plan_Workouts_Insert_Input>;
-  on_conflict?: InputMaybe<Plan_Workouts_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Plan_Workouts_OneArgs = {
-  object: Plan_Workouts_Insert_Input;
-  on_conflict?: InputMaybe<Plan_Workouts_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_PlansArgs = {
-  objects: Array<Plans_Insert_Input>;
-  on_conflict?: InputMaybe<Plans_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Plans_OneArgs = {
-  object: Plans_Insert_Input;
-  on_conflict?: InputMaybe<Plans_On_Conflict>;
 };
 
 
@@ -6913,6 +7434,20 @@ export type Mutation_RootInsert_Sleep_OneArgs = {
 
 
 /** mutation root */
+export type Mutation_RootInsert_SportsArgs = {
+  objects: Array<Sports_Insert_Input>;
+  on_conflict?: InputMaybe<Sports_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_Sports_OneArgs = {
+  object: Sports_Insert_Input;
+  on_conflict?: InputMaybe<Sports_On_Conflict>;
+};
+
+
+/** mutation root */
 export type Mutation_RootInsert_Training_ReadinessArgs = {
   objects: Array<Training_Readiness_Insert_Input>;
   on_conflict?: InputMaybe<Training_Readiness_On_Conflict>;
@@ -6927,9 +7462,30 @@ export type Mutation_RootInsert_Training_Readiness_OneArgs = {
 
 
 /** mutation root */
-export type Mutation_RootSyncActivitiesArgs = {
-  days?: Scalars['Int']['input'];
-  maxActivities?: Scalars['Int']['input'];
+export type Mutation_RootInsert_Week_NotesArgs = {
+  objects: Array<Week_Notes_Insert_Input>;
+  on_conflict?: InputMaybe<Week_Notes_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_Week_Notes_OneArgs = {
+  object: Week_Notes_Insert_Input;
+  on_conflict?: InputMaybe<Week_Notes_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_Week_ObjectivesArgs = {
+  objects: Array<Week_Objectives_Insert_Input>;
+  on_conflict?: InputMaybe<Week_Objectives_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_Week_Objectives_OneArgs = {
+  object: Week_Objectives_Insert_Input;
+  on_conflict?: InputMaybe<Week_Objectives_On_Conflict>;
 };
 
 
@@ -7360,6 +7916,26 @@ export type Mutation_RootUpdate_AuthUserSecurityKeys_ManyArgs = {
 
 
 /** mutation root */
+export type Mutation_RootUpdate_Auth_Pkce_Authorization_CodesArgs = {
+  _set?: InputMaybe<Auth_Pkce_Authorization_Codes_Set_Input>;
+  where: Auth_Pkce_Authorization_Codes_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Auth_Pkce_Authorization_Codes_By_PkArgs = {
+  _set?: InputMaybe<Auth_Pkce_Authorization_Codes_Set_Input>;
+  pk_columns: Auth_Pkce_Authorization_Codes_Pk_Columns_Input;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Auth_Pkce_Authorization_Codes_ManyArgs = {
+  updates: Array<Auth_Pkce_Authorization_Codes_Updates>;
+};
+
+
+/** mutation root */
 export type Mutation_RootUpdate_Buckets_ManyArgs = {
   updates: Array<Buckets_Updates>;
 };
@@ -7398,6 +7974,26 @@ export type Mutation_RootUpdate_Daily_Hrv_ManyArgs = {
 
 
 /** mutation root */
+export type Mutation_RootUpdate_Day_PlansArgs = {
+  _set?: InputMaybe<Day_Plans_Set_Input>;
+  where: Day_Plans_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Day_Plans_By_PkArgs = {
+  _set?: InputMaybe<Day_Plans_Set_Input>;
+  pk_columns: Day_Plans_Pk_Columns_Input;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Day_Plans_ManyArgs = {
+  updates: Array<Day_Plans_Updates>;
+};
+
+
+/** mutation root */
 export type Mutation_RootUpdate_ExercisesArgs = {
   _set?: InputMaybe<Exercises_Set_Input>;
   where: Exercises_Bool_Exp;
@@ -7420,70 +8016,6 @@ export type Mutation_RootUpdate_Exercises_ManyArgs = {
 /** mutation root */
 export type Mutation_RootUpdate_Files_ManyArgs = {
   updates: Array<Files_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Plan_RequirementsArgs = {
-  _inc?: InputMaybe<Plan_Requirements_Inc_Input>;
-  _set?: InputMaybe<Plan_Requirements_Set_Input>;
-  where: Plan_Requirements_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Plan_Requirements_By_PkArgs = {
-  _inc?: InputMaybe<Plan_Requirements_Inc_Input>;
-  _set?: InputMaybe<Plan_Requirements_Set_Input>;
-  pk_columns: Plan_Requirements_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Plan_Requirements_ManyArgs = {
-  updates: Array<Plan_Requirements_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Plan_WorkoutsArgs = {
-  _inc?: InputMaybe<Plan_Workouts_Inc_Input>;
-  _set?: InputMaybe<Plan_Workouts_Set_Input>;
-  where: Plan_Workouts_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Plan_Workouts_By_PkArgs = {
-  _inc?: InputMaybe<Plan_Workouts_Inc_Input>;
-  _set?: InputMaybe<Plan_Workouts_Set_Input>;
-  pk_columns: Plan_Workouts_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Plan_Workouts_ManyArgs = {
-  updates: Array<Plan_Workouts_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_PlansArgs = {
-  _set?: InputMaybe<Plans_Set_Input>;
-  where: Plans_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Plans_By_PkArgs = {
-  _set?: InputMaybe<Plans_Set_Input>;
-  pk_columns: Plans_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Plans_ManyArgs = {
-  updates: Array<Plans_Updates>;
 };
 
 
@@ -7532,6 +8064,28 @@ export type Mutation_RootUpdate_Sleep_ManyArgs = {
 
 
 /** mutation root */
+export type Mutation_RootUpdate_SportsArgs = {
+  _inc?: InputMaybe<Sports_Inc_Input>;
+  _set?: InputMaybe<Sports_Set_Input>;
+  where: Sports_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Sports_By_PkArgs = {
+  _inc?: InputMaybe<Sports_Inc_Input>;
+  _set?: InputMaybe<Sports_Set_Input>;
+  pk_columns: Sports_Pk_Columns_Input;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Sports_ManyArgs = {
+  updates: Array<Sports_Updates>;
+};
+
+
+/** mutation root */
 export type Mutation_RootUpdate_Training_ReadinessArgs = {
   _inc?: InputMaybe<Training_Readiness_Inc_Input>;
   _set?: InputMaybe<Training_Readiness_Set_Input>;
@@ -7564,6 +8118,48 @@ export type Mutation_RootUpdate_Virus_ManyArgs = {
   updates: Array<Virus_Updates>;
 };
 
+
+/** mutation root */
+export type Mutation_RootUpdate_Week_NotesArgs = {
+  _set?: InputMaybe<Week_Notes_Set_Input>;
+  where: Week_Notes_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Week_Notes_By_PkArgs = {
+  _set?: InputMaybe<Week_Notes_Set_Input>;
+  pk_columns: Week_Notes_Pk_Columns_Input;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Week_Notes_ManyArgs = {
+  updates: Array<Week_Notes_Updates>;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Week_ObjectivesArgs = {
+  _inc?: InputMaybe<Week_Objectives_Inc_Input>;
+  _set?: InputMaybe<Week_Objectives_Set_Input>;
+  where: Week_Objectives_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Week_Objectives_By_PkArgs = {
+  _inc?: InputMaybe<Week_Objectives_Inc_Input>;
+  _set?: InputMaybe<Week_Objectives_Set_Input>;
+  pk_columns: Week_Objectives_Pk_Columns_Input;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Week_Objectives_ManyArgs = {
+  updates: Array<Week_Objectives_Updates>;
+};
+
 /** Boolean expression to compare columns of type "numeric". All fields are combined with logical 'AND'. */
 export type Numeric_Comparison_Exp = {
   _eq?: InputMaybe<Scalars['numeric']['input']>;
@@ -7592,1060 +8188,6 @@ export enum Order_By {
   /** in descending order, nulls last */
   DescNullsLast = 'desc_nulls_last'
 }
-
-/** columns and relationships of "plan_requirements" */
-export type Plan_Requirements = {
-  __typename?: 'plan_requirements';
-  id: Scalars['bigint']['output'];
-  metric: Scalars['String']['output'];
-  notes?: Maybe<Scalars['String']['output']>;
-  /** An object relationship */
-  plan: Plans;
-  plan_id: Scalars['bigint']['output'];
-  sport?: Maybe<Scalars['String']['output']>;
-  target: Scalars['numeric']['output'];
-  week: Scalars['String']['output'];
-};
-
-/** aggregated selection of "plan_requirements" */
-export type Plan_Requirements_Aggregate = {
-  __typename?: 'plan_requirements_aggregate';
-  aggregate?: Maybe<Plan_Requirements_Aggregate_Fields>;
-  nodes: Array<Plan_Requirements>;
-};
-
-export type Plan_Requirements_Aggregate_Bool_Exp = {
-  count?: InputMaybe<Plan_Requirements_Aggregate_Bool_Exp_Count>;
-};
-
-export type Plan_Requirements_Aggregate_Bool_Exp_Count = {
-  arguments?: InputMaybe<Array<Plan_Requirements_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']['input']>;
-  filter?: InputMaybe<Plan_Requirements_Bool_Exp>;
-  predicate: Int_Comparison_Exp;
-};
-
-/** aggregate fields of "plan_requirements" */
-export type Plan_Requirements_Aggregate_Fields = {
-  __typename?: 'plan_requirements_aggregate_fields';
-  avg?: Maybe<Plan_Requirements_Avg_Fields>;
-  count: Scalars['Int']['output'];
-  max?: Maybe<Plan_Requirements_Max_Fields>;
-  min?: Maybe<Plan_Requirements_Min_Fields>;
-  stddev?: Maybe<Plan_Requirements_Stddev_Fields>;
-  stddev_pop?: Maybe<Plan_Requirements_Stddev_Pop_Fields>;
-  stddev_samp?: Maybe<Plan_Requirements_Stddev_Samp_Fields>;
-  sum?: Maybe<Plan_Requirements_Sum_Fields>;
-  var_pop?: Maybe<Plan_Requirements_Var_Pop_Fields>;
-  var_samp?: Maybe<Plan_Requirements_Var_Samp_Fields>;
-  variance?: Maybe<Plan_Requirements_Variance_Fields>;
-};
-
-
-/** aggregate fields of "plan_requirements" */
-export type Plan_Requirements_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Plan_Requirements_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']['input']>;
-};
-
-/** order by aggregate values of table "plan_requirements" */
-export type Plan_Requirements_Aggregate_Order_By = {
-  avg?: InputMaybe<Plan_Requirements_Avg_Order_By>;
-  count?: InputMaybe<Order_By>;
-  max?: InputMaybe<Plan_Requirements_Max_Order_By>;
-  min?: InputMaybe<Plan_Requirements_Min_Order_By>;
-  stddev?: InputMaybe<Plan_Requirements_Stddev_Order_By>;
-  stddev_pop?: InputMaybe<Plan_Requirements_Stddev_Pop_Order_By>;
-  stddev_samp?: InputMaybe<Plan_Requirements_Stddev_Samp_Order_By>;
-  sum?: InputMaybe<Plan_Requirements_Sum_Order_By>;
-  var_pop?: InputMaybe<Plan_Requirements_Var_Pop_Order_By>;
-  var_samp?: InputMaybe<Plan_Requirements_Var_Samp_Order_By>;
-  variance?: InputMaybe<Plan_Requirements_Variance_Order_By>;
-};
-
-/** input type for inserting array relation for remote table "plan_requirements" */
-export type Plan_Requirements_Arr_Rel_Insert_Input = {
-  data: Array<Plan_Requirements_Insert_Input>;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Plan_Requirements_On_Conflict>;
-};
-
-/** aggregate avg on columns */
-export type Plan_Requirements_Avg_Fields = {
-  __typename?: 'plan_requirements_avg_fields';
-  id?: Maybe<Scalars['Float']['output']>;
-  plan_id?: Maybe<Scalars['Float']['output']>;
-  target?: Maybe<Scalars['Float']['output']>;
-};
-
-/** order by avg() on columns of table "plan_requirements" */
-export type Plan_Requirements_Avg_Order_By = {
-  id?: InputMaybe<Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-  target?: InputMaybe<Order_By>;
-};
-
-/** Boolean expression to filter rows from the table "plan_requirements". All fields are combined with a logical 'AND'. */
-export type Plan_Requirements_Bool_Exp = {
-  _and?: InputMaybe<Array<Plan_Requirements_Bool_Exp>>;
-  _not?: InputMaybe<Plan_Requirements_Bool_Exp>;
-  _or?: InputMaybe<Array<Plan_Requirements_Bool_Exp>>;
-  id?: InputMaybe<Bigint_Comparison_Exp>;
-  metric?: InputMaybe<String_Comparison_Exp>;
-  notes?: InputMaybe<String_Comparison_Exp>;
-  plan?: InputMaybe<Plans_Bool_Exp>;
-  plan_id?: InputMaybe<Bigint_Comparison_Exp>;
-  sport?: InputMaybe<String_Comparison_Exp>;
-  target?: InputMaybe<Numeric_Comparison_Exp>;
-  week?: InputMaybe<String_Comparison_Exp>;
-};
-
-/** unique or primary key constraints on table "plan_requirements" */
-export enum Plan_Requirements_Constraint {
-  /** unique or primary key constraint on columns "id" */
-  PlanRequirementsPkey = 'plan_requirements_pkey'
-}
-
-/** input type for incrementing numeric columns in table "plan_requirements" */
-export type Plan_Requirements_Inc_Input = {
-  plan_id?: InputMaybe<Scalars['bigint']['input']>;
-  target?: InputMaybe<Scalars['numeric']['input']>;
-};
-
-/** input type for inserting data into table "plan_requirements" */
-export type Plan_Requirements_Insert_Input = {
-  metric?: InputMaybe<Scalars['String']['input']>;
-  notes?: InputMaybe<Scalars['String']['input']>;
-  plan?: InputMaybe<Plans_Obj_Rel_Insert_Input>;
-  plan_id?: InputMaybe<Scalars['bigint']['input']>;
-  sport?: InputMaybe<Scalars['String']['input']>;
-  target?: InputMaybe<Scalars['numeric']['input']>;
-  week?: InputMaybe<Scalars['String']['input']>;
-};
-
-/** aggregate max on columns */
-export type Plan_Requirements_Max_Fields = {
-  __typename?: 'plan_requirements_max_fields';
-  id?: Maybe<Scalars['bigint']['output']>;
-  metric?: Maybe<Scalars['String']['output']>;
-  notes?: Maybe<Scalars['String']['output']>;
-  plan_id?: Maybe<Scalars['bigint']['output']>;
-  sport?: Maybe<Scalars['String']['output']>;
-  target?: Maybe<Scalars['numeric']['output']>;
-  week?: Maybe<Scalars['String']['output']>;
-};
-
-/** order by max() on columns of table "plan_requirements" */
-export type Plan_Requirements_Max_Order_By = {
-  id?: InputMaybe<Order_By>;
-  metric?: InputMaybe<Order_By>;
-  notes?: InputMaybe<Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-  sport?: InputMaybe<Order_By>;
-  target?: InputMaybe<Order_By>;
-  week?: InputMaybe<Order_By>;
-};
-
-/** aggregate min on columns */
-export type Plan_Requirements_Min_Fields = {
-  __typename?: 'plan_requirements_min_fields';
-  id?: Maybe<Scalars['bigint']['output']>;
-  metric?: Maybe<Scalars['String']['output']>;
-  notes?: Maybe<Scalars['String']['output']>;
-  plan_id?: Maybe<Scalars['bigint']['output']>;
-  sport?: Maybe<Scalars['String']['output']>;
-  target?: Maybe<Scalars['numeric']['output']>;
-  week?: Maybe<Scalars['String']['output']>;
-};
-
-/** order by min() on columns of table "plan_requirements" */
-export type Plan_Requirements_Min_Order_By = {
-  id?: InputMaybe<Order_By>;
-  metric?: InputMaybe<Order_By>;
-  notes?: InputMaybe<Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-  sport?: InputMaybe<Order_By>;
-  target?: InputMaybe<Order_By>;
-  week?: InputMaybe<Order_By>;
-};
-
-/** response of any mutation on the table "plan_requirements" */
-export type Plan_Requirements_Mutation_Response = {
-  __typename?: 'plan_requirements_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int']['output'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Plan_Requirements>;
-};
-
-/** on_conflict condition type for table "plan_requirements" */
-export type Plan_Requirements_On_Conflict = {
-  constraint: Plan_Requirements_Constraint;
-  update_columns?: Array<Plan_Requirements_Update_Column>;
-  where?: InputMaybe<Plan_Requirements_Bool_Exp>;
-};
-
-/** Ordering options when selecting data from "plan_requirements". */
-export type Plan_Requirements_Order_By = {
-  id?: InputMaybe<Order_By>;
-  metric?: InputMaybe<Order_By>;
-  notes?: InputMaybe<Order_By>;
-  plan?: InputMaybe<Plans_Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-  sport?: InputMaybe<Order_By>;
-  target?: InputMaybe<Order_By>;
-  week?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: plan_requirements */
-export type Plan_Requirements_Pk_Columns_Input = {
-  id: Scalars['bigint']['input'];
-};
-
-/** select columns of table "plan_requirements" */
-export enum Plan_Requirements_Select_Column {
-  /** column name */
-  Id = 'id',
-  /** column name */
-  Metric = 'metric',
-  /** column name */
-  Notes = 'notes',
-  /** column name */
-  PlanId = 'plan_id',
-  /** column name */
-  Sport = 'sport',
-  /** column name */
-  Target = 'target',
-  /** column name */
-  Week = 'week'
-}
-
-/** input type for updating data in table "plan_requirements" */
-export type Plan_Requirements_Set_Input = {
-  metric?: InputMaybe<Scalars['String']['input']>;
-  notes?: InputMaybe<Scalars['String']['input']>;
-  plan_id?: InputMaybe<Scalars['bigint']['input']>;
-  sport?: InputMaybe<Scalars['String']['input']>;
-  target?: InputMaybe<Scalars['numeric']['input']>;
-  week?: InputMaybe<Scalars['String']['input']>;
-};
-
-/** aggregate stddev on columns */
-export type Plan_Requirements_Stddev_Fields = {
-  __typename?: 'plan_requirements_stddev_fields';
-  id?: Maybe<Scalars['Float']['output']>;
-  plan_id?: Maybe<Scalars['Float']['output']>;
-  target?: Maybe<Scalars['Float']['output']>;
-};
-
-/** order by stddev() on columns of table "plan_requirements" */
-export type Plan_Requirements_Stddev_Order_By = {
-  id?: InputMaybe<Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-  target?: InputMaybe<Order_By>;
-};
-
-/** aggregate stddev_pop on columns */
-export type Plan_Requirements_Stddev_Pop_Fields = {
-  __typename?: 'plan_requirements_stddev_pop_fields';
-  id?: Maybe<Scalars['Float']['output']>;
-  plan_id?: Maybe<Scalars['Float']['output']>;
-  target?: Maybe<Scalars['Float']['output']>;
-};
-
-/** order by stddev_pop() on columns of table "plan_requirements" */
-export type Plan_Requirements_Stddev_Pop_Order_By = {
-  id?: InputMaybe<Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-  target?: InputMaybe<Order_By>;
-};
-
-/** aggregate stddev_samp on columns */
-export type Plan_Requirements_Stddev_Samp_Fields = {
-  __typename?: 'plan_requirements_stddev_samp_fields';
-  id?: Maybe<Scalars['Float']['output']>;
-  plan_id?: Maybe<Scalars['Float']['output']>;
-  target?: Maybe<Scalars['Float']['output']>;
-};
-
-/** order by stddev_samp() on columns of table "plan_requirements" */
-export type Plan_Requirements_Stddev_Samp_Order_By = {
-  id?: InputMaybe<Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-  target?: InputMaybe<Order_By>;
-};
-
-/** Streaming cursor of the table "plan_requirements" */
-export type Plan_Requirements_Stream_Cursor_Input = {
-  /** Stream column input with initial value */
-  initial_value: Plan_Requirements_Stream_Cursor_Value_Input;
-  /** cursor ordering */
-  ordering?: InputMaybe<Cursor_Ordering>;
-};
-
-/** Initial value of the column from where the streaming should start */
-export type Plan_Requirements_Stream_Cursor_Value_Input = {
-  id?: InputMaybe<Scalars['bigint']['input']>;
-  metric?: InputMaybe<Scalars['String']['input']>;
-  notes?: InputMaybe<Scalars['String']['input']>;
-  plan_id?: InputMaybe<Scalars['bigint']['input']>;
-  sport?: InputMaybe<Scalars['String']['input']>;
-  target?: InputMaybe<Scalars['numeric']['input']>;
-  week?: InputMaybe<Scalars['String']['input']>;
-};
-
-/** aggregate sum on columns */
-export type Plan_Requirements_Sum_Fields = {
-  __typename?: 'plan_requirements_sum_fields';
-  id?: Maybe<Scalars['bigint']['output']>;
-  plan_id?: Maybe<Scalars['bigint']['output']>;
-  target?: Maybe<Scalars['numeric']['output']>;
-};
-
-/** order by sum() on columns of table "plan_requirements" */
-export type Plan_Requirements_Sum_Order_By = {
-  id?: InputMaybe<Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-  target?: InputMaybe<Order_By>;
-};
-
-/** update columns of table "plan_requirements" */
-export enum Plan_Requirements_Update_Column {
-  /** column name */
-  Metric = 'metric',
-  /** column name */
-  Notes = 'notes',
-  /** column name */
-  PlanId = 'plan_id',
-  /** column name */
-  Sport = 'sport',
-  /** column name */
-  Target = 'target',
-  /** column name */
-  Week = 'week'
-}
-
-export type Plan_Requirements_Updates = {
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<Plan_Requirements_Inc_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Plan_Requirements_Set_Input>;
-  /** filter the rows which have to be updated */
-  where: Plan_Requirements_Bool_Exp;
-};
-
-/** aggregate var_pop on columns */
-export type Plan_Requirements_Var_Pop_Fields = {
-  __typename?: 'plan_requirements_var_pop_fields';
-  id?: Maybe<Scalars['Float']['output']>;
-  plan_id?: Maybe<Scalars['Float']['output']>;
-  target?: Maybe<Scalars['Float']['output']>;
-};
-
-/** order by var_pop() on columns of table "plan_requirements" */
-export type Plan_Requirements_Var_Pop_Order_By = {
-  id?: InputMaybe<Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-  target?: InputMaybe<Order_By>;
-};
-
-/** aggregate var_samp on columns */
-export type Plan_Requirements_Var_Samp_Fields = {
-  __typename?: 'plan_requirements_var_samp_fields';
-  id?: Maybe<Scalars['Float']['output']>;
-  plan_id?: Maybe<Scalars['Float']['output']>;
-  target?: Maybe<Scalars['Float']['output']>;
-};
-
-/** order by var_samp() on columns of table "plan_requirements" */
-export type Plan_Requirements_Var_Samp_Order_By = {
-  id?: InputMaybe<Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-  target?: InputMaybe<Order_By>;
-};
-
-/** aggregate variance on columns */
-export type Plan_Requirements_Variance_Fields = {
-  __typename?: 'plan_requirements_variance_fields';
-  id?: Maybe<Scalars['Float']['output']>;
-  plan_id?: Maybe<Scalars['Float']['output']>;
-  target?: Maybe<Scalars['Float']['output']>;
-};
-
-/** order by variance() on columns of table "plan_requirements" */
-export type Plan_Requirements_Variance_Order_By = {
-  id?: InputMaybe<Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-  target?: InputMaybe<Order_By>;
-};
-
-/** columns and relationships of "plan_workouts" */
-export type Plan_Workouts = {
-  __typename?: 'plan_workouts';
-  completed_at?: Maybe<Scalars['timestamptz']['output']>;
-  day_of_week: Scalars['String']['output'];
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['bigint']['output'];
-  /** An object relationship */
-  plan: Plans;
-  plan_id: Scalars['bigint']['output'];
-  sport: Scalars['String']['output'];
-  title: Scalars['String']['output'];
-  week: Scalars['String']['output'];
-};
-
-/** aggregated selection of "plan_workouts" */
-export type Plan_Workouts_Aggregate = {
-  __typename?: 'plan_workouts_aggregate';
-  aggregate?: Maybe<Plan_Workouts_Aggregate_Fields>;
-  nodes: Array<Plan_Workouts>;
-};
-
-export type Plan_Workouts_Aggregate_Bool_Exp = {
-  count?: InputMaybe<Plan_Workouts_Aggregate_Bool_Exp_Count>;
-};
-
-export type Plan_Workouts_Aggregate_Bool_Exp_Count = {
-  arguments?: InputMaybe<Array<Plan_Workouts_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']['input']>;
-  filter?: InputMaybe<Plan_Workouts_Bool_Exp>;
-  predicate: Int_Comparison_Exp;
-};
-
-/** aggregate fields of "plan_workouts" */
-export type Plan_Workouts_Aggregate_Fields = {
-  __typename?: 'plan_workouts_aggregate_fields';
-  avg?: Maybe<Plan_Workouts_Avg_Fields>;
-  count: Scalars['Int']['output'];
-  max?: Maybe<Plan_Workouts_Max_Fields>;
-  min?: Maybe<Plan_Workouts_Min_Fields>;
-  stddev?: Maybe<Plan_Workouts_Stddev_Fields>;
-  stddev_pop?: Maybe<Plan_Workouts_Stddev_Pop_Fields>;
-  stddev_samp?: Maybe<Plan_Workouts_Stddev_Samp_Fields>;
-  sum?: Maybe<Plan_Workouts_Sum_Fields>;
-  var_pop?: Maybe<Plan_Workouts_Var_Pop_Fields>;
-  var_samp?: Maybe<Plan_Workouts_Var_Samp_Fields>;
-  variance?: Maybe<Plan_Workouts_Variance_Fields>;
-};
-
-
-/** aggregate fields of "plan_workouts" */
-export type Plan_Workouts_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Plan_Workouts_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']['input']>;
-};
-
-/** order by aggregate values of table "plan_workouts" */
-export type Plan_Workouts_Aggregate_Order_By = {
-  avg?: InputMaybe<Plan_Workouts_Avg_Order_By>;
-  count?: InputMaybe<Order_By>;
-  max?: InputMaybe<Plan_Workouts_Max_Order_By>;
-  min?: InputMaybe<Plan_Workouts_Min_Order_By>;
-  stddev?: InputMaybe<Plan_Workouts_Stddev_Order_By>;
-  stddev_pop?: InputMaybe<Plan_Workouts_Stddev_Pop_Order_By>;
-  stddev_samp?: InputMaybe<Plan_Workouts_Stddev_Samp_Order_By>;
-  sum?: InputMaybe<Plan_Workouts_Sum_Order_By>;
-  var_pop?: InputMaybe<Plan_Workouts_Var_Pop_Order_By>;
-  var_samp?: InputMaybe<Plan_Workouts_Var_Samp_Order_By>;
-  variance?: InputMaybe<Plan_Workouts_Variance_Order_By>;
-};
-
-/** input type for inserting array relation for remote table "plan_workouts" */
-export type Plan_Workouts_Arr_Rel_Insert_Input = {
-  data: Array<Plan_Workouts_Insert_Input>;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Plan_Workouts_On_Conflict>;
-};
-
-/** aggregate avg on columns */
-export type Plan_Workouts_Avg_Fields = {
-  __typename?: 'plan_workouts_avg_fields';
-  id?: Maybe<Scalars['Float']['output']>;
-  plan_id?: Maybe<Scalars['Float']['output']>;
-};
-
-/** order by avg() on columns of table "plan_workouts" */
-export type Plan_Workouts_Avg_Order_By = {
-  id?: InputMaybe<Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-};
-
-/** Boolean expression to filter rows from the table "plan_workouts". All fields are combined with a logical 'AND'. */
-export type Plan_Workouts_Bool_Exp = {
-  _and?: InputMaybe<Array<Plan_Workouts_Bool_Exp>>;
-  _not?: InputMaybe<Plan_Workouts_Bool_Exp>;
-  _or?: InputMaybe<Array<Plan_Workouts_Bool_Exp>>;
-  completed_at?: InputMaybe<Timestamptz_Comparison_Exp>;
-  day_of_week?: InputMaybe<String_Comparison_Exp>;
-  description?: InputMaybe<String_Comparison_Exp>;
-  id?: InputMaybe<Bigint_Comparison_Exp>;
-  plan?: InputMaybe<Plans_Bool_Exp>;
-  plan_id?: InputMaybe<Bigint_Comparison_Exp>;
-  sport?: InputMaybe<String_Comparison_Exp>;
-  title?: InputMaybe<String_Comparison_Exp>;
-  week?: InputMaybe<String_Comparison_Exp>;
-};
-
-/** unique or primary key constraints on table "plan_workouts" */
-export enum Plan_Workouts_Constraint {
-  /** unique or primary key constraint on columns "id" */
-  PlanWorkoutsPkey = 'plan_workouts_pkey'
-}
-
-/** input type for incrementing numeric columns in table "plan_workouts" */
-export type Plan_Workouts_Inc_Input = {
-  plan_id?: InputMaybe<Scalars['bigint']['input']>;
-};
-
-/** input type for inserting data into table "plan_workouts" */
-export type Plan_Workouts_Insert_Input = {
-  completed_at?: InputMaybe<Scalars['timestamptz']['input']>;
-  day_of_week?: InputMaybe<Scalars['String']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
-  plan?: InputMaybe<Plans_Obj_Rel_Insert_Input>;
-  plan_id?: InputMaybe<Scalars['bigint']['input']>;
-  sport?: InputMaybe<Scalars['String']['input']>;
-  title?: InputMaybe<Scalars['String']['input']>;
-  week?: InputMaybe<Scalars['String']['input']>;
-};
-
-/** aggregate max on columns */
-export type Plan_Workouts_Max_Fields = {
-  __typename?: 'plan_workouts_max_fields';
-  completed_at?: Maybe<Scalars['timestamptz']['output']>;
-  day_of_week?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  id?: Maybe<Scalars['bigint']['output']>;
-  plan_id?: Maybe<Scalars['bigint']['output']>;
-  sport?: Maybe<Scalars['String']['output']>;
-  title?: Maybe<Scalars['String']['output']>;
-  week?: Maybe<Scalars['String']['output']>;
-};
-
-/** order by max() on columns of table "plan_workouts" */
-export type Plan_Workouts_Max_Order_By = {
-  completed_at?: InputMaybe<Order_By>;
-  day_of_week?: InputMaybe<Order_By>;
-  description?: InputMaybe<Order_By>;
-  id?: InputMaybe<Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-  sport?: InputMaybe<Order_By>;
-  title?: InputMaybe<Order_By>;
-  week?: InputMaybe<Order_By>;
-};
-
-/** aggregate min on columns */
-export type Plan_Workouts_Min_Fields = {
-  __typename?: 'plan_workouts_min_fields';
-  completed_at?: Maybe<Scalars['timestamptz']['output']>;
-  day_of_week?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  id?: Maybe<Scalars['bigint']['output']>;
-  plan_id?: Maybe<Scalars['bigint']['output']>;
-  sport?: Maybe<Scalars['String']['output']>;
-  title?: Maybe<Scalars['String']['output']>;
-  week?: Maybe<Scalars['String']['output']>;
-};
-
-/** order by min() on columns of table "plan_workouts" */
-export type Plan_Workouts_Min_Order_By = {
-  completed_at?: InputMaybe<Order_By>;
-  day_of_week?: InputMaybe<Order_By>;
-  description?: InputMaybe<Order_By>;
-  id?: InputMaybe<Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-  sport?: InputMaybe<Order_By>;
-  title?: InputMaybe<Order_By>;
-  week?: InputMaybe<Order_By>;
-};
-
-/** response of any mutation on the table "plan_workouts" */
-export type Plan_Workouts_Mutation_Response = {
-  __typename?: 'plan_workouts_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int']['output'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Plan_Workouts>;
-};
-
-/** on_conflict condition type for table "plan_workouts" */
-export type Plan_Workouts_On_Conflict = {
-  constraint: Plan_Workouts_Constraint;
-  update_columns?: Array<Plan_Workouts_Update_Column>;
-  where?: InputMaybe<Plan_Workouts_Bool_Exp>;
-};
-
-/** Ordering options when selecting data from "plan_workouts". */
-export type Plan_Workouts_Order_By = {
-  completed_at?: InputMaybe<Order_By>;
-  day_of_week?: InputMaybe<Order_By>;
-  description?: InputMaybe<Order_By>;
-  id?: InputMaybe<Order_By>;
-  plan?: InputMaybe<Plans_Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-  sport?: InputMaybe<Order_By>;
-  title?: InputMaybe<Order_By>;
-  week?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: plan_workouts */
-export type Plan_Workouts_Pk_Columns_Input = {
-  id: Scalars['bigint']['input'];
-};
-
-/** select columns of table "plan_workouts" */
-export enum Plan_Workouts_Select_Column {
-  /** column name */
-  CompletedAt = 'completed_at',
-  /** column name */
-  DayOfWeek = 'day_of_week',
-  /** column name */
-  Description = 'description',
-  /** column name */
-  Id = 'id',
-  /** column name */
-  PlanId = 'plan_id',
-  /** column name */
-  Sport = 'sport',
-  /** column name */
-  Title = 'title',
-  /** column name */
-  Week = 'week'
-}
-
-/** input type for updating data in table "plan_workouts" */
-export type Plan_Workouts_Set_Input = {
-  completed_at?: InputMaybe<Scalars['timestamptz']['input']>;
-  day_of_week?: InputMaybe<Scalars['String']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
-  plan_id?: InputMaybe<Scalars['bigint']['input']>;
-  sport?: InputMaybe<Scalars['String']['input']>;
-  title?: InputMaybe<Scalars['String']['input']>;
-  week?: InputMaybe<Scalars['String']['input']>;
-};
-
-/** aggregate stddev on columns */
-export type Plan_Workouts_Stddev_Fields = {
-  __typename?: 'plan_workouts_stddev_fields';
-  id?: Maybe<Scalars['Float']['output']>;
-  plan_id?: Maybe<Scalars['Float']['output']>;
-};
-
-/** order by stddev() on columns of table "plan_workouts" */
-export type Plan_Workouts_Stddev_Order_By = {
-  id?: InputMaybe<Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-};
-
-/** aggregate stddev_pop on columns */
-export type Plan_Workouts_Stddev_Pop_Fields = {
-  __typename?: 'plan_workouts_stddev_pop_fields';
-  id?: Maybe<Scalars['Float']['output']>;
-  plan_id?: Maybe<Scalars['Float']['output']>;
-};
-
-/** order by stddev_pop() on columns of table "plan_workouts" */
-export type Plan_Workouts_Stddev_Pop_Order_By = {
-  id?: InputMaybe<Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-};
-
-/** aggregate stddev_samp on columns */
-export type Plan_Workouts_Stddev_Samp_Fields = {
-  __typename?: 'plan_workouts_stddev_samp_fields';
-  id?: Maybe<Scalars['Float']['output']>;
-  plan_id?: Maybe<Scalars['Float']['output']>;
-};
-
-/** order by stddev_samp() on columns of table "plan_workouts" */
-export type Plan_Workouts_Stddev_Samp_Order_By = {
-  id?: InputMaybe<Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-};
-
-/** Streaming cursor of the table "plan_workouts" */
-export type Plan_Workouts_Stream_Cursor_Input = {
-  /** Stream column input with initial value */
-  initial_value: Plan_Workouts_Stream_Cursor_Value_Input;
-  /** cursor ordering */
-  ordering?: InputMaybe<Cursor_Ordering>;
-};
-
-/** Initial value of the column from where the streaming should start */
-export type Plan_Workouts_Stream_Cursor_Value_Input = {
-  completed_at?: InputMaybe<Scalars['timestamptz']['input']>;
-  day_of_week?: InputMaybe<Scalars['String']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
-  id?: InputMaybe<Scalars['bigint']['input']>;
-  plan_id?: InputMaybe<Scalars['bigint']['input']>;
-  sport?: InputMaybe<Scalars['String']['input']>;
-  title?: InputMaybe<Scalars['String']['input']>;
-  week?: InputMaybe<Scalars['String']['input']>;
-};
-
-/** aggregate sum on columns */
-export type Plan_Workouts_Sum_Fields = {
-  __typename?: 'plan_workouts_sum_fields';
-  id?: Maybe<Scalars['bigint']['output']>;
-  plan_id?: Maybe<Scalars['bigint']['output']>;
-};
-
-/** order by sum() on columns of table "plan_workouts" */
-export type Plan_Workouts_Sum_Order_By = {
-  id?: InputMaybe<Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-};
-
-/** update columns of table "plan_workouts" */
-export enum Plan_Workouts_Update_Column {
-  /** column name */
-  CompletedAt = 'completed_at',
-  /** column name */
-  DayOfWeek = 'day_of_week',
-  /** column name */
-  Description = 'description',
-  /** column name */
-  PlanId = 'plan_id',
-  /** column name */
-  Sport = 'sport',
-  /** column name */
-  Title = 'title',
-  /** column name */
-  Week = 'week'
-}
-
-export type Plan_Workouts_Updates = {
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<Plan_Workouts_Inc_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Plan_Workouts_Set_Input>;
-  /** filter the rows which have to be updated */
-  where: Plan_Workouts_Bool_Exp;
-};
-
-/** aggregate var_pop on columns */
-export type Plan_Workouts_Var_Pop_Fields = {
-  __typename?: 'plan_workouts_var_pop_fields';
-  id?: Maybe<Scalars['Float']['output']>;
-  plan_id?: Maybe<Scalars['Float']['output']>;
-};
-
-/** order by var_pop() on columns of table "plan_workouts" */
-export type Plan_Workouts_Var_Pop_Order_By = {
-  id?: InputMaybe<Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-};
-
-/** aggregate var_samp on columns */
-export type Plan_Workouts_Var_Samp_Fields = {
-  __typename?: 'plan_workouts_var_samp_fields';
-  id?: Maybe<Scalars['Float']['output']>;
-  plan_id?: Maybe<Scalars['Float']['output']>;
-};
-
-/** order by var_samp() on columns of table "plan_workouts" */
-export type Plan_Workouts_Var_Samp_Order_By = {
-  id?: InputMaybe<Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-};
-
-/** aggregate variance on columns */
-export type Plan_Workouts_Variance_Fields = {
-  __typename?: 'plan_workouts_variance_fields';
-  id?: Maybe<Scalars['Float']['output']>;
-  plan_id?: Maybe<Scalars['Float']['output']>;
-};
-
-/** order by variance() on columns of table "plan_workouts" */
-export type Plan_Workouts_Variance_Order_By = {
-  id?: InputMaybe<Order_By>;
-  plan_id?: InputMaybe<Order_By>;
-};
-
-/** columns and relationships of "plans" */
-export type Plans = {
-  __typename?: 'plans';
-  end_week: Scalars['String']['output'];
-  id: Scalars['bigint']['output'];
-  name: Scalars['String']['output'];
-  notes?: Maybe<Scalars['String']['output']>;
-  /** An array relationship */
-  requirements: Array<Plan_Requirements>;
-  /** An aggregate relationship */
-  requirements_aggregate: Plan_Requirements_Aggregate;
-  start_week: Scalars['String']['output'];
-  /** An array relationship */
-  workouts: Array<Plan_Workouts>;
-  /** An aggregate relationship */
-  workouts_aggregate: Plan_Workouts_Aggregate;
-};
-
-
-/** columns and relationships of "plans" */
-export type PlansRequirementsArgs = {
-  distinct_on?: InputMaybe<Array<Plan_Requirements_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  order_by?: InputMaybe<Array<Plan_Requirements_Order_By>>;
-  where?: InputMaybe<Plan_Requirements_Bool_Exp>;
-};
-
-
-/** columns and relationships of "plans" */
-export type PlansRequirements_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Plan_Requirements_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  order_by?: InputMaybe<Array<Plan_Requirements_Order_By>>;
-  where?: InputMaybe<Plan_Requirements_Bool_Exp>;
-};
-
-
-/** columns and relationships of "plans" */
-export type PlansWorkoutsArgs = {
-  distinct_on?: InputMaybe<Array<Plan_Workouts_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  order_by?: InputMaybe<Array<Plan_Workouts_Order_By>>;
-  where?: InputMaybe<Plan_Workouts_Bool_Exp>;
-};
-
-
-/** columns and relationships of "plans" */
-export type PlansWorkouts_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Plan_Workouts_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  order_by?: InputMaybe<Array<Plan_Workouts_Order_By>>;
-  where?: InputMaybe<Plan_Workouts_Bool_Exp>;
-};
-
-/** aggregated selection of "plans" */
-export type Plans_Aggregate = {
-  __typename?: 'plans_aggregate';
-  aggregate?: Maybe<Plans_Aggregate_Fields>;
-  nodes: Array<Plans>;
-};
-
-/** aggregate fields of "plans" */
-export type Plans_Aggregate_Fields = {
-  __typename?: 'plans_aggregate_fields';
-  avg?: Maybe<Plans_Avg_Fields>;
-  count: Scalars['Int']['output'];
-  max?: Maybe<Plans_Max_Fields>;
-  min?: Maybe<Plans_Min_Fields>;
-  stddev?: Maybe<Plans_Stddev_Fields>;
-  stddev_pop?: Maybe<Plans_Stddev_Pop_Fields>;
-  stddev_samp?: Maybe<Plans_Stddev_Samp_Fields>;
-  sum?: Maybe<Plans_Sum_Fields>;
-  var_pop?: Maybe<Plans_Var_Pop_Fields>;
-  var_samp?: Maybe<Plans_Var_Samp_Fields>;
-  variance?: Maybe<Plans_Variance_Fields>;
-};
-
-
-/** aggregate fields of "plans" */
-export type Plans_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Plans_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']['input']>;
-};
-
-/** aggregate avg on columns */
-export type Plans_Avg_Fields = {
-  __typename?: 'plans_avg_fields';
-  id?: Maybe<Scalars['Float']['output']>;
-};
-
-/** Boolean expression to filter rows from the table "plans". All fields are combined with a logical 'AND'. */
-export type Plans_Bool_Exp = {
-  _and?: InputMaybe<Array<Plans_Bool_Exp>>;
-  _not?: InputMaybe<Plans_Bool_Exp>;
-  _or?: InputMaybe<Array<Plans_Bool_Exp>>;
-  end_week?: InputMaybe<String_Comparison_Exp>;
-  id?: InputMaybe<Bigint_Comparison_Exp>;
-  name?: InputMaybe<String_Comparison_Exp>;
-  notes?: InputMaybe<String_Comparison_Exp>;
-  requirements?: InputMaybe<Plan_Requirements_Bool_Exp>;
-  requirements_aggregate?: InputMaybe<Plan_Requirements_Aggregate_Bool_Exp>;
-  start_week?: InputMaybe<String_Comparison_Exp>;
-  workouts?: InputMaybe<Plan_Workouts_Bool_Exp>;
-  workouts_aggregate?: InputMaybe<Plan_Workouts_Aggregate_Bool_Exp>;
-};
-
-/** unique or primary key constraints on table "plans" */
-export enum Plans_Constraint {
-  /** unique or primary key constraint on columns "id" */
-  PlansPkey = 'plans_pkey'
-}
-
-/** input type for inserting data into table "plans" */
-export type Plans_Insert_Input = {
-  end_week?: InputMaybe<Scalars['String']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  notes?: InputMaybe<Scalars['String']['input']>;
-  requirements?: InputMaybe<Plan_Requirements_Arr_Rel_Insert_Input>;
-  start_week?: InputMaybe<Scalars['String']['input']>;
-  workouts?: InputMaybe<Plan_Workouts_Arr_Rel_Insert_Input>;
-};
-
-/** aggregate max on columns */
-export type Plans_Max_Fields = {
-  __typename?: 'plans_max_fields';
-  end_week?: Maybe<Scalars['String']['output']>;
-  id?: Maybe<Scalars['bigint']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  notes?: Maybe<Scalars['String']['output']>;
-  start_week?: Maybe<Scalars['String']['output']>;
-};
-
-/** aggregate min on columns */
-export type Plans_Min_Fields = {
-  __typename?: 'plans_min_fields';
-  end_week?: Maybe<Scalars['String']['output']>;
-  id?: Maybe<Scalars['bigint']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  notes?: Maybe<Scalars['String']['output']>;
-  start_week?: Maybe<Scalars['String']['output']>;
-};
-
-/** response of any mutation on the table "plans" */
-export type Plans_Mutation_Response = {
-  __typename?: 'plans_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int']['output'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Plans>;
-};
-
-/** input type for inserting object relation for remote table "plans" */
-export type Plans_Obj_Rel_Insert_Input = {
-  data: Plans_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Plans_On_Conflict>;
-};
-
-/** on_conflict condition type for table "plans" */
-export type Plans_On_Conflict = {
-  constraint: Plans_Constraint;
-  update_columns?: Array<Plans_Update_Column>;
-  where?: InputMaybe<Plans_Bool_Exp>;
-};
-
-/** Ordering options when selecting data from "plans". */
-export type Plans_Order_By = {
-  end_week?: InputMaybe<Order_By>;
-  id?: InputMaybe<Order_By>;
-  name?: InputMaybe<Order_By>;
-  notes?: InputMaybe<Order_By>;
-  requirements_aggregate?: InputMaybe<Plan_Requirements_Aggregate_Order_By>;
-  start_week?: InputMaybe<Order_By>;
-  workouts_aggregate?: InputMaybe<Plan_Workouts_Aggregate_Order_By>;
-};
-
-/** primary key columns input for table: plans */
-export type Plans_Pk_Columns_Input = {
-  id: Scalars['bigint']['input'];
-};
-
-/** select columns of table "plans" */
-export enum Plans_Select_Column {
-  /** column name */
-  EndWeek = 'end_week',
-  /** column name */
-  Id = 'id',
-  /** column name */
-  Name = 'name',
-  /** column name */
-  Notes = 'notes',
-  /** column name */
-  StartWeek = 'start_week'
-}
-
-/** input type for updating data in table "plans" */
-export type Plans_Set_Input = {
-  end_week?: InputMaybe<Scalars['String']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  notes?: InputMaybe<Scalars['String']['input']>;
-  start_week?: InputMaybe<Scalars['String']['input']>;
-};
-
-/** aggregate stddev on columns */
-export type Plans_Stddev_Fields = {
-  __typename?: 'plans_stddev_fields';
-  id?: Maybe<Scalars['Float']['output']>;
-};
-
-/** aggregate stddev_pop on columns */
-export type Plans_Stddev_Pop_Fields = {
-  __typename?: 'plans_stddev_pop_fields';
-  id?: Maybe<Scalars['Float']['output']>;
-};
-
-/** aggregate stddev_samp on columns */
-export type Plans_Stddev_Samp_Fields = {
-  __typename?: 'plans_stddev_samp_fields';
-  id?: Maybe<Scalars['Float']['output']>;
-};
-
-/** Streaming cursor of the table "plans" */
-export type Plans_Stream_Cursor_Input = {
-  /** Stream column input with initial value */
-  initial_value: Plans_Stream_Cursor_Value_Input;
-  /** cursor ordering */
-  ordering?: InputMaybe<Cursor_Ordering>;
-};
-
-/** Initial value of the column from where the streaming should start */
-export type Plans_Stream_Cursor_Value_Input = {
-  end_week?: InputMaybe<Scalars['String']['input']>;
-  id?: InputMaybe<Scalars['bigint']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  notes?: InputMaybe<Scalars['String']['input']>;
-  start_week?: InputMaybe<Scalars['String']['input']>;
-};
-
-/** aggregate sum on columns */
-export type Plans_Sum_Fields = {
-  __typename?: 'plans_sum_fields';
-  id?: Maybe<Scalars['bigint']['output']>;
-};
-
-/** update columns of table "plans" */
-export enum Plans_Update_Column {
-  /** column name */
-  EndWeek = 'end_week',
-  /** column name */
-  Name = 'name',
-  /** column name */
-  Notes = 'notes',
-  /** column name */
-  StartWeek = 'start_week'
-}
-
-export type Plans_Updates = {
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Plans_Set_Input>;
-  /** filter the rows which have to be updated */
-  where: Plans_Bool_Exp;
-};
-
-/** aggregate var_pop on columns */
-export type Plans_Var_Pop_Fields = {
-  __typename?: 'plans_var_pop_fields';
-  id?: Maybe<Scalars['Float']['output']>;
-};
-
-/** aggregate var_samp on columns */
-export type Plans_Var_Samp_Fields = {
-  __typename?: 'plans_var_samp_fields';
-  id?: Maybe<Scalars['Float']['output']>;
-};
-
-/** aggregate variance on columns */
-export type Plans_Variance_Fields = {
-  __typename?: 'plans_variance_fields';
-  id?: Maybe<Scalars['Float']['output']>;
-};
 
 export type Query_Root = {
   __typename?: 'query_root';
@@ -8733,6 +8275,12 @@ export type Query_Root = {
   authUserSecurityKeys: Array<AuthUserSecurityKeys>;
   /** fetch aggregated fields from the table: "auth.user_security_keys" */
   authUserSecurityKeysAggregate: AuthUserSecurityKeys_Aggregate;
+  /** fetch data from the table: "auth.pkce_authorization_codes" */
+  auth_pkce_authorization_codes: Array<Auth_Pkce_Authorization_Codes>;
+  /** fetch aggregated fields from the table: "auth.pkce_authorization_codes" */
+  auth_pkce_authorization_codes_aggregate: Auth_Pkce_Authorization_Codes_Aggregate;
+  /** fetch data from the table: "auth.pkce_authorization_codes" using primary key columns */
+  auth_pkce_authorization_codes_by_pk?: Maybe<Auth_Pkce_Authorization_Codes>;
   /** fetch data from the table: "storage.buckets" using primary key columns */
   bucket?: Maybe<Buckets>;
   /** fetch data from the table: "storage.buckets" */
@@ -8745,6 +8293,12 @@ export type Query_Root = {
   daily_hrv_aggregate: Daily_Hrv_Aggregate;
   /** fetch data from the table: "daily_hrv" using primary key columns */
   daily_hrv_by_pk?: Maybe<Daily_Hrv>;
+  /** An array relationship */
+  day_plans: Array<Day_Plans>;
+  /** An aggregate relationship */
+  day_plans_aggregate: Day_Plans_Aggregate;
+  /** fetch data from the table: "day_plans" using primary key columns */
+  day_plans_by_pk?: Maybe<Day_Plans>;
   /** fetch data from the table: "exercises" */
   exercises: Array<Exercises>;
   /** fetch aggregated fields from the table: "exercises" */
@@ -8761,38 +8315,24 @@ export type Query_Root = {
   food_options: Array<Food_Options>;
   /** fetch aggregated fields from the table: "food_options" */
   food_options_aggregate: Food_Options_Aggregate;
-  /** fetch data from the table: "plan_requirements" */
-  plan_requirements: Array<Plan_Requirements>;
-  /** fetch aggregated fields from the table: "plan_requirements" */
-  plan_requirements_aggregate: Plan_Requirements_Aggregate;
-  /** fetch data from the table: "plan_requirements" using primary key columns */
-  plan_requirements_by_pk?: Maybe<Plan_Requirements>;
-  /** fetch data from the table: "plan_workouts" */
-  plan_workouts: Array<Plan_Workouts>;
-  /** fetch aggregated fields from the table: "plan_workouts" */
-  plan_workouts_aggregate: Plan_Workouts_Aggregate;
-  /** fetch data from the table: "plan_workouts" using primary key columns */
-  plan_workouts_by_pk?: Maybe<Plan_Workouts>;
-  /** fetch data from the table: "plans" */
-  plans: Array<Plans>;
-  /** fetch aggregated fields from the table: "plans" */
-  plans_aggregate: Plans_Aggregate;
-  /** fetch data from the table: "plans" using primary key columns */
-  plans_by_pk?: Maybe<Plans>;
   /** fetch data from the table: "races" */
   races: Array<Races>;
   /** fetch aggregated fields from the table: "races" */
   races_aggregate: Races_Aggregate;
   /** fetch data from the table: "races" using primary key columns */
   races_by_pk?: Maybe<Races>;
-  /** Service readiness marker. */
-  service: Scalars['String']['output'];
   /** fetch data from the table: "sleep" */
   sleep: Array<Sleep>;
   /** fetch aggregated fields from the table: "sleep" */
   sleep_aggregate: Sleep_Aggregate;
   /** fetch data from the table: "sleep" using primary key columns */
   sleep_by_pk?: Maybe<Sleep>;
+  /** fetch data from the table: "sports" */
+  sports: Array<Sports>;
+  /** fetch aggregated fields from the table: "sports" */
+  sports_aggregate: Sports_Aggregate;
+  /** fetch data from the table: "sports" using primary key columns */
+  sports_by_pk?: Maybe<Sports>;
   /** fetch data from the table: "training_readiness" */
   training_readiness: Array<Training_Readiness>;
   /** fetch aggregated fields from the table: "training_readiness" */
@@ -8811,6 +8351,18 @@ export type Query_Root = {
   viruses: Array<Virus>;
   /** fetch aggregated fields from the table: "storage.virus" */
   virusesAggregate: Virus_Aggregate;
+  /** fetch data from the table: "week_notes" */
+  week_notes: Array<Week_Notes>;
+  /** fetch aggregated fields from the table: "week_notes" */
+  week_notes_aggregate: Week_Notes_Aggregate;
+  /** fetch data from the table: "week_notes" using primary key columns */
+  week_notes_by_pk?: Maybe<Week_Notes>;
+  /** An array relationship */
+  week_objectives: Array<Week_Objectives>;
+  /** An aggregate relationship */
+  week_objectives_aggregate: Week_Objectives_Aggregate;
+  /** fetch data from the table: "week_objectives" using primary key columns */
+  week_objectives_by_pk?: Maybe<Week_Objectives>;
 };
 
 
@@ -9136,6 +8688,29 @@ export type Query_RootAuthUserSecurityKeysAggregateArgs = {
 };
 
 
+export type Query_RootAuth_Pkce_Authorization_CodesArgs = {
+  distinct_on?: InputMaybe<Array<Auth_Pkce_Authorization_Codes_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Auth_Pkce_Authorization_Codes_Order_By>>;
+  where?: InputMaybe<Auth_Pkce_Authorization_Codes_Bool_Exp>;
+};
+
+
+export type Query_RootAuth_Pkce_Authorization_Codes_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Auth_Pkce_Authorization_Codes_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Auth_Pkce_Authorization_Codes_Order_By>>;
+  where?: InputMaybe<Auth_Pkce_Authorization_Codes_Bool_Exp>;
+};
+
+
+export type Query_RootAuth_Pkce_Authorization_Codes_By_PkArgs = {
+  id: Scalars['uuid']['input'];
+};
+
+
 export type Query_RootBucketArgs = {
   id: Scalars['String']['input'];
 };
@@ -9178,6 +8753,29 @@ export type Query_RootDaily_Hrv_AggregateArgs = {
 
 
 export type Query_RootDaily_Hrv_By_PkArgs = {
+  id: Scalars['bigint']['input'];
+};
+
+
+export type Query_RootDay_PlansArgs = {
+  distinct_on?: InputMaybe<Array<Day_Plans_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Day_Plans_Order_By>>;
+  where?: InputMaybe<Day_Plans_Bool_Exp>;
+};
+
+
+export type Query_RootDay_Plans_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Day_Plans_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Day_Plans_Order_By>>;
+  where?: InputMaybe<Day_Plans_Bool_Exp>;
+};
+
+
+export type Query_RootDay_Plans_By_PkArgs = {
   id: Scalars['bigint']['input'];
 };
 
@@ -9246,75 +8844,6 @@ export type Query_RootFood_Options_AggregateArgs = {
 };
 
 
-export type Query_RootPlan_RequirementsArgs = {
-  distinct_on?: InputMaybe<Array<Plan_Requirements_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  order_by?: InputMaybe<Array<Plan_Requirements_Order_By>>;
-  where?: InputMaybe<Plan_Requirements_Bool_Exp>;
-};
-
-
-export type Query_RootPlan_Requirements_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Plan_Requirements_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  order_by?: InputMaybe<Array<Plan_Requirements_Order_By>>;
-  where?: InputMaybe<Plan_Requirements_Bool_Exp>;
-};
-
-
-export type Query_RootPlan_Requirements_By_PkArgs = {
-  id: Scalars['bigint']['input'];
-};
-
-
-export type Query_RootPlan_WorkoutsArgs = {
-  distinct_on?: InputMaybe<Array<Plan_Workouts_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  order_by?: InputMaybe<Array<Plan_Workouts_Order_By>>;
-  where?: InputMaybe<Plan_Workouts_Bool_Exp>;
-};
-
-
-export type Query_RootPlan_Workouts_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Plan_Workouts_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  order_by?: InputMaybe<Array<Plan_Workouts_Order_By>>;
-  where?: InputMaybe<Plan_Workouts_Bool_Exp>;
-};
-
-
-export type Query_RootPlan_Workouts_By_PkArgs = {
-  id: Scalars['bigint']['input'];
-};
-
-
-export type Query_RootPlansArgs = {
-  distinct_on?: InputMaybe<Array<Plans_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  order_by?: InputMaybe<Array<Plans_Order_By>>;
-  where?: InputMaybe<Plans_Bool_Exp>;
-};
-
-
-export type Query_RootPlans_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Plans_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  order_by?: InputMaybe<Array<Plans_Order_By>>;
-  where?: InputMaybe<Plans_Bool_Exp>;
-};
-
-
-export type Query_RootPlans_By_PkArgs = {
-  id: Scalars['bigint']['input'];
-};
-
-
 export type Query_RootRacesArgs = {
   distinct_on?: InputMaybe<Array<Races_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -9358,6 +8887,29 @@ export type Query_RootSleep_AggregateArgs = {
 
 export type Query_RootSleep_By_PkArgs = {
   id: Scalars['bigint']['input'];
+};
+
+
+export type Query_RootSportsArgs = {
+  distinct_on?: InputMaybe<Array<Sports_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Sports_Order_By>>;
+  where?: InputMaybe<Sports_Bool_Exp>;
+};
+
+
+export type Query_RootSports_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Sports_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Sports_Order_By>>;
+  where?: InputMaybe<Sports_Bool_Exp>;
+};
+
+
+export type Query_RootSports_By_PkArgs = {
+  value: Scalars['String']['input'];
 };
 
 
@@ -9427,6 +8979,52 @@ export type Query_RootVirusesAggregateArgs = {
   offset?: InputMaybe<Scalars['Int']['input']>;
   order_by?: InputMaybe<Array<Virus_Order_By>>;
   where?: InputMaybe<Virus_Bool_Exp>;
+};
+
+
+export type Query_RootWeek_NotesArgs = {
+  distinct_on?: InputMaybe<Array<Week_Notes_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Week_Notes_Order_By>>;
+  where?: InputMaybe<Week_Notes_Bool_Exp>;
+};
+
+
+export type Query_RootWeek_Notes_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Week_Notes_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Week_Notes_Order_By>>;
+  where?: InputMaybe<Week_Notes_Bool_Exp>;
+};
+
+
+export type Query_RootWeek_Notes_By_PkArgs = {
+  week: Scalars['String']['input'];
+};
+
+
+export type Query_RootWeek_ObjectivesArgs = {
+  distinct_on?: InputMaybe<Array<Week_Objectives_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Week_Objectives_Order_By>>;
+  where?: InputMaybe<Week_Objectives_Bool_Exp>;
+};
+
+
+export type Query_RootWeek_Objectives_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Week_Objectives_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Week_Objectives_Order_By>>;
+  where?: InputMaybe<Week_Objectives_Bool_Exp>;
+};
+
+
+export type Query_RootWeek_Objectives_By_PkArgs = {
+  id: Scalars['bigint']['input'];
 };
 
 /** columns and relationships of "races" */
@@ -10073,6 +9671,280 @@ export type Sleep_Variance_Fields = {
   total_sleep_s?: Maybe<Scalars['Float']['output']>;
 };
 
+/** columns and relationships of "sports" */
+export type Sports = {
+  __typename?: 'sports';
+  /** An array relationship */
+  day_plans: Array<Day_Plans>;
+  /** An aggregate relationship */
+  day_plans_aggregate: Day_Plans_Aggregate;
+  label: Scalars['String']['output'];
+  sort_order: Scalars['Int']['output'];
+  value: Scalars['String']['output'];
+  /** An array relationship */
+  week_objectives: Array<Week_Objectives>;
+  /** An aggregate relationship */
+  week_objectives_aggregate: Week_Objectives_Aggregate;
+};
+
+
+/** columns and relationships of "sports" */
+export type SportsDay_PlansArgs = {
+  distinct_on?: InputMaybe<Array<Day_Plans_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Day_Plans_Order_By>>;
+  where?: InputMaybe<Day_Plans_Bool_Exp>;
+};
+
+
+/** columns and relationships of "sports" */
+export type SportsDay_Plans_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Day_Plans_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Day_Plans_Order_By>>;
+  where?: InputMaybe<Day_Plans_Bool_Exp>;
+};
+
+
+/** columns and relationships of "sports" */
+export type SportsWeek_ObjectivesArgs = {
+  distinct_on?: InputMaybe<Array<Week_Objectives_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Week_Objectives_Order_By>>;
+  where?: InputMaybe<Week_Objectives_Bool_Exp>;
+};
+
+
+/** columns and relationships of "sports" */
+export type SportsWeek_Objectives_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Week_Objectives_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Week_Objectives_Order_By>>;
+  where?: InputMaybe<Week_Objectives_Bool_Exp>;
+};
+
+/** aggregated selection of "sports" */
+export type Sports_Aggregate = {
+  __typename?: 'sports_aggregate';
+  aggregate?: Maybe<Sports_Aggregate_Fields>;
+  nodes: Array<Sports>;
+};
+
+/** aggregate fields of "sports" */
+export type Sports_Aggregate_Fields = {
+  __typename?: 'sports_aggregate_fields';
+  avg?: Maybe<Sports_Avg_Fields>;
+  count: Scalars['Int']['output'];
+  max?: Maybe<Sports_Max_Fields>;
+  min?: Maybe<Sports_Min_Fields>;
+  stddev?: Maybe<Sports_Stddev_Fields>;
+  stddev_pop?: Maybe<Sports_Stddev_Pop_Fields>;
+  stddev_samp?: Maybe<Sports_Stddev_Samp_Fields>;
+  sum?: Maybe<Sports_Sum_Fields>;
+  var_pop?: Maybe<Sports_Var_Pop_Fields>;
+  var_samp?: Maybe<Sports_Var_Samp_Fields>;
+  variance?: Maybe<Sports_Variance_Fields>;
+};
+
+
+/** aggregate fields of "sports" */
+export type Sports_Aggregate_FieldsCountArgs = {
+  columns?: InputMaybe<Array<Sports_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+/** aggregate avg on columns */
+export type Sports_Avg_Fields = {
+  __typename?: 'sports_avg_fields';
+  sort_order?: Maybe<Scalars['Float']['output']>;
+};
+
+/** Boolean expression to filter rows from the table "sports". All fields are combined with a logical 'AND'. */
+export type Sports_Bool_Exp = {
+  _and?: InputMaybe<Array<Sports_Bool_Exp>>;
+  _not?: InputMaybe<Sports_Bool_Exp>;
+  _or?: InputMaybe<Array<Sports_Bool_Exp>>;
+  day_plans?: InputMaybe<Day_Plans_Bool_Exp>;
+  day_plans_aggregate?: InputMaybe<Day_Plans_Aggregate_Bool_Exp>;
+  label?: InputMaybe<String_Comparison_Exp>;
+  sort_order?: InputMaybe<Int_Comparison_Exp>;
+  value?: InputMaybe<String_Comparison_Exp>;
+  week_objectives?: InputMaybe<Week_Objectives_Bool_Exp>;
+  week_objectives_aggregate?: InputMaybe<Week_Objectives_Aggregate_Bool_Exp>;
+};
+
+/** unique or primary key constraints on table "sports" */
+export enum Sports_Constraint {
+  /** unique or primary key constraint on columns "value" */
+  SportsPkey = 'sports_pkey',
+  /** unique or primary key constraint on columns "sort_order" */
+  SportsSortOrderKey = 'sports_sort_order_key'
+}
+
+/** input type for incrementing numeric columns in table "sports" */
+export type Sports_Inc_Input = {
+  sort_order?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** input type for inserting data into table "sports" */
+export type Sports_Insert_Input = {
+  day_plans?: InputMaybe<Day_Plans_Arr_Rel_Insert_Input>;
+  label?: InputMaybe<Scalars['String']['input']>;
+  sort_order?: InputMaybe<Scalars['Int']['input']>;
+  value?: InputMaybe<Scalars['String']['input']>;
+  week_objectives?: InputMaybe<Week_Objectives_Arr_Rel_Insert_Input>;
+};
+
+/** aggregate max on columns */
+export type Sports_Max_Fields = {
+  __typename?: 'sports_max_fields';
+  label?: Maybe<Scalars['String']['output']>;
+  sort_order?: Maybe<Scalars['Int']['output']>;
+  value?: Maybe<Scalars['String']['output']>;
+};
+
+/** aggregate min on columns */
+export type Sports_Min_Fields = {
+  __typename?: 'sports_min_fields';
+  label?: Maybe<Scalars['String']['output']>;
+  sort_order?: Maybe<Scalars['Int']['output']>;
+  value?: Maybe<Scalars['String']['output']>;
+};
+
+/** response of any mutation on the table "sports" */
+export type Sports_Mutation_Response = {
+  __typename?: 'sports_mutation_response';
+  /** number of rows affected by the mutation */
+  affected_rows: Scalars['Int']['output'];
+  /** data from the rows affected by the mutation */
+  returning: Array<Sports>;
+};
+
+/** input type for inserting object relation for remote table "sports" */
+export type Sports_Obj_Rel_Insert_Input = {
+  data: Sports_Insert_Input;
+  /** upsert condition */
+  on_conflict?: InputMaybe<Sports_On_Conflict>;
+};
+
+/** on_conflict condition type for table "sports" */
+export type Sports_On_Conflict = {
+  constraint: Sports_Constraint;
+  update_columns?: Array<Sports_Update_Column>;
+  where?: InputMaybe<Sports_Bool_Exp>;
+};
+
+/** Ordering options when selecting data from "sports". */
+export type Sports_Order_By = {
+  day_plans_aggregate?: InputMaybe<Day_Plans_Aggregate_Order_By>;
+  label?: InputMaybe<Order_By>;
+  sort_order?: InputMaybe<Order_By>;
+  value?: InputMaybe<Order_By>;
+  week_objectives_aggregate?: InputMaybe<Week_Objectives_Aggregate_Order_By>;
+};
+
+/** primary key columns input for table: sports */
+export type Sports_Pk_Columns_Input = {
+  value: Scalars['String']['input'];
+};
+
+/** select columns of table "sports" */
+export enum Sports_Select_Column {
+  /** column name */
+  Label = 'label',
+  /** column name */
+  SortOrder = 'sort_order',
+  /** column name */
+  Value = 'value'
+}
+
+/** input type for updating data in table "sports" */
+export type Sports_Set_Input = {
+  label?: InputMaybe<Scalars['String']['input']>;
+  sort_order?: InputMaybe<Scalars['Int']['input']>;
+  value?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** aggregate stddev on columns */
+export type Sports_Stddev_Fields = {
+  __typename?: 'sports_stddev_fields';
+  sort_order?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate stddev_pop on columns */
+export type Sports_Stddev_Pop_Fields = {
+  __typename?: 'sports_stddev_pop_fields';
+  sort_order?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate stddev_samp on columns */
+export type Sports_Stddev_Samp_Fields = {
+  __typename?: 'sports_stddev_samp_fields';
+  sort_order?: Maybe<Scalars['Float']['output']>;
+};
+
+/** Streaming cursor of the table "sports" */
+export type Sports_Stream_Cursor_Input = {
+  /** Stream column input with initial value */
+  initial_value: Sports_Stream_Cursor_Value_Input;
+  /** cursor ordering */
+  ordering?: InputMaybe<Cursor_Ordering>;
+};
+
+/** Initial value of the column from where the streaming should start */
+export type Sports_Stream_Cursor_Value_Input = {
+  label?: InputMaybe<Scalars['String']['input']>;
+  sort_order?: InputMaybe<Scalars['Int']['input']>;
+  value?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** aggregate sum on columns */
+export type Sports_Sum_Fields = {
+  __typename?: 'sports_sum_fields';
+  sort_order?: Maybe<Scalars['Int']['output']>;
+};
+
+/** update columns of table "sports" */
+export enum Sports_Update_Column {
+  /** column name */
+  Label = 'label',
+  /** column name */
+  SortOrder = 'sort_order',
+  /** column name */
+  Value = 'value'
+}
+
+export type Sports_Updates = {
+  /** increments the numeric columns with given value of the filtered values */
+  _inc?: InputMaybe<Sports_Inc_Input>;
+  /** sets the columns of the filtered rows to the given values */
+  _set?: InputMaybe<Sports_Set_Input>;
+  /** filter the rows which have to be updated */
+  where: Sports_Bool_Exp;
+};
+
+/** aggregate var_pop on columns */
+export type Sports_Var_Pop_Fields = {
+  __typename?: 'sports_var_pop_fields';
+  sort_order?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate var_samp on columns */
+export type Sports_Var_Samp_Fields = {
+  __typename?: 'sports_var_samp_fields';
+  sort_order?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate variance on columns */
+export type Sports_Variance_Fields = {
+  __typename?: 'sports_variance_fields';
+  sort_order?: Maybe<Scalars['Float']['output']>;
+};
+
 export type Subscription_Root = {
   __typename?: 'subscription_root';
   /** fetch data from the table: "activities" */
@@ -10187,6 +10059,14 @@ export type Subscription_Root = {
   authUserSecurityKeysAggregate: AuthUserSecurityKeys_Aggregate;
   /** fetch data from the table in a streaming manner: "auth.user_security_keys" */
   authUserSecurityKeys_stream: Array<AuthUserSecurityKeys>;
+  /** fetch data from the table: "auth.pkce_authorization_codes" */
+  auth_pkce_authorization_codes: Array<Auth_Pkce_Authorization_Codes>;
+  /** fetch aggregated fields from the table: "auth.pkce_authorization_codes" */
+  auth_pkce_authorization_codes_aggregate: Auth_Pkce_Authorization_Codes_Aggregate;
+  /** fetch data from the table: "auth.pkce_authorization_codes" using primary key columns */
+  auth_pkce_authorization_codes_by_pk?: Maybe<Auth_Pkce_Authorization_Codes>;
+  /** fetch data from the table in a streaming manner: "auth.pkce_authorization_codes" */
+  auth_pkce_authorization_codes_stream: Array<Auth_Pkce_Authorization_Codes>;
   /** fetch data from the table: "storage.buckets" using primary key columns */
   bucket?: Maybe<Buckets>;
   /** fetch data from the table: "storage.buckets" */
@@ -10203,6 +10083,14 @@ export type Subscription_Root = {
   daily_hrv_by_pk?: Maybe<Daily_Hrv>;
   /** fetch data from the table in a streaming manner: "daily_hrv" */
   daily_hrv_stream: Array<Daily_Hrv>;
+  /** An array relationship */
+  day_plans: Array<Day_Plans>;
+  /** An aggregate relationship */
+  day_plans_aggregate: Day_Plans_Aggregate;
+  /** fetch data from the table: "day_plans" using primary key columns */
+  day_plans_by_pk?: Maybe<Day_Plans>;
+  /** fetch data from the table in a streaming manner: "day_plans" */
+  day_plans_stream: Array<Day_Plans>;
   /** fetch data from the table: "exercises" */
   exercises: Array<Exercises>;
   /** fetch aggregated fields from the table: "exercises" */
@@ -10225,30 +10113,6 @@ export type Subscription_Root = {
   food_options_aggregate: Food_Options_Aggregate;
   /** fetch data from the table in a streaming manner: "food_options" */
   food_options_stream: Array<Food_Options>;
-  /** fetch data from the table: "plan_requirements" */
-  plan_requirements: Array<Plan_Requirements>;
-  /** fetch aggregated fields from the table: "plan_requirements" */
-  plan_requirements_aggregate: Plan_Requirements_Aggregate;
-  /** fetch data from the table: "plan_requirements" using primary key columns */
-  plan_requirements_by_pk?: Maybe<Plan_Requirements>;
-  /** fetch data from the table in a streaming manner: "plan_requirements" */
-  plan_requirements_stream: Array<Plan_Requirements>;
-  /** fetch data from the table: "plan_workouts" */
-  plan_workouts: Array<Plan_Workouts>;
-  /** fetch aggregated fields from the table: "plan_workouts" */
-  plan_workouts_aggregate: Plan_Workouts_Aggregate;
-  /** fetch data from the table: "plan_workouts" using primary key columns */
-  plan_workouts_by_pk?: Maybe<Plan_Workouts>;
-  /** fetch data from the table in a streaming manner: "plan_workouts" */
-  plan_workouts_stream: Array<Plan_Workouts>;
-  /** fetch data from the table: "plans" */
-  plans: Array<Plans>;
-  /** fetch aggregated fields from the table: "plans" */
-  plans_aggregate: Plans_Aggregate;
-  /** fetch data from the table: "plans" using primary key columns */
-  plans_by_pk?: Maybe<Plans>;
-  /** fetch data from the table in a streaming manner: "plans" */
-  plans_stream: Array<Plans>;
   /** fetch data from the table: "races" */
   races: Array<Races>;
   /** fetch aggregated fields from the table: "races" */
@@ -10265,6 +10129,14 @@ export type Subscription_Root = {
   sleep_by_pk?: Maybe<Sleep>;
   /** fetch data from the table in a streaming manner: "sleep" */
   sleep_stream: Array<Sleep>;
+  /** fetch data from the table: "sports" */
+  sports: Array<Sports>;
+  /** fetch aggregated fields from the table: "sports" */
+  sports_aggregate: Sports_Aggregate;
+  /** fetch data from the table: "sports" using primary key columns */
+  sports_by_pk?: Maybe<Sports>;
+  /** fetch data from the table in a streaming manner: "sports" */
+  sports_stream: Array<Sports>;
   /** fetch data from the table: "training_readiness" */
   training_readiness: Array<Training_Readiness>;
   /** fetch aggregated fields from the table: "training_readiness" */
@@ -10289,6 +10161,22 @@ export type Subscription_Root = {
   viruses: Array<Virus>;
   /** fetch aggregated fields from the table: "storage.virus" */
   virusesAggregate: Virus_Aggregate;
+  /** fetch data from the table: "week_notes" */
+  week_notes: Array<Week_Notes>;
+  /** fetch aggregated fields from the table: "week_notes" */
+  week_notes_aggregate: Week_Notes_Aggregate;
+  /** fetch data from the table: "week_notes" using primary key columns */
+  week_notes_by_pk?: Maybe<Week_Notes>;
+  /** fetch data from the table in a streaming manner: "week_notes" */
+  week_notes_stream: Array<Week_Notes>;
+  /** An array relationship */
+  week_objectives: Array<Week_Objectives>;
+  /** An aggregate relationship */
+  week_objectives_aggregate: Week_Objectives_Aggregate;
+  /** fetch data from the table: "week_objectives" using primary key columns */
+  week_objectives_by_pk?: Maybe<Week_Objectives>;
+  /** fetch data from the table in a streaming manner: "week_objectives" */
+  week_objectives_stream: Array<Week_Objectives>;
 };
 
 
@@ -10712,6 +10600,36 @@ export type Subscription_RootAuthUserSecurityKeys_StreamArgs = {
 };
 
 
+export type Subscription_RootAuth_Pkce_Authorization_CodesArgs = {
+  distinct_on?: InputMaybe<Array<Auth_Pkce_Authorization_Codes_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Auth_Pkce_Authorization_Codes_Order_By>>;
+  where?: InputMaybe<Auth_Pkce_Authorization_Codes_Bool_Exp>;
+};
+
+
+export type Subscription_RootAuth_Pkce_Authorization_Codes_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Auth_Pkce_Authorization_Codes_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Auth_Pkce_Authorization_Codes_Order_By>>;
+  where?: InputMaybe<Auth_Pkce_Authorization_Codes_Bool_Exp>;
+};
+
+
+export type Subscription_RootAuth_Pkce_Authorization_Codes_By_PkArgs = {
+  id: Scalars['uuid']['input'];
+};
+
+
+export type Subscription_RootAuth_Pkce_Authorization_Codes_StreamArgs = {
+  batch_size: Scalars['Int']['input'];
+  cursor: Array<InputMaybe<Auth_Pkce_Authorization_Codes_Stream_Cursor_Input>>;
+  where?: InputMaybe<Auth_Pkce_Authorization_Codes_Bool_Exp>;
+};
+
+
 export type Subscription_RootBucketArgs = {
   id: Scalars['String']['input'];
 };
@@ -10769,6 +10687,36 @@ export type Subscription_RootDaily_Hrv_StreamArgs = {
   batch_size: Scalars['Int']['input'];
   cursor: Array<InputMaybe<Daily_Hrv_Stream_Cursor_Input>>;
   where?: InputMaybe<Daily_Hrv_Bool_Exp>;
+};
+
+
+export type Subscription_RootDay_PlansArgs = {
+  distinct_on?: InputMaybe<Array<Day_Plans_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Day_Plans_Order_By>>;
+  where?: InputMaybe<Day_Plans_Bool_Exp>;
+};
+
+
+export type Subscription_RootDay_Plans_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Day_Plans_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Day_Plans_Order_By>>;
+  where?: InputMaybe<Day_Plans_Bool_Exp>;
+};
+
+
+export type Subscription_RootDay_Plans_By_PkArgs = {
+  id: Scalars['bigint']['input'];
+};
+
+
+export type Subscription_RootDay_Plans_StreamArgs = {
+  batch_size: Scalars['Int']['input'];
+  cursor: Array<InputMaybe<Day_Plans_Stream_Cursor_Input>>;
+  where?: InputMaybe<Day_Plans_Bool_Exp>;
 };
 
 
@@ -10857,96 +10805,6 @@ export type Subscription_RootFood_Options_StreamArgs = {
 };
 
 
-export type Subscription_RootPlan_RequirementsArgs = {
-  distinct_on?: InputMaybe<Array<Plan_Requirements_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  order_by?: InputMaybe<Array<Plan_Requirements_Order_By>>;
-  where?: InputMaybe<Plan_Requirements_Bool_Exp>;
-};
-
-
-export type Subscription_RootPlan_Requirements_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Plan_Requirements_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  order_by?: InputMaybe<Array<Plan_Requirements_Order_By>>;
-  where?: InputMaybe<Plan_Requirements_Bool_Exp>;
-};
-
-
-export type Subscription_RootPlan_Requirements_By_PkArgs = {
-  id: Scalars['bigint']['input'];
-};
-
-
-export type Subscription_RootPlan_Requirements_StreamArgs = {
-  batch_size: Scalars['Int']['input'];
-  cursor: Array<InputMaybe<Plan_Requirements_Stream_Cursor_Input>>;
-  where?: InputMaybe<Plan_Requirements_Bool_Exp>;
-};
-
-
-export type Subscription_RootPlan_WorkoutsArgs = {
-  distinct_on?: InputMaybe<Array<Plan_Workouts_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  order_by?: InputMaybe<Array<Plan_Workouts_Order_By>>;
-  where?: InputMaybe<Plan_Workouts_Bool_Exp>;
-};
-
-
-export type Subscription_RootPlan_Workouts_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Plan_Workouts_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  order_by?: InputMaybe<Array<Plan_Workouts_Order_By>>;
-  where?: InputMaybe<Plan_Workouts_Bool_Exp>;
-};
-
-
-export type Subscription_RootPlan_Workouts_By_PkArgs = {
-  id: Scalars['bigint']['input'];
-};
-
-
-export type Subscription_RootPlan_Workouts_StreamArgs = {
-  batch_size: Scalars['Int']['input'];
-  cursor: Array<InputMaybe<Plan_Workouts_Stream_Cursor_Input>>;
-  where?: InputMaybe<Plan_Workouts_Bool_Exp>;
-};
-
-
-export type Subscription_RootPlansArgs = {
-  distinct_on?: InputMaybe<Array<Plans_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  order_by?: InputMaybe<Array<Plans_Order_By>>;
-  where?: InputMaybe<Plans_Bool_Exp>;
-};
-
-
-export type Subscription_RootPlans_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Plans_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  order_by?: InputMaybe<Array<Plans_Order_By>>;
-  where?: InputMaybe<Plans_Bool_Exp>;
-};
-
-
-export type Subscription_RootPlans_By_PkArgs = {
-  id: Scalars['bigint']['input'];
-};
-
-
-export type Subscription_RootPlans_StreamArgs = {
-  batch_size: Scalars['Int']['input'];
-  cursor: Array<InputMaybe<Plans_Stream_Cursor_Input>>;
-  where?: InputMaybe<Plans_Bool_Exp>;
-};
-
-
 export type Subscription_RootRacesArgs = {
   distinct_on?: InputMaybe<Array<Races_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -11004,6 +10862,36 @@ export type Subscription_RootSleep_StreamArgs = {
   batch_size: Scalars['Int']['input'];
   cursor: Array<InputMaybe<Sleep_Stream_Cursor_Input>>;
   where?: InputMaybe<Sleep_Bool_Exp>;
+};
+
+
+export type Subscription_RootSportsArgs = {
+  distinct_on?: InputMaybe<Array<Sports_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Sports_Order_By>>;
+  where?: InputMaybe<Sports_Bool_Exp>;
+};
+
+
+export type Subscription_RootSports_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Sports_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Sports_Order_By>>;
+  where?: InputMaybe<Sports_Bool_Exp>;
+};
+
+
+export type Subscription_RootSports_By_PkArgs = {
+  value: Scalars['String']['input'];
+};
+
+
+export type Subscription_RootSports_StreamArgs = {
+  batch_size: Scalars['Int']['input'];
+  cursor: Array<InputMaybe<Sports_Stream_Cursor_Input>>;
+  where?: InputMaybe<Sports_Bool_Exp>;
 };
 
 
@@ -11094,6 +10982,66 @@ export type Subscription_RootVirusesAggregateArgs = {
   offset?: InputMaybe<Scalars['Int']['input']>;
   order_by?: InputMaybe<Array<Virus_Order_By>>;
   where?: InputMaybe<Virus_Bool_Exp>;
+};
+
+
+export type Subscription_RootWeek_NotesArgs = {
+  distinct_on?: InputMaybe<Array<Week_Notes_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Week_Notes_Order_By>>;
+  where?: InputMaybe<Week_Notes_Bool_Exp>;
+};
+
+
+export type Subscription_RootWeek_Notes_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Week_Notes_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Week_Notes_Order_By>>;
+  where?: InputMaybe<Week_Notes_Bool_Exp>;
+};
+
+
+export type Subscription_RootWeek_Notes_By_PkArgs = {
+  week: Scalars['String']['input'];
+};
+
+
+export type Subscription_RootWeek_Notes_StreamArgs = {
+  batch_size: Scalars['Int']['input'];
+  cursor: Array<InputMaybe<Week_Notes_Stream_Cursor_Input>>;
+  where?: InputMaybe<Week_Notes_Bool_Exp>;
+};
+
+
+export type Subscription_RootWeek_ObjectivesArgs = {
+  distinct_on?: InputMaybe<Array<Week_Objectives_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Week_Objectives_Order_By>>;
+  where?: InputMaybe<Week_Objectives_Bool_Exp>;
+};
+
+
+export type Subscription_RootWeek_Objectives_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Week_Objectives_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Week_Objectives_Order_By>>;
+  where?: InputMaybe<Week_Objectives_Bool_Exp>;
+};
+
+
+export type Subscription_RootWeek_Objectives_By_PkArgs = {
+  id: Scalars['bigint']['input'];
+};
+
+
+export type Subscription_RootWeek_Objectives_StreamArgs = {
+  batch_size: Scalars['Int']['input'];
+  cursor: Array<InputMaybe<Week_Objectives_Stream_Cursor_Input>>;
+  where?: InputMaybe<Week_Objectives_Bool_Exp>;
 };
 
 /** Boolean expression to compare columns of type "timestamptz". All fields are combined with logical 'AND'. */
@@ -12710,6 +12658,495 @@ export type Virus_Updates = {
   where: Virus_Bool_Exp;
 };
 
+/** columns and relationships of "week_notes" */
+export type Week_Notes = {
+  __typename?: 'week_notes';
+  note: Scalars['String']['output'];
+  week: Scalars['String']['output'];
+};
+
+/** aggregated selection of "week_notes" */
+export type Week_Notes_Aggregate = {
+  __typename?: 'week_notes_aggregate';
+  aggregate?: Maybe<Week_Notes_Aggregate_Fields>;
+  nodes: Array<Week_Notes>;
+};
+
+/** aggregate fields of "week_notes" */
+export type Week_Notes_Aggregate_Fields = {
+  __typename?: 'week_notes_aggregate_fields';
+  count: Scalars['Int']['output'];
+  max?: Maybe<Week_Notes_Max_Fields>;
+  min?: Maybe<Week_Notes_Min_Fields>;
+};
+
+
+/** aggregate fields of "week_notes" */
+export type Week_Notes_Aggregate_FieldsCountArgs = {
+  columns?: InputMaybe<Array<Week_Notes_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+/** Boolean expression to filter rows from the table "week_notes". All fields are combined with a logical 'AND'. */
+export type Week_Notes_Bool_Exp = {
+  _and?: InputMaybe<Array<Week_Notes_Bool_Exp>>;
+  _not?: InputMaybe<Week_Notes_Bool_Exp>;
+  _or?: InputMaybe<Array<Week_Notes_Bool_Exp>>;
+  note?: InputMaybe<String_Comparison_Exp>;
+  week?: InputMaybe<String_Comparison_Exp>;
+};
+
+/** unique or primary key constraints on table "week_notes" */
+export enum Week_Notes_Constraint {
+  /** unique or primary key constraint on columns "week" */
+  WeekNotesPkey = 'week_notes_pkey'
+}
+
+/** input type for inserting data into table "week_notes" */
+export type Week_Notes_Insert_Input = {
+  note?: InputMaybe<Scalars['String']['input']>;
+  week?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** aggregate max on columns */
+export type Week_Notes_Max_Fields = {
+  __typename?: 'week_notes_max_fields';
+  note?: Maybe<Scalars['String']['output']>;
+  week?: Maybe<Scalars['String']['output']>;
+};
+
+/** aggregate min on columns */
+export type Week_Notes_Min_Fields = {
+  __typename?: 'week_notes_min_fields';
+  note?: Maybe<Scalars['String']['output']>;
+  week?: Maybe<Scalars['String']['output']>;
+};
+
+/** response of any mutation on the table "week_notes" */
+export type Week_Notes_Mutation_Response = {
+  __typename?: 'week_notes_mutation_response';
+  /** number of rows affected by the mutation */
+  affected_rows: Scalars['Int']['output'];
+  /** data from the rows affected by the mutation */
+  returning: Array<Week_Notes>;
+};
+
+/** on_conflict condition type for table "week_notes" */
+export type Week_Notes_On_Conflict = {
+  constraint: Week_Notes_Constraint;
+  update_columns?: Array<Week_Notes_Update_Column>;
+  where?: InputMaybe<Week_Notes_Bool_Exp>;
+};
+
+/** Ordering options when selecting data from "week_notes". */
+export type Week_Notes_Order_By = {
+  note?: InputMaybe<Order_By>;
+  week?: InputMaybe<Order_By>;
+};
+
+/** primary key columns input for table: week_notes */
+export type Week_Notes_Pk_Columns_Input = {
+  week: Scalars['String']['input'];
+};
+
+/** select columns of table "week_notes" */
+export enum Week_Notes_Select_Column {
+  /** column name */
+  Note = 'note',
+  /** column name */
+  Week = 'week'
+}
+
+/** input type for updating data in table "week_notes" */
+export type Week_Notes_Set_Input = {
+  note?: InputMaybe<Scalars['String']['input']>;
+  week?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** Streaming cursor of the table "week_notes" */
+export type Week_Notes_Stream_Cursor_Input = {
+  /** Stream column input with initial value */
+  initial_value: Week_Notes_Stream_Cursor_Value_Input;
+  /** cursor ordering */
+  ordering?: InputMaybe<Cursor_Ordering>;
+};
+
+/** Initial value of the column from where the streaming should start */
+export type Week_Notes_Stream_Cursor_Value_Input = {
+  note?: InputMaybe<Scalars['String']['input']>;
+  week?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** update columns of table "week_notes" */
+export enum Week_Notes_Update_Column {
+  /** column name */
+  Note = 'note',
+  /** column name */
+  Week = 'week'
+}
+
+export type Week_Notes_Updates = {
+  /** sets the columns of the filtered rows to the given values */
+  _set?: InputMaybe<Week_Notes_Set_Input>;
+  /** filter the rows which have to be updated */
+  where: Week_Notes_Bool_Exp;
+};
+
+/** columns and relationships of "week_objectives" */
+export type Week_Objectives = {
+  __typename?: 'week_objectives';
+  id: Scalars['bigint']['output'];
+  metric: Scalars['String']['output'];
+  notes?: Maybe<Scalars['String']['output']>;
+  sport?: Maybe<Scalars['String']['output']>;
+  /** An object relationship */
+  sportBySport?: Maybe<Sports>;
+  target: Scalars['numeric']['output'];
+  week: Scalars['String']['output'];
+};
+
+/** aggregated selection of "week_objectives" */
+export type Week_Objectives_Aggregate = {
+  __typename?: 'week_objectives_aggregate';
+  aggregate?: Maybe<Week_Objectives_Aggregate_Fields>;
+  nodes: Array<Week_Objectives>;
+};
+
+export type Week_Objectives_Aggregate_Bool_Exp = {
+  count?: InputMaybe<Week_Objectives_Aggregate_Bool_Exp_Count>;
+};
+
+export type Week_Objectives_Aggregate_Bool_Exp_Count = {
+  arguments?: InputMaybe<Array<Week_Objectives_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+  filter?: InputMaybe<Week_Objectives_Bool_Exp>;
+  predicate: Int_Comparison_Exp;
+};
+
+/** aggregate fields of "week_objectives" */
+export type Week_Objectives_Aggregate_Fields = {
+  __typename?: 'week_objectives_aggregate_fields';
+  avg?: Maybe<Week_Objectives_Avg_Fields>;
+  count: Scalars['Int']['output'];
+  max?: Maybe<Week_Objectives_Max_Fields>;
+  min?: Maybe<Week_Objectives_Min_Fields>;
+  stddev?: Maybe<Week_Objectives_Stddev_Fields>;
+  stddev_pop?: Maybe<Week_Objectives_Stddev_Pop_Fields>;
+  stddev_samp?: Maybe<Week_Objectives_Stddev_Samp_Fields>;
+  sum?: Maybe<Week_Objectives_Sum_Fields>;
+  var_pop?: Maybe<Week_Objectives_Var_Pop_Fields>;
+  var_samp?: Maybe<Week_Objectives_Var_Samp_Fields>;
+  variance?: Maybe<Week_Objectives_Variance_Fields>;
+};
+
+
+/** aggregate fields of "week_objectives" */
+export type Week_Objectives_Aggregate_FieldsCountArgs = {
+  columns?: InputMaybe<Array<Week_Objectives_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+/** order by aggregate values of table "week_objectives" */
+export type Week_Objectives_Aggregate_Order_By = {
+  avg?: InputMaybe<Week_Objectives_Avg_Order_By>;
+  count?: InputMaybe<Order_By>;
+  max?: InputMaybe<Week_Objectives_Max_Order_By>;
+  min?: InputMaybe<Week_Objectives_Min_Order_By>;
+  stddev?: InputMaybe<Week_Objectives_Stddev_Order_By>;
+  stddev_pop?: InputMaybe<Week_Objectives_Stddev_Pop_Order_By>;
+  stddev_samp?: InputMaybe<Week_Objectives_Stddev_Samp_Order_By>;
+  sum?: InputMaybe<Week_Objectives_Sum_Order_By>;
+  var_pop?: InputMaybe<Week_Objectives_Var_Pop_Order_By>;
+  var_samp?: InputMaybe<Week_Objectives_Var_Samp_Order_By>;
+  variance?: InputMaybe<Week_Objectives_Variance_Order_By>;
+};
+
+/** input type for inserting array relation for remote table "week_objectives" */
+export type Week_Objectives_Arr_Rel_Insert_Input = {
+  data: Array<Week_Objectives_Insert_Input>;
+  /** upsert condition */
+  on_conflict?: InputMaybe<Week_Objectives_On_Conflict>;
+};
+
+/** aggregate avg on columns */
+export type Week_Objectives_Avg_Fields = {
+  __typename?: 'week_objectives_avg_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+  target?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by avg() on columns of table "week_objectives" */
+export type Week_Objectives_Avg_Order_By = {
+  id?: InputMaybe<Order_By>;
+  target?: InputMaybe<Order_By>;
+};
+
+/** Boolean expression to filter rows from the table "week_objectives". All fields are combined with a logical 'AND'. */
+export type Week_Objectives_Bool_Exp = {
+  _and?: InputMaybe<Array<Week_Objectives_Bool_Exp>>;
+  _not?: InputMaybe<Week_Objectives_Bool_Exp>;
+  _or?: InputMaybe<Array<Week_Objectives_Bool_Exp>>;
+  id?: InputMaybe<Bigint_Comparison_Exp>;
+  metric?: InputMaybe<String_Comparison_Exp>;
+  notes?: InputMaybe<String_Comparison_Exp>;
+  sport?: InputMaybe<String_Comparison_Exp>;
+  sportBySport?: InputMaybe<Sports_Bool_Exp>;
+  target?: InputMaybe<Numeric_Comparison_Exp>;
+  week?: InputMaybe<String_Comparison_Exp>;
+};
+
+/** unique or primary key constraints on table "week_objectives" */
+export enum Week_Objectives_Constraint {
+  /** unique or primary key constraint on columns "id" */
+  WeekObjectivesPkey = 'week_objectives_pkey'
+}
+
+/** input type for incrementing numeric columns in table "week_objectives" */
+export type Week_Objectives_Inc_Input = {
+  target?: InputMaybe<Scalars['numeric']['input']>;
+};
+
+/** input type for inserting data into table "week_objectives" */
+export type Week_Objectives_Insert_Input = {
+  metric?: InputMaybe<Scalars['String']['input']>;
+  notes?: InputMaybe<Scalars['String']['input']>;
+  sport?: InputMaybe<Scalars['String']['input']>;
+  sportBySport?: InputMaybe<Sports_Obj_Rel_Insert_Input>;
+  target?: InputMaybe<Scalars['numeric']['input']>;
+  week?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** aggregate max on columns */
+export type Week_Objectives_Max_Fields = {
+  __typename?: 'week_objectives_max_fields';
+  id?: Maybe<Scalars['bigint']['output']>;
+  metric?: Maybe<Scalars['String']['output']>;
+  notes?: Maybe<Scalars['String']['output']>;
+  sport?: Maybe<Scalars['String']['output']>;
+  target?: Maybe<Scalars['numeric']['output']>;
+  week?: Maybe<Scalars['String']['output']>;
+};
+
+/** order by max() on columns of table "week_objectives" */
+export type Week_Objectives_Max_Order_By = {
+  id?: InputMaybe<Order_By>;
+  metric?: InputMaybe<Order_By>;
+  notes?: InputMaybe<Order_By>;
+  sport?: InputMaybe<Order_By>;
+  target?: InputMaybe<Order_By>;
+  week?: InputMaybe<Order_By>;
+};
+
+/** aggregate min on columns */
+export type Week_Objectives_Min_Fields = {
+  __typename?: 'week_objectives_min_fields';
+  id?: Maybe<Scalars['bigint']['output']>;
+  metric?: Maybe<Scalars['String']['output']>;
+  notes?: Maybe<Scalars['String']['output']>;
+  sport?: Maybe<Scalars['String']['output']>;
+  target?: Maybe<Scalars['numeric']['output']>;
+  week?: Maybe<Scalars['String']['output']>;
+};
+
+/** order by min() on columns of table "week_objectives" */
+export type Week_Objectives_Min_Order_By = {
+  id?: InputMaybe<Order_By>;
+  metric?: InputMaybe<Order_By>;
+  notes?: InputMaybe<Order_By>;
+  sport?: InputMaybe<Order_By>;
+  target?: InputMaybe<Order_By>;
+  week?: InputMaybe<Order_By>;
+};
+
+/** response of any mutation on the table "week_objectives" */
+export type Week_Objectives_Mutation_Response = {
+  __typename?: 'week_objectives_mutation_response';
+  /** number of rows affected by the mutation */
+  affected_rows: Scalars['Int']['output'];
+  /** data from the rows affected by the mutation */
+  returning: Array<Week_Objectives>;
+};
+
+/** on_conflict condition type for table "week_objectives" */
+export type Week_Objectives_On_Conflict = {
+  constraint: Week_Objectives_Constraint;
+  update_columns?: Array<Week_Objectives_Update_Column>;
+  where?: InputMaybe<Week_Objectives_Bool_Exp>;
+};
+
+/** Ordering options when selecting data from "week_objectives". */
+export type Week_Objectives_Order_By = {
+  id?: InputMaybe<Order_By>;
+  metric?: InputMaybe<Order_By>;
+  notes?: InputMaybe<Order_By>;
+  sport?: InputMaybe<Order_By>;
+  sportBySport?: InputMaybe<Sports_Order_By>;
+  target?: InputMaybe<Order_By>;
+  week?: InputMaybe<Order_By>;
+};
+
+/** primary key columns input for table: week_objectives */
+export type Week_Objectives_Pk_Columns_Input = {
+  id: Scalars['bigint']['input'];
+};
+
+/** select columns of table "week_objectives" */
+export enum Week_Objectives_Select_Column {
+  /** column name */
+  Id = 'id',
+  /** column name */
+  Metric = 'metric',
+  /** column name */
+  Notes = 'notes',
+  /** column name */
+  Sport = 'sport',
+  /** column name */
+  Target = 'target',
+  /** column name */
+  Week = 'week'
+}
+
+/** input type for updating data in table "week_objectives" */
+export type Week_Objectives_Set_Input = {
+  metric?: InputMaybe<Scalars['String']['input']>;
+  notes?: InputMaybe<Scalars['String']['input']>;
+  sport?: InputMaybe<Scalars['String']['input']>;
+  target?: InputMaybe<Scalars['numeric']['input']>;
+  week?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** aggregate stddev on columns */
+export type Week_Objectives_Stddev_Fields = {
+  __typename?: 'week_objectives_stddev_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+  target?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by stddev() on columns of table "week_objectives" */
+export type Week_Objectives_Stddev_Order_By = {
+  id?: InputMaybe<Order_By>;
+  target?: InputMaybe<Order_By>;
+};
+
+/** aggregate stddev_pop on columns */
+export type Week_Objectives_Stddev_Pop_Fields = {
+  __typename?: 'week_objectives_stddev_pop_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+  target?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by stddev_pop() on columns of table "week_objectives" */
+export type Week_Objectives_Stddev_Pop_Order_By = {
+  id?: InputMaybe<Order_By>;
+  target?: InputMaybe<Order_By>;
+};
+
+/** aggregate stddev_samp on columns */
+export type Week_Objectives_Stddev_Samp_Fields = {
+  __typename?: 'week_objectives_stddev_samp_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+  target?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by stddev_samp() on columns of table "week_objectives" */
+export type Week_Objectives_Stddev_Samp_Order_By = {
+  id?: InputMaybe<Order_By>;
+  target?: InputMaybe<Order_By>;
+};
+
+/** Streaming cursor of the table "week_objectives" */
+export type Week_Objectives_Stream_Cursor_Input = {
+  /** Stream column input with initial value */
+  initial_value: Week_Objectives_Stream_Cursor_Value_Input;
+  /** cursor ordering */
+  ordering?: InputMaybe<Cursor_Ordering>;
+};
+
+/** Initial value of the column from where the streaming should start */
+export type Week_Objectives_Stream_Cursor_Value_Input = {
+  id?: InputMaybe<Scalars['bigint']['input']>;
+  metric?: InputMaybe<Scalars['String']['input']>;
+  notes?: InputMaybe<Scalars['String']['input']>;
+  sport?: InputMaybe<Scalars['String']['input']>;
+  target?: InputMaybe<Scalars['numeric']['input']>;
+  week?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** aggregate sum on columns */
+export type Week_Objectives_Sum_Fields = {
+  __typename?: 'week_objectives_sum_fields';
+  id?: Maybe<Scalars['bigint']['output']>;
+  target?: Maybe<Scalars['numeric']['output']>;
+};
+
+/** order by sum() on columns of table "week_objectives" */
+export type Week_Objectives_Sum_Order_By = {
+  id?: InputMaybe<Order_By>;
+  target?: InputMaybe<Order_By>;
+};
+
+/** update columns of table "week_objectives" */
+export enum Week_Objectives_Update_Column {
+  /** column name */
+  Metric = 'metric',
+  /** column name */
+  Notes = 'notes',
+  /** column name */
+  Sport = 'sport',
+  /** column name */
+  Target = 'target',
+  /** column name */
+  Week = 'week'
+}
+
+export type Week_Objectives_Updates = {
+  /** increments the numeric columns with given value of the filtered values */
+  _inc?: InputMaybe<Week_Objectives_Inc_Input>;
+  /** sets the columns of the filtered rows to the given values */
+  _set?: InputMaybe<Week_Objectives_Set_Input>;
+  /** filter the rows which have to be updated */
+  where: Week_Objectives_Bool_Exp;
+};
+
+/** aggregate var_pop on columns */
+export type Week_Objectives_Var_Pop_Fields = {
+  __typename?: 'week_objectives_var_pop_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+  target?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by var_pop() on columns of table "week_objectives" */
+export type Week_Objectives_Var_Pop_Order_By = {
+  id?: InputMaybe<Order_By>;
+  target?: InputMaybe<Order_By>;
+};
+
+/** aggregate var_samp on columns */
+export type Week_Objectives_Var_Samp_Fields = {
+  __typename?: 'week_objectives_var_samp_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+  target?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by var_samp() on columns of table "week_objectives" */
+export type Week_Objectives_Var_Samp_Order_By = {
+  id?: InputMaybe<Order_By>;
+  target?: InputMaybe<Order_By>;
+};
+
+/** aggregate variance on columns */
+export type Week_Objectives_Variance_Fields = {
+  __typename?: 'week_objectives_variance_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+  target?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by variance() on columns of table "week_objectives" */
+export type Week_Objectives_Variance_Order_By = {
+  id?: InputMaybe<Order_By>;
+  target?: InputMaybe<Order_By>;
+};
+
 /** Boolean expression to compare columns of type "Int". All fields are combined with logical 'AND'. */
 export type GeneratedInt_Comparison_Exp = {
   _eq?: number | null | undefined;
@@ -12799,6 +13236,96 @@ export type GeneratedBigint_Comparison_Exp = {
   _nin?: Array<unknown> | null | undefined;
 };
 
+/** Boolean expression to compare columns of type "date". All fields are combined with logical 'AND'. */
+export type GeneratedDate_Comparison_Exp = {
+  _eq?: unknown;
+  _gt?: unknown;
+  _gte?: unknown;
+  _in?: Array<unknown> | null | undefined;
+  _is_null?: boolean | null | undefined;
+  _lt?: unknown;
+  _lte?: unknown;
+  _neq?: unknown;
+  _nin?: Array<unknown> | null | undefined;
+};
+
+export type GeneratedDay_Plans_Aggregate_Bool_Exp = {
+  count?: GeneratedDay_Plans_Aggregate_Bool_Exp_Count | null | undefined;
+};
+
+export type GeneratedDay_Plans_Aggregate_Bool_Exp_Count = {
+  arguments?: Array<GeneratedDay_Plans_Select_Column> | null | undefined;
+  distinct?: boolean | null | undefined;
+  filter?: GeneratedDay_Plans_Bool_Exp | null | undefined;
+  predicate: GeneratedInt_Comparison_Exp;
+};
+
+/** input type for inserting array relation for remote table "day_plans" */
+export type GeneratedDay_Plans_Arr_Rel_Insert_Input = {
+  data: Array<GeneratedDay_Plans_Insert_Input>;
+  /** upsert condition */
+  on_conflict?: GeneratedDay_Plans_On_Conflict | null | undefined;
+};
+
+/** Boolean expression to filter rows from the table "day_plans". All fields are combined with a logical 'AND'. */
+export type GeneratedDay_Plans_Bool_Exp = {
+  _and?: Array<GeneratedDay_Plans_Bool_Exp> | null | undefined;
+  _not?: GeneratedDay_Plans_Bool_Exp | null | undefined;
+  _or?: Array<GeneratedDay_Plans_Bool_Exp> | null | undefined;
+  date?: GeneratedDate_Comparison_Exp | null | undefined;
+  id?: GeneratedBigint_Comparison_Exp | null | undefined;
+  note?: GeneratedString_Comparison_Exp | null | undefined;
+  sport?: GeneratedString_Comparison_Exp | null | undefined;
+  sportBySport?: GeneratedSports_Bool_Exp | null | undefined;
+};
+
+/** unique or primary key constraints on table "day_plans" */
+export type GeneratedDay_Plans_Constraint =
+  /** unique or primary key constraint on columns "id" */
+  | 'day_plans_pkey';
+
+/** input type for inserting data into table "day_plans" */
+export type GeneratedDay_Plans_Insert_Input = {
+  date?: unknown;
+  note?: string | null | undefined;
+  sport?: string | null | undefined;
+  sportBySport?: GeneratedSports_Obj_Rel_Insert_Input | null | undefined;
+};
+
+/** on_conflict condition type for table "day_plans" */
+export type GeneratedDay_Plans_On_Conflict = {
+  constraint: GeneratedDay_Plans_Constraint;
+  update_columns?: Array<GeneratedDay_Plans_Update_Column>;
+  where?: GeneratedDay_Plans_Bool_Exp | null | undefined;
+};
+
+/** select columns of table "day_plans" */
+export type GeneratedDay_Plans_Select_Column =
+  /** column name */
+  | 'date'
+  /** column name */
+  | 'id'
+  /** column name */
+  | 'note'
+  /** column name */
+  | 'sport';
+
+/** input type for updating data in table "day_plans" */
+export type GeneratedDay_Plans_Set_Input = {
+  date?: unknown;
+  note?: string | null | undefined;
+  sport?: string | null | undefined;
+};
+
+/** update columns of table "day_plans" */
+export type GeneratedDay_Plans_Update_Column =
+  /** column name */
+  | 'date'
+  /** column name */
+  | 'note'
+  /** column name */
+  | 'sport';
+
 /** input type for updating data in table "exercises" */
 export type GeneratedExercises_Set_Input = {
   categories?: Array<string> | null | undefined;
@@ -12818,273 +13345,6 @@ export type GeneratedNumeric_Comparison_Exp = {
   _nin?: Array<unknown> | null | undefined;
 };
 
-export type GeneratedPlan_Requirements_Aggregate_Bool_Exp = {
-  count?: GeneratedPlan_Requirements_Aggregate_Bool_Exp_Count | null | undefined;
-};
-
-export type GeneratedPlan_Requirements_Aggregate_Bool_Exp_Count = {
-  arguments?: Array<GeneratedPlan_Requirements_Select_Column> | null | undefined;
-  distinct?: boolean | null | undefined;
-  filter?: GeneratedPlan_Requirements_Bool_Exp | null | undefined;
-  predicate: GeneratedInt_Comparison_Exp;
-};
-
-/** input type for inserting array relation for remote table "plan_requirements" */
-export type GeneratedPlan_Requirements_Arr_Rel_Insert_Input = {
-  data: Array<GeneratedPlan_Requirements_Insert_Input>;
-  /** upsert condition */
-  on_conflict?: GeneratedPlan_Requirements_On_Conflict | null | undefined;
-};
-
-/** Boolean expression to filter rows from the table "plan_requirements". All fields are combined with a logical 'AND'. */
-export type GeneratedPlan_Requirements_Bool_Exp = {
-  _and?: Array<GeneratedPlan_Requirements_Bool_Exp> | null | undefined;
-  _not?: GeneratedPlan_Requirements_Bool_Exp | null | undefined;
-  _or?: Array<GeneratedPlan_Requirements_Bool_Exp> | null | undefined;
-  id?: GeneratedBigint_Comparison_Exp | null | undefined;
-  metric?: GeneratedString_Comparison_Exp | null | undefined;
-  notes?: GeneratedString_Comparison_Exp | null | undefined;
-  plan?: GeneratedPlans_Bool_Exp | null | undefined;
-  plan_id?: GeneratedBigint_Comparison_Exp | null | undefined;
-  sport?: GeneratedString_Comparison_Exp | null | undefined;
-  target?: GeneratedNumeric_Comparison_Exp | null | undefined;
-  week?: GeneratedString_Comparison_Exp | null | undefined;
-};
-
-/** unique or primary key constraints on table "plan_requirements" */
-export type GeneratedPlan_Requirements_Constraint =
-  /** unique or primary key constraint on columns "id" */
-  | 'plan_requirements_pkey';
-
-/** input type for inserting data into table "plan_requirements" */
-export type GeneratedPlan_Requirements_Insert_Input = {
-  metric?: string | null | undefined;
-  notes?: string | null | undefined;
-  plan?: GeneratedPlans_Obj_Rel_Insert_Input | null | undefined;
-  plan_id?: unknown;
-  sport?: string | null | undefined;
-  target?: unknown;
-  week?: string | null | undefined;
-};
-
-/** on_conflict condition type for table "plan_requirements" */
-export type GeneratedPlan_Requirements_On_Conflict = {
-  constraint: GeneratedPlan_Requirements_Constraint;
-  update_columns?: Array<GeneratedPlan_Requirements_Update_Column>;
-  where?: GeneratedPlan_Requirements_Bool_Exp | null | undefined;
-};
-
-/** select columns of table "plan_requirements" */
-export type GeneratedPlan_Requirements_Select_Column =
-  /** column name */
-  | 'id'
-  /** column name */
-  | 'metric'
-  /** column name */
-  | 'notes'
-  /** column name */
-  | 'plan_id'
-  /** column name */
-  | 'sport'
-  /** column name */
-  | 'target'
-  /** column name */
-  | 'week';
-
-/** input type for updating data in table "plan_requirements" */
-export type GeneratedPlan_Requirements_Set_Input = {
-  metric?: string | null | undefined;
-  notes?: string | null | undefined;
-  plan_id?: unknown;
-  sport?: string | null | undefined;
-  target?: unknown;
-  week?: string | null | undefined;
-};
-
-/** update columns of table "plan_requirements" */
-export type GeneratedPlan_Requirements_Update_Column =
-  /** column name */
-  | 'metric'
-  /** column name */
-  | 'notes'
-  /** column name */
-  | 'plan_id'
-  /** column name */
-  | 'sport'
-  /** column name */
-  | 'target'
-  /** column name */
-  | 'week';
-
-export type GeneratedPlan_Workouts_Aggregate_Bool_Exp = {
-  count?: GeneratedPlan_Workouts_Aggregate_Bool_Exp_Count | null | undefined;
-};
-
-export type GeneratedPlan_Workouts_Aggregate_Bool_Exp_Count = {
-  arguments?: Array<GeneratedPlan_Workouts_Select_Column> | null | undefined;
-  distinct?: boolean | null | undefined;
-  filter?: GeneratedPlan_Workouts_Bool_Exp | null | undefined;
-  predicate: GeneratedInt_Comparison_Exp;
-};
-
-/** input type for inserting array relation for remote table "plan_workouts" */
-export type GeneratedPlan_Workouts_Arr_Rel_Insert_Input = {
-  data: Array<GeneratedPlan_Workouts_Insert_Input>;
-  /** upsert condition */
-  on_conflict?: GeneratedPlan_Workouts_On_Conflict | null | undefined;
-};
-
-/** Boolean expression to filter rows from the table "plan_workouts". All fields are combined with a logical 'AND'. */
-export type GeneratedPlan_Workouts_Bool_Exp = {
-  _and?: Array<GeneratedPlan_Workouts_Bool_Exp> | null | undefined;
-  _not?: GeneratedPlan_Workouts_Bool_Exp | null | undefined;
-  _or?: Array<GeneratedPlan_Workouts_Bool_Exp> | null | undefined;
-  completed_at?: GeneratedTimestamptz_Comparison_Exp | null | undefined;
-  day_of_week?: GeneratedString_Comparison_Exp | null | undefined;
-  description?: GeneratedString_Comparison_Exp | null | undefined;
-  id?: GeneratedBigint_Comparison_Exp | null | undefined;
-  plan?: GeneratedPlans_Bool_Exp | null | undefined;
-  plan_id?: GeneratedBigint_Comparison_Exp | null | undefined;
-  sport?: GeneratedString_Comparison_Exp | null | undefined;
-  title?: GeneratedString_Comparison_Exp | null | undefined;
-  week?: GeneratedString_Comparison_Exp | null | undefined;
-};
-
-/** unique or primary key constraints on table "plan_workouts" */
-export type GeneratedPlan_Workouts_Constraint =
-  /** unique or primary key constraint on columns "id" */
-  | 'plan_workouts_pkey';
-
-/** input type for inserting data into table "plan_workouts" */
-export type GeneratedPlan_Workouts_Insert_Input = {
-  completed_at?: unknown;
-  day_of_week?: string | null | undefined;
-  description?: string | null | undefined;
-  plan?: GeneratedPlans_Obj_Rel_Insert_Input | null | undefined;
-  plan_id?: unknown;
-  sport?: string | null | undefined;
-  title?: string | null | undefined;
-  week?: string | null | undefined;
-};
-
-/** on_conflict condition type for table "plan_workouts" */
-export type GeneratedPlan_Workouts_On_Conflict = {
-  constraint: GeneratedPlan_Workouts_Constraint;
-  update_columns?: Array<GeneratedPlan_Workouts_Update_Column>;
-  where?: GeneratedPlan_Workouts_Bool_Exp | null | undefined;
-};
-
-/** select columns of table "plan_workouts" */
-export type GeneratedPlan_Workouts_Select_Column =
-  /** column name */
-  | 'completed_at'
-  /** column name */
-  | 'day_of_week'
-  /** column name */
-  | 'description'
-  /** column name */
-  | 'id'
-  /** column name */
-  | 'plan_id'
-  /** column name */
-  | 'sport'
-  /** column name */
-  | 'title'
-  /** column name */
-  | 'week';
-
-/** input type for updating data in table "plan_workouts" */
-export type GeneratedPlan_Workouts_Set_Input = {
-  completed_at?: unknown;
-  day_of_week?: string | null | undefined;
-  description?: string | null | undefined;
-  plan_id?: unknown;
-  sport?: string | null | undefined;
-  title?: string | null | undefined;
-  week?: string | null | undefined;
-};
-
-/** update columns of table "plan_workouts" */
-export type GeneratedPlan_Workouts_Update_Column =
-  /** column name */
-  | 'completed_at'
-  /** column name */
-  | 'day_of_week'
-  /** column name */
-  | 'description'
-  /** column name */
-  | 'plan_id'
-  /** column name */
-  | 'sport'
-  /** column name */
-  | 'title'
-  /** column name */
-  | 'week';
-
-/** Boolean expression to filter rows from the table "plans". All fields are combined with a logical 'AND'. */
-export type GeneratedPlans_Bool_Exp = {
-  _and?: Array<GeneratedPlans_Bool_Exp> | null | undefined;
-  _not?: GeneratedPlans_Bool_Exp | null | undefined;
-  _or?: Array<GeneratedPlans_Bool_Exp> | null | undefined;
-  end_week?: GeneratedString_Comparison_Exp | null | undefined;
-  id?: GeneratedBigint_Comparison_Exp | null | undefined;
-  name?: GeneratedString_Comparison_Exp | null | undefined;
-  notes?: GeneratedString_Comparison_Exp | null | undefined;
-  requirements?: GeneratedPlan_Requirements_Bool_Exp | null | undefined;
-  requirements_aggregate?: GeneratedPlan_Requirements_Aggregate_Bool_Exp | null | undefined;
-  start_week?: GeneratedString_Comparison_Exp | null | undefined;
-  workouts?: GeneratedPlan_Workouts_Bool_Exp | null | undefined;
-  workouts_aggregate?: GeneratedPlan_Workouts_Aggregate_Bool_Exp | null | undefined;
-};
-
-/** unique or primary key constraints on table "plans" */
-export type GeneratedPlans_Constraint =
-  /** unique or primary key constraint on columns "id" */
-  | 'plans_pkey';
-
-/** input type for inserting data into table "plans" */
-export type GeneratedPlans_Insert_Input = {
-  end_week?: string | null | undefined;
-  name?: string | null | undefined;
-  notes?: string | null | undefined;
-  requirements?: GeneratedPlan_Requirements_Arr_Rel_Insert_Input | null | undefined;
-  start_week?: string | null | undefined;
-  workouts?: GeneratedPlan_Workouts_Arr_Rel_Insert_Input | null | undefined;
-};
-
-/** input type for inserting object relation for remote table "plans" */
-export type GeneratedPlans_Obj_Rel_Insert_Input = {
-  data: GeneratedPlans_Insert_Input;
-  /** upsert condition */
-  on_conflict?: GeneratedPlans_On_Conflict | null | undefined;
-};
-
-/** on_conflict condition type for table "plans" */
-export type GeneratedPlans_On_Conflict = {
-  constraint: GeneratedPlans_Constraint;
-  update_columns?: Array<GeneratedPlans_Update_Column>;
-  where?: GeneratedPlans_Bool_Exp | null | undefined;
-};
-
-/** input type for updating data in table "plans" */
-export type GeneratedPlans_Set_Input = {
-  end_week?: string | null | undefined;
-  name?: string | null | undefined;
-  notes?: string | null | undefined;
-  start_week?: string | null | undefined;
-};
-
-/** update columns of table "plans" */
-export type GeneratedPlans_Update_Column =
-  /** column name */
-  | 'end_week'
-  /** column name */
-  | 'name'
-  /** column name */
-  | 'notes'
-  /** column name */
-  | 'start_week';
-
 /** input type for inserting data into table "races" */
 export type GeneratedRaces_Insert_Input = {
   date?: unknown;
@@ -13101,18 +13361,155 @@ export type GeneratedRaces_Set_Input = {
   name?: string | null | undefined;
 };
 
-/** Boolean expression to compare columns of type "timestamptz". All fields are combined with logical 'AND'. */
-export type GeneratedTimestamptz_Comparison_Exp = {
-  _eq?: unknown;
-  _gt?: unknown;
-  _gte?: unknown;
-  _in?: Array<unknown> | null | undefined;
-  _is_null?: boolean | null | undefined;
-  _lt?: unknown;
-  _lte?: unknown;
-  _neq?: unknown;
-  _nin?: Array<unknown> | null | undefined;
+/** Boolean expression to filter rows from the table "sports". All fields are combined with a logical 'AND'. */
+export type GeneratedSports_Bool_Exp = {
+  _and?: Array<GeneratedSports_Bool_Exp> | null | undefined;
+  _not?: GeneratedSports_Bool_Exp | null | undefined;
+  _or?: Array<GeneratedSports_Bool_Exp> | null | undefined;
+  day_plans?: GeneratedDay_Plans_Bool_Exp | null | undefined;
+  day_plans_aggregate?: GeneratedDay_Plans_Aggregate_Bool_Exp | null | undefined;
+  label?: GeneratedString_Comparison_Exp | null | undefined;
+  sort_order?: GeneratedInt_Comparison_Exp | null | undefined;
+  value?: GeneratedString_Comparison_Exp | null | undefined;
+  week_objectives?: GeneratedWeek_Objectives_Bool_Exp | null | undefined;
+  week_objectives_aggregate?: GeneratedWeek_Objectives_Aggregate_Bool_Exp | null | undefined;
 };
+
+/** unique or primary key constraints on table "sports" */
+export type GeneratedSports_Constraint =
+  /** unique or primary key constraint on columns "value" */
+  | 'sports_pkey'
+  /** unique or primary key constraint on columns "sort_order" */
+  | 'sports_sort_order_key';
+
+/** input type for inserting data into table "sports" */
+export type GeneratedSports_Insert_Input = {
+  day_plans?: GeneratedDay_Plans_Arr_Rel_Insert_Input | null | undefined;
+  label?: string | null | undefined;
+  sort_order?: number | null | undefined;
+  value?: string | null | undefined;
+  week_objectives?: GeneratedWeek_Objectives_Arr_Rel_Insert_Input | null | undefined;
+};
+
+/** input type for inserting object relation for remote table "sports" */
+export type GeneratedSports_Obj_Rel_Insert_Input = {
+  data: GeneratedSports_Insert_Input;
+  /** upsert condition */
+  on_conflict?: GeneratedSports_On_Conflict | null | undefined;
+};
+
+/** on_conflict condition type for table "sports" */
+export type GeneratedSports_On_Conflict = {
+  constraint: GeneratedSports_Constraint;
+  update_columns?: Array<GeneratedSports_Update_Column>;
+  where?: GeneratedSports_Bool_Exp | null | undefined;
+};
+
+/** update columns of table "sports" */
+export type GeneratedSports_Update_Column =
+  /** column name */
+  | 'label'
+  /** column name */
+  | 'sort_order'
+  /** column name */
+  | 'value';
+
+/** input type for inserting data into table "week_notes" */
+export type GeneratedWeek_Notes_Insert_Input = {
+  note?: string | null | undefined;
+  week?: string | null | undefined;
+};
+
+export type GeneratedWeek_Objectives_Aggregate_Bool_Exp = {
+  count?: GeneratedWeek_Objectives_Aggregate_Bool_Exp_Count | null | undefined;
+};
+
+export type GeneratedWeek_Objectives_Aggregate_Bool_Exp_Count = {
+  arguments?: Array<GeneratedWeek_Objectives_Select_Column> | null | undefined;
+  distinct?: boolean | null | undefined;
+  filter?: GeneratedWeek_Objectives_Bool_Exp | null | undefined;
+  predicate: GeneratedInt_Comparison_Exp;
+};
+
+/** input type for inserting array relation for remote table "week_objectives" */
+export type GeneratedWeek_Objectives_Arr_Rel_Insert_Input = {
+  data: Array<GeneratedWeek_Objectives_Insert_Input>;
+  /** upsert condition */
+  on_conflict?: GeneratedWeek_Objectives_On_Conflict | null | undefined;
+};
+
+/** Boolean expression to filter rows from the table "week_objectives". All fields are combined with a logical 'AND'. */
+export type GeneratedWeek_Objectives_Bool_Exp = {
+  _and?: Array<GeneratedWeek_Objectives_Bool_Exp> | null | undefined;
+  _not?: GeneratedWeek_Objectives_Bool_Exp | null | undefined;
+  _or?: Array<GeneratedWeek_Objectives_Bool_Exp> | null | undefined;
+  id?: GeneratedBigint_Comparison_Exp | null | undefined;
+  metric?: GeneratedString_Comparison_Exp | null | undefined;
+  notes?: GeneratedString_Comparison_Exp | null | undefined;
+  sport?: GeneratedString_Comparison_Exp | null | undefined;
+  sportBySport?: GeneratedSports_Bool_Exp | null | undefined;
+  target?: GeneratedNumeric_Comparison_Exp | null | undefined;
+  week?: GeneratedString_Comparison_Exp | null | undefined;
+};
+
+/** unique or primary key constraints on table "week_objectives" */
+export type GeneratedWeek_Objectives_Constraint =
+  /** unique or primary key constraint on columns "id" */
+  | 'week_objectives_pkey';
+
+/** input type for inserting data into table "week_objectives" */
+export type GeneratedWeek_Objectives_Insert_Input = {
+  metric?: string | null | undefined;
+  notes?: string | null | undefined;
+  sport?: string | null | undefined;
+  sportBySport?: GeneratedSports_Obj_Rel_Insert_Input | null | undefined;
+  target?: unknown;
+  week?: string | null | undefined;
+};
+
+/** on_conflict condition type for table "week_objectives" */
+export type GeneratedWeek_Objectives_On_Conflict = {
+  constraint: GeneratedWeek_Objectives_Constraint;
+  update_columns?: Array<GeneratedWeek_Objectives_Update_Column>;
+  where?: GeneratedWeek_Objectives_Bool_Exp | null | undefined;
+};
+
+/** select columns of table "week_objectives" */
+export type GeneratedWeek_Objectives_Select_Column =
+  /** column name */
+  | 'id'
+  /** column name */
+  | 'metric'
+  /** column name */
+  | 'notes'
+  /** column name */
+  | 'sport'
+  /** column name */
+  | 'target'
+  /** column name */
+  | 'week';
+
+/** input type for updating data in table "week_objectives" */
+export type GeneratedWeek_Objectives_Set_Input = {
+  metric?: string | null | undefined;
+  notes?: string | null | undefined;
+  sport?: string | null | undefined;
+  target?: unknown;
+  week?: string | null | undefined;
+};
+
+/** update columns of table "week_objectives" */
+export type GeneratedWeek_Objectives_Update_Column =
+  /** column name */
+  | 'metric'
+  /** column name */
+  | 'notes'
+  /** column name */
+  | 'sport'
+  /** column name */
+  | 'target'
+  /** column name */
+  | 'week';
 
 export type GeneratedActivitiesSmokeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -13172,11 +13569,6 @@ export type GeneratedDeleteExerciseMutationVariables = Exact<{
 
 export type GeneratedDeleteExerciseMutation = { delete_exercises_by_pk: { id: unknown } | null };
 
-export type GeneratedPlansQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GeneratedPlansQuery = { plans: Array<{ id: unknown, name: string, start_week: string, end_week: string, notes: string | null }> };
-
 export type GeneratedRacesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -13204,96 +13596,83 @@ export type GeneratedDeleteRaceMutationVariables = Exact<{
 
 export type GeneratedDeleteRaceMutation = { delete_races_by_pk: { id: unknown } | null };
 
-export type GeneratedPlanQueryVariables = Exact<{
+export type GeneratedSportsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GeneratedSportsQuery = { sports: Array<{ value: string, label: string }> };
+
+export type GeneratedDayPlansQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GeneratedDayPlansQuery = { day_plans: Array<{ id: unknown, date: unknown, sport: string | null, note: string }> };
+
+export type GeneratedInsertDayPlanMutationVariables = Exact<{
+  object: GeneratedDay_Plans_Insert_Input;
+}>;
+
+
+export type GeneratedInsertDayPlanMutation = { insert_day_plans_one: { id: unknown } | null };
+
+export type GeneratedUpdateDayPlanMutationVariables = Exact<{
+  id: unknown;
+  set: GeneratedDay_Plans_Set_Input;
+}>;
+
+
+export type GeneratedUpdateDayPlanMutation = { update_day_plans_by_pk: { id: unknown } | null };
+
+export type GeneratedDeleteDayPlanMutationVariables = Exact<{
   id: unknown;
 }>;
 
 
-export type GeneratedPlanQuery = { plans_by_pk: { id: unknown, name: string, start_week: string, end_week: string, notes: string | null, requirements: Array<{ id: unknown, week: string, sport: string | null, metric: string, target: unknown, notes: string | null }>, workouts: Array<{ id: unknown, week: string, day_of_week: string, sport: string, title: string, description: string | null }> } | null };
+export type GeneratedDeleteDayPlanMutation = { delete_day_plans_by_pk: { id: unknown } | null };
 
-export type GeneratedInsertPlanMutationVariables = Exact<{
-  object: GeneratedPlans_Insert_Input;
+export type GeneratedWeekNotesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GeneratedWeekNotesQuery = { week_notes: Array<{ week: string, note: string }> };
+
+export type GeneratedUpsertWeekNoteMutationVariables = Exact<{
+  object: GeneratedWeek_Notes_Insert_Input;
 }>;
 
 
-export type GeneratedInsertPlanMutation = { insert_plans_one: { id: unknown } | null };
+export type GeneratedUpsertWeekNoteMutation = { insert_week_notes_one: { week: string } | null };
 
-export type GeneratedUpdatePlanMutationVariables = Exact<{
+export type GeneratedDeleteWeekNoteMutationVariables = Exact<{
+  week: string;
+}>;
+
+
+export type GeneratedDeleteWeekNoteMutation = { delete_week_notes_by_pk: { week: string } | null };
+
+export type GeneratedWeekObjectivesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GeneratedWeekObjectivesQuery = { week_objectives: Array<{ id: unknown, week: string, sport: string | null, metric: string, target: unknown, notes: string | null }> };
+
+export type GeneratedInsertWeekObjectiveMutationVariables = Exact<{
+  object: GeneratedWeek_Objectives_Insert_Input;
+}>;
+
+
+export type GeneratedInsertWeekObjectiveMutation = { insert_week_objectives_one: { id: unknown } | null };
+
+export type GeneratedUpdateWeekObjectiveMutationVariables = Exact<{
   id: unknown;
-  set: GeneratedPlans_Set_Input;
+  set: GeneratedWeek_Objectives_Set_Input;
 }>;
 
 
-export type GeneratedUpdatePlanMutation = { update_plans_by_pk: { id: unknown } | null };
+export type GeneratedUpdateWeekObjectiveMutation = { update_week_objectives_by_pk: { id: unknown } | null };
 
-export type GeneratedDeletePlanMutationVariables = Exact<{
-  id: unknown;
-}>;
-
-
-export type GeneratedDeletePlanMutation = { delete_plans_by_pk: { id: unknown } | null };
-
-export type GeneratedInsertPlanRequirementMutationVariables = Exact<{
-  object: GeneratedPlan_Requirements_Insert_Input;
-}>;
-
-
-export type GeneratedInsertPlanRequirementMutation = { insert_plan_requirements_one: { id: unknown } | null };
-
-export type GeneratedUpdatePlanRequirementMutationVariables = Exact<{
-  id: unknown;
-  set: GeneratedPlan_Requirements_Set_Input;
-}>;
-
-
-export type GeneratedUpdatePlanRequirementMutation = { update_plan_requirements_by_pk: { id: unknown } | null };
-
-export type GeneratedDeletePlanRequirementMutationVariables = Exact<{
-  id: unknown;
-}>;
-
-
-export type GeneratedDeletePlanRequirementMutation = { delete_plan_requirements_by_pk: { id: unknown } | null };
-
-export type GeneratedAllPlanRequirementsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GeneratedAllPlanRequirementsQuery = { plan_requirements: Array<{ id: unknown, plan_id: unknown, week: string, sport: string | null, metric: string, target: unknown }> };
-
-export type GeneratedAllPlanWorkoutsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GeneratedAllPlanWorkoutsQuery = { plan_workouts: Array<{ id: unknown, plan_id: unknown, week: string, day_of_week: string, sport: string, title: string, description: string | null, completed_at: unknown }> };
-
-export type GeneratedInsertPlanWorkoutMutationVariables = Exact<{
-  object: GeneratedPlan_Workouts_Insert_Input;
-}>;
-
-
-export type GeneratedInsertPlanWorkoutMutation = { insert_plan_workouts_one: { id: unknown } | null };
-
-export type GeneratedUpdatePlanWorkoutMutationVariables = Exact<{
-  id: unknown;
-  set: GeneratedPlan_Workouts_Set_Input;
-}>;
-
-
-export type GeneratedUpdatePlanWorkoutMutation = { update_plan_workouts_by_pk: { id: unknown } | null };
-
-export type GeneratedDeletePlanWorkoutMutationVariables = Exact<{
+export type GeneratedDeleteWeekObjectiveMutationVariables = Exact<{
   id: unknown;
 }>;
 
 
-export type GeneratedDeletePlanWorkoutMutation = { delete_plan_workouts_by_pk: { id: unknown } | null };
-
-export type GeneratedSyncActivitiesMutationVariables = Exact<{
-  days?: number | null | undefined;
-  maxActivities?: number | null | undefined;
-}>;
-
-
-export type GeneratedSyncActivitiesMutation = { syncActivities: { activities_created: number, activities_updated: number, sleep_created: number, sleep_updated: number, streams_written: number, activities_failed: number, errors: Array<string> } };
+export type GeneratedDeleteWeekObjectiveMutation = { delete_week_objectives_by_pk: { id: unknown } | null };
 
 
 export const ActivitiesSmokeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ActivitiesSmoke"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"activities"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"start_time"},"value":{"kind":"EnumValue","value":"desc_nulls_last"}}]}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"25"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"garmin_activity_id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"activity_type"}},{"kind":"Field","name":{"kind":"Name","value":"subtype"}},{"kind":"Field","name":{"kind":"Name","value":"start_time"}},{"kind":"Field","name":{"kind":"Name","value":"duration_s"}},{"kind":"Field","name":{"kind":"Name","value":"distance_m"}}]}}]}}]} as unknown as DocumentNode<GeneratedActivitiesSmokeQuery, GeneratedActivitiesSmokeQueryVariables>;
@@ -13305,21 +13684,19 @@ export const ExercisesDocument = {"kind":"Document","definitions":[{"kind":"Oper
 export const InsertExerciseDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"InsertExercise"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"name"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"categories"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"insert_exercises_one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"object"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"name"},"value":{"kind":"Variable","name":{"kind":"Name","value":"name"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"categories"},"value":{"kind":"Variable","name":{"kind":"Name","value":"categories"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"categories"}}]}}]}}]} as unknown as DocumentNode<GeneratedInsertExerciseMutation, GeneratedInsertExerciseMutationVariables>;
 export const UpdateExerciseDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateExercise"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"set"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"exercises_set_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"update_exercises_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"pk_columns"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}},{"kind":"Argument","name":{"kind":"Name","value":"_set"},"value":{"kind":"Variable","name":{"kind":"Name","value":"set"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"categories"}}]}}]}}]} as unknown as DocumentNode<GeneratedUpdateExerciseMutation, GeneratedUpdateExerciseMutationVariables>;
 export const DeleteExerciseDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteExercise"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"delete_exercises_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedDeleteExerciseMutation, GeneratedDeleteExerciseMutationVariables>;
-export const PlansDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Plans"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"plans"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"start_week"},"value":{"kind":"EnumValue","value":"desc"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"start_week"}},{"kind":"Field","name":{"kind":"Name","value":"end_week"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}}]}}]}}]} as unknown as DocumentNode<GeneratedPlansQuery, GeneratedPlansQueryVariables>;
 export const RacesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Races"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"races"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"date"},"value":{"kind":"EnumValue","value":"desc"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"distance_m"}},{"kind":"Field","name":{"kind":"Name","value":"elevation_gain_m"}}]}}]}}]} as unknown as DocumentNode<GeneratedRacesQuery, GeneratedRacesQueryVariables>;
 export const InsertRaceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"InsertRace"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"object"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"races_insert_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"insert_races_one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"object"},"value":{"kind":"Variable","name":{"kind":"Name","value":"object"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedInsertRaceMutation, GeneratedInsertRaceMutationVariables>;
 export const UpdateRaceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateRace"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"set"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"races_set_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"update_races_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"pk_columns"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}},{"kind":"Argument","name":{"kind":"Name","value":"_set"},"value":{"kind":"Variable","name":{"kind":"Name","value":"set"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedUpdateRaceMutation, GeneratedUpdateRaceMutationVariables>;
 export const DeleteRaceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteRace"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"delete_races_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedDeleteRaceMutation, GeneratedDeleteRaceMutationVariables>;
-export const PlanDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Plan"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"plans_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"start_week"}},{"kind":"Field","name":{"kind":"Name","value":"end_week"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}},{"kind":"Field","name":{"kind":"Name","value":"requirements"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"week"},"value":{"kind":"EnumValue","value":"asc"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"week"}},{"kind":"Field","name":{"kind":"Name","value":"sport"}},{"kind":"Field","name":{"kind":"Name","value":"metric"}},{"kind":"Field","name":{"kind":"Name","value":"target"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}}]}},{"kind":"Field","name":{"kind":"Name","value":"workouts"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"week"},"value":{"kind":"EnumValue","value":"asc"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"week"}},{"kind":"Field","name":{"kind":"Name","value":"day_of_week"}},{"kind":"Field","name":{"kind":"Name","value":"sport"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}}]}}]}}]}}]} as unknown as DocumentNode<GeneratedPlanQuery, GeneratedPlanQueryVariables>;
-export const InsertPlanDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"InsertPlan"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"object"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"plans_insert_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"insert_plans_one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"object"},"value":{"kind":"Variable","name":{"kind":"Name","value":"object"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedInsertPlanMutation, GeneratedInsertPlanMutationVariables>;
-export const UpdatePlanDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdatePlan"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"set"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"plans_set_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"update_plans_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"pk_columns"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}},{"kind":"Argument","name":{"kind":"Name","value":"_set"},"value":{"kind":"Variable","name":{"kind":"Name","value":"set"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedUpdatePlanMutation, GeneratedUpdatePlanMutationVariables>;
-export const DeletePlanDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeletePlan"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"delete_plans_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedDeletePlanMutation, GeneratedDeletePlanMutationVariables>;
-export const InsertPlanRequirementDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"InsertPlanRequirement"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"object"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"plan_requirements_insert_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"insert_plan_requirements_one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"object"},"value":{"kind":"Variable","name":{"kind":"Name","value":"object"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedInsertPlanRequirementMutation, GeneratedInsertPlanRequirementMutationVariables>;
-export const UpdatePlanRequirementDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdatePlanRequirement"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"set"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"plan_requirements_set_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"update_plan_requirements_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"pk_columns"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}},{"kind":"Argument","name":{"kind":"Name","value":"_set"},"value":{"kind":"Variable","name":{"kind":"Name","value":"set"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedUpdatePlanRequirementMutation, GeneratedUpdatePlanRequirementMutationVariables>;
-export const DeletePlanRequirementDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeletePlanRequirement"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"delete_plan_requirements_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedDeletePlanRequirementMutation, GeneratedDeletePlanRequirementMutationVariables>;
-export const AllPlanRequirementsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AllPlanRequirements"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"plan_requirements"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"week"},"value":{"kind":"EnumValue","value":"asc"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"plan_id"}},{"kind":"Field","name":{"kind":"Name","value":"week"}},{"kind":"Field","name":{"kind":"Name","value":"sport"}},{"kind":"Field","name":{"kind":"Name","value":"metric"}},{"kind":"Field","name":{"kind":"Name","value":"target"}}]}}]}}]} as unknown as DocumentNode<GeneratedAllPlanRequirementsQuery, GeneratedAllPlanRequirementsQueryVariables>;
-export const AllPlanWorkoutsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AllPlanWorkouts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"plan_workouts"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"week"},"value":{"kind":"EnumValue","value":"asc"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"plan_id"}},{"kind":"Field","name":{"kind":"Name","value":"week"}},{"kind":"Field","name":{"kind":"Name","value":"day_of_week"}},{"kind":"Field","name":{"kind":"Name","value":"sport"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"completed_at"}}]}}]}}]} as unknown as DocumentNode<GeneratedAllPlanWorkoutsQuery, GeneratedAllPlanWorkoutsQueryVariables>;
-export const InsertPlanWorkoutDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"InsertPlanWorkout"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"object"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"plan_workouts_insert_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"insert_plan_workouts_one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"object"},"value":{"kind":"Variable","name":{"kind":"Name","value":"object"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedInsertPlanWorkoutMutation, GeneratedInsertPlanWorkoutMutationVariables>;
-export const UpdatePlanWorkoutDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdatePlanWorkout"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"set"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"plan_workouts_set_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"update_plan_workouts_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"pk_columns"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}},{"kind":"Argument","name":{"kind":"Name","value":"_set"},"value":{"kind":"Variable","name":{"kind":"Name","value":"set"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedUpdatePlanWorkoutMutation, GeneratedUpdatePlanWorkoutMutationVariables>;
-export const DeletePlanWorkoutDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeletePlanWorkout"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"delete_plan_workouts_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedDeletePlanWorkoutMutation, GeneratedDeletePlanWorkoutMutationVariables>;
-export const SyncActivitiesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SyncActivities"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"days"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}},"defaultValue":{"kind":"IntValue","value":"7"}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"maxActivities"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}},"defaultValue":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"syncActivities"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"days"},"value":{"kind":"Variable","name":{"kind":"Name","value":"days"}}},{"kind":"Argument","name":{"kind":"Name","value":"maxActivities"},"value":{"kind":"Variable","name":{"kind":"Name","value":"maxActivities"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"activities_created"}},{"kind":"Field","name":{"kind":"Name","value":"activities_updated"}},{"kind":"Field","name":{"kind":"Name","value":"sleep_created"}},{"kind":"Field","name":{"kind":"Name","value":"sleep_updated"}},{"kind":"Field","name":{"kind":"Name","value":"streams_written"}},{"kind":"Field","name":{"kind":"Name","value":"activities_failed"}},{"kind":"Field","name":{"kind":"Name","value":"errors"}}]}}]}}]} as unknown as DocumentNode<GeneratedSyncActivitiesMutation, GeneratedSyncActivitiesMutationVariables>;
+export const SportsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Sports"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"sports"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"sort_order"},"value":{"kind":"EnumValue","value":"asc"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"label"}}]}}]}}]} as unknown as DocumentNode<GeneratedSportsQuery, GeneratedSportsQueryVariables>;
+export const DayPlansDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"DayPlans"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"day_plans"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"date"},"value":{"kind":"EnumValue","value":"asc"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"sport"}},{"kind":"Field","name":{"kind":"Name","value":"note"}}]}}]}}]} as unknown as DocumentNode<GeneratedDayPlansQuery, GeneratedDayPlansQueryVariables>;
+export const InsertDayPlanDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"InsertDayPlan"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"object"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"day_plans_insert_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"insert_day_plans_one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"object"},"value":{"kind":"Variable","name":{"kind":"Name","value":"object"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedInsertDayPlanMutation, GeneratedInsertDayPlanMutationVariables>;
+export const UpdateDayPlanDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateDayPlan"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"set"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"day_plans_set_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"update_day_plans_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"pk_columns"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}},{"kind":"Argument","name":{"kind":"Name","value":"_set"},"value":{"kind":"Variable","name":{"kind":"Name","value":"set"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedUpdateDayPlanMutation, GeneratedUpdateDayPlanMutationVariables>;
+export const DeleteDayPlanDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteDayPlan"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"delete_day_plans_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedDeleteDayPlanMutation, GeneratedDeleteDayPlanMutationVariables>;
+export const WeekNotesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"WeekNotes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"week_notes"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"week"},"value":{"kind":"EnumValue","value":"asc"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"week"}},{"kind":"Field","name":{"kind":"Name","value":"note"}}]}}]}}]} as unknown as DocumentNode<GeneratedWeekNotesQuery, GeneratedWeekNotesQueryVariables>;
+export const UpsertWeekNoteDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpsertWeekNote"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"object"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"week_notes_insert_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"insert_week_notes_one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"object"},"value":{"kind":"Variable","name":{"kind":"Name","value":"object"}}},{"kind":"Argument","name":{"kind":"Name","value":"on_conflict"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"constraint"},"value":{"kind":"EnumValue","value":"week_notes_pkey"}},{"kind":"ObjectField","name":{"kind":"Name","value":"update_columns"},"value":{"kind":"ListValue","values":[{"kind":"EnumValue","value":"note"}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"week"}}]}}]}}]} as unknown as DocumentNode<GeneratedUpsertWeekNoteMutation, GeneratedUpsertWeekNoteMutationVariables>;
+export const DeleteWeekNoteDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteWeekNote"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"week"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"delete_week_notes_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"week"},"value":{"kind":"Variable","name":{"kind":"Name","value":"week"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"week"}}]}}]}}]} as unknown as DocumentNode<GeneratedDeleteWeekNoteMutation, GeneratedDeleteWeekNoteMutationVariables>;
+export const WeekObjectivesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"WeekObjectives"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"week_objectives"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"week"},"value":{"kind":"EnumValue","value":"asc"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"week"}},{"kind":"Field","name":{"kind":"Name","value":"sport"}},{"kind":"Field","name":{"kind":"Name","value":"metric"}},{"kind":"Field","name":{"kind":"Name","value":"target"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}}]}}]}}]} as unknown as DocumentNode<GeneratedWeekObjectivesQuery, GeneratedWeekObjectivesQueryVariables>;
+export const InsertWeekObjectiveDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"InsertWeekObjective"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"object"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"week_objectives_insert_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"insert_week_objectives_one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"object"},"value":{"kind":"Variable","name":{"kind":"Name","value":"object"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedInsertWeekObjectiveMutation, GeneratedInsertWeekObjectiveMutationVariables>;
+export const UpdateWeekObjectiveDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateWeekObjective"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"set"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"week_objectives_set_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"update_week_objectives_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"pk_columns"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}},{"kind":"Argument","name":{"kind":"Name","value":"_set"},"value":{"kind":"Variable","name":{"kind":"Name","value":"set"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedUpdateWeekObjectiveMutation, GeneratedUpdateWeekObjectiveMutationVariables>;
+export const DeleteWeekObjectiveDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteWeekObjective"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"delete_week_objectives_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedDeleteWeekObjectiveMutation, GeneratedDeleteWeekObjectiveMutationVariables>;

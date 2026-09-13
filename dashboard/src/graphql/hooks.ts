@@ -12,10 +12,10 @@ import {
 	FoodOptionsDocument,
 	InsertExerciseDocument,
 	type GeneratedInsertExerciseMutationVariables,
-	PlansDocument,
-	PlanDocument,
-	AllPlanWorkoutsDocument,
-	AllPlanRequirementsDocument,
+	SportsDocument,
+	DayPlansDocument,
+	WeekNotesDocument,
+	WeekObjectivesDocument,
 	RacesDocument,
 	InsertRaceDocument,
 	type GeneratedInsertRaceMutationVariables,
@@ -23,25 +23,22 @@ import {
 	type GeneratedUpdateRaceMutationVariables,
 	DeleteRaceDocument,
 	type GeneratedDeleteRaceMutationVariables,
-	type GeneratedPlanQueryVariables,
-	InsertPlanDocument,
-	type GeneratedInsertPlanMutationVariables,
-	UpdatePlanDocument,
-	type GeneratedUpdatePlanMutationVariables,
-	DeletePlanDocument,
-	type GeneratedDeletePlanMutationVariables,
-	InsertPlanRequirementDocument,
-	type GeneratedInsertPlanRequirementMutationVariables,
-	UpdatePlanRequirementDocument,
-	type GeneratedUpdatePlanRequirementMutationVariables,
-	DeletePlanRequirementDocument,
-	type GeneratedDeletePlanRequirementMutationVariables,
-	InsertPlanWorkoutDocument,
-	type GeneratedInsertPlanWorkoutMutationVariables,
-	UpdatePlanWorkoutDocument,
-	type GeneratedUpdatePlanWorkoutMutationVariables,
-	DeletePlanWorkoutDocument,
-	type GeneratedDeletePlanWorkoutMutationVariables,
+	InsertDayPlanDocument,
+	type GeneratedInsertDayPlanMutationVariables,
+	UpdateDayPlanDocument,
+	type GeneratedUpdateDayPlanMutationVariables,
+	DeleteDayPlanDocument,
+	type GeneratedDeleteDayPlanMutationVariables,
+	UpsertWeekNoteDocument,
+	type GeneratedUpsertWeekNoteMutationVariables,
+	DeleteWeekNoteDocument,
+	type GeneratedDeleteWeekNoteMutationVariables,
+	InsertWeekObjectiveDocument,
+	type GeneratedInsertWeekObjectiveMutationVariables,
+	UpdateWeekObjectiveDocument,
+	type GeneratedUpdateWeekObjectiveMutationVariables,
+	DeleteWeekObjectiveDocument,
+	type GeneratedDeleteWeekObjectiveMutationVariables,
 	UpdateActivityDocument,
 	UpdateExerciseDocument,
 	type GeneratedUpdateExerciseMutationVariables,
@@ -123,11 +120,11 @@ export function useDeleteExerciseMutation() {
 	});
 }
 
-export function usePlansQuery() {
+export function useSportsQuery() {
 	return useQuery({
-		queryKey: ["plans"],
-		queryFn: () => graphQLClient.request(PlansDocument),
-		select: (data) => data.plans,
+		queryKey: ["sports"],
+		queryFn: () => graphQLClient.request(SportsDocument),
+		select: (data) => data.sports,
 	});
 }
 
@@ -160,93 +157,82 @@ export function useDeleteRaceMutation() {
 	});
 }
 
-export function useAllPlanRequirementsQuery() {
+export function useDayPlansQuery() {
 	return useQuery({
-		queryKey: ["plan-requirements"],
-		queryFn: () => graphQLClient.request(AllPlanRequirementsDocument),
-		select: (data) => data.plan_requirements,
+		queryKey: ["day-plans"],
+		queryFn: () => graphQLClient.request(DayPlansDocument),
+		select: (data) => data.day_plans,
 	});
 }
 
-export function useAllPlanWorkoutsQuery() {
+export function useInsertDayPlanMutation() {
+	return useMutation({
+		mutationFn: (variables: GeneratedInsertDayPlanMutationVariables) =>
+			graphQLClient.request(InsertDayPlanDocument, variables),
+	});
+}
+
+export function useUpdateDayPlanMutation() {
+	return useMutation({
+		mutationFn: (variables: GeneratedUpdateDayPlanMutationVariables) =>
+			graphQLClient.request(UpdateDayPlanDocument, variables),
+	});
+}
+
+export function useDeleteDayPlanMutation() {
+	return useMutation({
+		mutationFn: (variables: GeneratedDeleteDayPlanMutationVariables) =>
+			graphQLClient.request(DeleteDayPlanDocument, variables),
+	});
+}
+
+export function useWeekNotesQuery() {
 	return useQuery({
-		queryKey: ["plan-workouts"],
-		queryFn: () => graphQLClient.request(AllPlanWorkoutsDocument),
-		select: (data) => data.plan_workouts,
+		queryKey: ["week-notes"],
+		queryFn: () => graphQLClient.request(WeekNotesDocument),
+		select: (data) => data.week_notes,
 	});
 }
 
-export function usePlanQuery(id: string | undefined) {
+export function useUpsertWeekNoteMutation() {
+	return useMutation({
+		mutationFn: (variables: GeneratedUpsertWeekNoteMutationVariables) =>
+			graphQLClient.request(UpsertWeekNoteDocument, variables),
+	});
+}
+
+export function useDeleteWeekNoteMutation() {
+	return useMutation({
+		mutationFn: (variables: GeneratedDeleteWeekNoteMutationVariables) =>
+			graphQLClient.request(DeleteWeekNoteDocument, variables),
+	});
+}
+
+export function useWeekObjectivesQuery() {
 	return useQuery({
-		queryKey: ["plan", id],
-		enabled: Boolean(id),
-		queryFn: () =>
-			graphQLClient.request(PlanDocument, {
-				id,
-			} as GeneratedPlanQueryVariables),
-		select: (data) => data.plans_by_pk,
+		queryKey: ["week-objectives"],
+		queryFn: () => graphQLClient.request(WeekObjectivesDocument),
+		select: (data) => data.week_objectives,
 	});
 }
 
-export function useInsertPlanMutation() {
+export function useInsertWeekObjectiveMutation() {
 	return useMutation({
-		mutationFn: (variables: GeneratedInsertPlanMutationVariables) =>
-			graphQLClient.request(InsertPlanDocument, variables),
+		mutationFn: (variables: GeneratedInsertWeekObjectiveMutationVariables) =>
+			graphQLClient.request(InsertWeekObjectiveDocument, variables),
 	});
 }
 
-export function useUpdatePlanMutation() {
+export function useUpdateWeekObjectiveMutation() {
 	return useMutation({
-		mutationFn: (variables: GeneratedUpdatePlanMutationVariables) =>
-			graphQLClient.request(UpdatePlanDocument, variables),
+		mutationFn: (variables: GeneratedUpdateWeekObjectiveMutationVariables) =>
+			graphQLClient.request(UpdateWeekObjectiveDocument, variables),
 	});
 }
 
-export function useDeletePlanMutation() {
+export function useDeleteWeekObjectiveMutation() {
 	return useMutation({
-		mutationFn: (variables: GeneratedDeletePlanMutationVariables) =>
-			graphQLClient.request(DeletePlanDocument, variables),
-	});
-}
-
-export function useInsertPlanRequirementMutation() {
-	return useMutation({
-		mutationFn: (variables: GeneratedInsertPlanRequirementMutationVariables) =>
-			graphQLClient.request(InsertPlanRequirementDocument, variables),
-	});
-}
-
-export function useUpdatePlanRequirementMutation() {
-	return useMutation({
-		mutationFn: (variables: GeneratedUpdatePlanRequirementMutationVariables) =>
-			graphQLClient.request(UpdatePlanRequirementDocument, variables),
-	});
-}
-
-export function useDeletePlanRequirementMutation() {
-	return useMutation({
-		mutationFn: (variables: GeneratedDeletePlanRequirementMutationVariables) =>
-			graphQLClient.request(DeletePlanRequirementDocument, variables),
-	});
-}
-
-export function useInsertPlanWorkoutMutation() {
-	return useMutation({
-		mutationFn: (variables: GeneratedInsertPlanWorkoutMutationVariables) =>
-			graphQLClient.request(InsertPlanWorkoutDocument, variables),
-	});
-}
-
-export function useUpdatePlanWorkoutMutation() {
-	return useMutation({
-		mutationFn: (variables: GeneratedUpdatePlanWorkoutMutationVariables) =>
-			graphQLClient.request(UpdatePlanWorkoutDocument, variables),
-	});
-}
-
-export function useDeletePlanWorkoutMutation() {
-	return useMutation({
-		mutationFn: (variables: GeneratedDeletePlanWorkoutMutationVariables) =>
-			graphQLClient.request(DeletePlanWorkoutDocument, variables),
+		mutationFn: (variables: GeneratedDeleteWeekObjectiveMutationVariables) =>
+			graphQLClient.request(DeleteWeekObjectiveDocument, variables),
 	});
 }

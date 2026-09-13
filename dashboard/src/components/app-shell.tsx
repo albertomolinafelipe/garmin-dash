@@ -5,7 +5,6 @@ import { iconifyIcon } from "@/lib/activity-types";
 
 const CalendarDays = iconifyIcon("mdi:calendar-month");
 const Activity = iconifyIcon("mdi:format-list-bulleted");
-const Target = iconifyIcon("material-symbols:target");
 const Settings = iconifyIcon("mdi:cog");
 const Megaphone = iconifyIcon("mdi:bullhorn");
 const ChevronDown = iconifyIcon("mdi:chevron-down");
@@ -47,7 +46,6 @@ const NAV = [
 	{ to: "/overview", label: "Overview", icon: LayoutDashboard },
 	{ to: "/calendar", label: "Calendar", icon: CalendarDays },
 	{ to: "/activities", label: "Activities", icon: Activity },
-	{ to: "/plans", label: "Plans", icon: Target },
 	{ to: "/settings", label: "Settings", icon: Settings },
 ];
 

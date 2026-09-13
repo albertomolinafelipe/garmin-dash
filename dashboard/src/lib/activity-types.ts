@@ -27,6 +27,7 @@ export function iconifyIcon(name: string): IconComponent {
 export type Category =
 	| "running"
 	| "climbing"
+	| "skiing"
 	| "strength"
 	| "hiking"
 	| "swimming"
@@ -37,6 +38,7 @@ export type Category =
 export const CATEGORY_ORDER: Category[] = [
 	"running",
 	"climbing",
+	"skiing",
 	"strength",
 	"hiking",
 	"swimming",
@@ -98,6 +100,7 @@ export function categoryOf(
 	if (at.includes("running")) return "running";
 	if (at.includes("swimming")) return "swimming";
 	if (at.includes("cycling") || at.includes("biking")) return "cycling";
+	if (at.includes("ski")) return "skiing";
 	if (["hiking", "mountaineering", "walking"].includes(at)) return "hiking";
 	if (at.includes("strength")) return "strength";
 	return "other";
@@ -198,6 +201,7 @@ export function typeLabel(
 export const categoryIcon: Record<Category, IconComponent> = {
 	running: iconifyIcon("mdi:run"),
 	climbing: iconifyIcon("mdi:rock-climbing"),
+	skiing: iconifyIcon("mdi:ski"),
 	strength: iconifyIcon("mdi:weights"),
 	hiking: iconifyIcon("mdi:pine-tree"),
 	swimming: iconifyIcon("mdi:swim"),
@@ -210,6 +214,7 @@ export const categoryIcon: Record<Category, IconComponent> = {
 export const categoryColor: Record<Category, string> = {
 	running: "#658594", // dragonBlue
 	climbing: "#DCA561", // autumnYellow
+	skiing: "#A3D4D5", // waveAqua1
 	strength: "#C34043", // autumnRed
 	hiking: "#76946A", // autumnGreen
 	swimming: "#7AA89F", // waveAqua2

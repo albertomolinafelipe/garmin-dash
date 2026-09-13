@@ -114,16 +114,6 @@ mutation DeleteExercise($id: bigint!) {
   }
 }
 
-query Plans {
-  plans(order_by: {start_week: desc}) {
-    id
-    name
-    start_week
-    end_week
-    notes
-  }
-}
-
 query Races {
   races(order_by: {date: desc}) {
     id
@@ -152,106 +142,87 @@ mutation DeleteRace($id: bigint!) {
   }
 }
 
-query Plan($id: bigint!) {
-  plans_by_pk(id: $id) {
-    id
-    name
-    start_week
-    end_week
-    notes
-    requirements(order_by: {week: asc}) {
-      id
-      week
-      sport
-      metric
-      target
-      notes
-    }
-    workouts(order_by: {week: asc}) {
-      id
-      week
-      day_of_week
-      sport
-      title
-      description
-    }
+query Sports {
+  sports(order_by: {sort_order: asc}) {
+    value
+    label
   }
 }
 
-mutation InsertPlan($object: plans_insert_input!) {
-  insert_plans_one(object: $object) {
+query DayPlans {
+  day_plans(order_by: {date: asc}) {
+    id
+    date
+    sport
+    note
+  }
+}
+
+mutation InsertDayPlan($object: day_plans_insert_input!) {
+  insert_day_plans_one(object: $object) {
     id
   }
 }
 
-mutation UpdatePlan($id: bigint!, $set: plans_set_input!) {
-  update_plans_by_pk(pk_columns: {id: $id}, _set: $set) {
+mutation UpdateDayPlan($id: bigint!, $set: day_plans_set_input!) {
+  update_day_plans_by_pk(pk_columns: {id: $id}, _set: $set) {
     id
   }
 }
 
-mutation DeletePlan($id: bigint!) {
-  delete_plans_by_pk(id: $id) {
+mutation DeleteDayPlan($id: bigint!) {
+  delete_day_plans_by_pk(id: $id) {
     id
   }
 }
 
-mutation InsertPlanRequirement($object: plan_requirements_insert_input!) {
-  insert_plan_requirements_one(object: $object) {
-    id
+query WeekNotes {
+  week_notes(order_by: {week: asc}) {
+    week
+    note
   }
 }
 
-mutation UpdatePlanRequirement($id: bigint!, $set: plan_requirements_set_input!) {
-  update_plan_requirements_by_pk(pk_columns: {id: $id}, _set: $set) {
-    id
+mutation UpsertWeekNote($object: week_notes_insert_input!) {
+  insert_week_notes_one(
+    object: $object
+    on_conflict: {constraint: week_notes_pkey, update_columns: [note]}
+  ) {
+    week
   }
 }
 
-mutation DeletePlanRequirement($id: bigint!) {
-  delete_plan_requirements_by_pk(id: $id) {
-    id
+mutation DeleteWeekNote($week: String!) {
+  delete_week_notes_by_pk(week: $week) {
+    week
   }
 }
 
-query AllPlanRequirements {
-  plan_requirements(order_by: {week: asc}) {
+query WeekObjectives {
+  week_objectives(order_by: {week: asc}) {
     id
-    plan_id
     week
     sport
     metric
     target
+    notes
   }
 }
 
-query AllPlanWorkouts {
-  plan_workouts(order_by: {week: asc}) {
-    id
-    plan_id
-    week
-    day_of_week
-    sport
-    title
-    description
-    completed_at
-  }
-}
-
-mutation InsertPlanWorkout($object: plan_workouts_insert_input!) {
-  insert_plan_workouts_one(object: $object) {
+mutation InsertWeekObjective($object: week_objectives_insert_input!) {
+  insert_week_objectives_one(object: $object) {
     id
   }
 }
 
-mutation UpdatePlanWorkout($id: bigint!, $set: plan_workouts_set_input!) {
-  update_plan_workouts_by_pk(pk_columns: {id: $id}, _set: $set) {
+mutation UpdateWeekObjective($id: bigint!, $set: week_objectives_set_input!) {
+  update_week_objectives_by_pk(pk_columns: {id: $id}, _set: $set) {
     id
   }
 }
 
-mutation DeletePlanWorkout($id: bigint!) {
-  delete_plan_workouts_by_pk(id: $id) {
+mutation DeleteWeekObjective($id: bigint!) {
+  delete_week_objectives_by_pk(id: $id) {
     id
   }
 }
