@@ -1,3 +1,8 @@
+-- timescaledb is a trusted extension, so the migration role can install it.
+-- postgis is NOT trusted and needs a superuser, which the migration role is
+-- not: create it once per environment before migrating (see README, "Database
+-- bootstrap"). Once it exists this statement is a no-op the migration role is
+-- allowed to run, so the migration stays portable.
 CREATE EXTENSION IF NOT EXISTS timescaledb;
 CREATE EXTENSION IF NOT EXISTS postgis;
 
@@ -120,7 +125,9 @@ SELECT
   max(recorded_at) AS ended_at,
   max(elapsed_s) - min(elapsed_s) AS duration_s,
   max(distance_m) - min(distance_m) AS length_m,
-  max(altitude_m) - min(altitude_m) AS elevation_delta_m,
+  -- Signed: last minus first, not max minus min, so a descent reads negative.
+  last(altitude_m, recorded_at) - first(altitude_m, recorded_at)
+    AS elevation_delta_m,
   ST_MakeLine(geom ORDER BY recorded_at) AS geom
 FROM islands
 GROUP BY activity_id, band, island
