@@ -17,10 +17,20 @@
               nhost-cli
               nodejs_22
               docker-client
+              python312
+              python312Packages.pip
+              python312Packages.venvShellHook
+              ruff
             ];
 
-            shellHook = ''
-              echo "garmin-nhost shell: nhost $(nhost --version | tail -n1), node $(node --version)"
+            venvDir = ".venv";
+            postVenvCreation = ''
+              unset SOURCE_DATE_EPOCH
+              pip install -r sync/requirements.txt
+            '';
+            postShellHook = ''
+              unset SOURCE_DATE_EPOCH
+              echo "garmin-nhost shell: nhost $(nhost --version | tail -n1), node $(node --version), python $(python --version)"
             '';
           };
         });

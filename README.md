@@ -12,14 +12,14 @@ Hasura), annotated and planned through a React dashboard.
 | Path                | What it is                                              |
 | ------------------- | ------------------------------------------------------- |
 | `dashboard/`        | React + Vite SPA, deployed as an Nhost Run service       |
+| `sync/`             | Garmin -> Postgres CLI (`make sync`, `make backfill`)    |
 | `nhost/migrations/` | Postgres migrations (`nhost.toml` is the project config) |
 | `nhost/metadata/`   | Hasura table metadata and permissions                    |
 | `flake.nix`         | Dev shell pinning the Nhost CLI, Node and Docker client  |
 
-There is no sync service in the repo. It previously ran as an Nhost Run service
-(`ondra`) that Hasura called through a remote schema; Garmin rate-limits made
-that unworkable and it was removed. The ingestion contract it used is documented
-under [Rebuilding the sync](#rebuilding-the-sync) so it can be rebuilt as a CLI.
+Sync is a local CLI (`sync/`), run by hand via `make`. It previously ran as an
+Nhost Run service (`ondra`) that Hasura called through a remote schema; Garmin
+rate-limits made that unworkable.
 
 ## Getting started
 
@@ -77,8 +77,11 @@ Written by the sync, read-only in the dashboard.
 
 - **`activities`** — one row per Garmin activity, keyed by `garmin_activity_id`.
   Mixes synced columns with user-owned annotation columns (see below).
-- **`activity_streams`** — one row per activity, `payload` jsonb holding the
-  downsampled HR / elevation / GPS series.
+- **`activity_samples`** — full-resolution stream, one row per FIT record.
+  See [Samples](#samples).
+- **`activity_streams`** — the older jsonb payload of independently downsampled
+  HR / elevation / GPS series. Still what the dashboard reads; superseded by
+  `activity_samples` and dropped once the backfill is verified.
 - **`sleep`**, **`daily_hrv`**, **`training_readiness`** — one row per
   `calendar_date`.
 
@@ -98,67 +101,104 @@ Written by the sync, read-only in the dashboard.
 ISO weeks are stored as `'2026-W03'` text, CHECK-constrained. They sort
 lexicographically in chronological order, which the calendar relies on.
 
-## Rebuilding the sync
+## Sync
 
-The old service pulled from Garmin with `garminconnect` + `garth`, parsed FIT
-files with `fitdecode`, and wrote to Hasura over GraphQL. A CLI only needs the
-Hasura admin secret and a Garmin session — the FastAPI/Strawberry layer and the
-remote-schema wiring exist only because it had to be callable from Hasura.
+`sync/` is a small CLI. It talks to Postgres directly rather than through
+Hasura — sample volume makes `COPY` the only sensible transport, and it runs
+locally as a trusted tool. Configure it with the `sync` block in `.env`.
 
-### Write contract
-
-Upsert with `on_conflict` against these constraints, and **restrict
-`update_columns` to synced columns** so re-syncing never clobbers annotations:
-
-| Table                 | Constraint                                       |
-| --------------------- | ------------------------------------------------ |
-| `activities`          | `activities_garmin_activity_id_key`              |
-| `activity_streams`    | `activity_streams_activity_id_key`               |
-| `sleep`               | `sleep_calendar_date_key`                        |
-| `daily_hrv`           | `daily_hrv_calendar_date_key`                    |
-| `training_readiness`  | `training_readiness_calendar_date_timestamp_key` |
-
-Synced columns for `activities`: `activity_type`, `start_time`, `duration_s`,
-`distance_m`, `avg_hr`, `max_hr`, `elevation_gain_m`, `calories`,
-`avg_speed_mps`, `avg_power_w`, `start_lat`, `start_lng`, `synced_at`.
-
-`start_lat` doubles as the dashboard's "has GPS" flag — the calendar only offers
-a hover preview when it is non-null.
-
-### Stream payload
-
-`activity_streams.payload` is currently:
-
-```jsonc
-{
-  "hr":        [{ "t": 0, "v": 132 }],   // t = seconds elapsed from start
-  "elevation": [{ "t": 0, "v": 1840 }],  // v = metres
-  "track":     [{ "lat": 42.6, "lng": 0.7 }]
-}
+```sh
+make sync                      # recent activities + sleep/HRV/readiness
+make sync ARGS="--limit 50"    # look further back
+make sync-activities           # activities only
+make test                      # unit tests
 ```
 
-Series are downsampled independently — HR and elevation bucket-averaged to 400
-points, track uniformly thinned to 800.
+First run needs `GARMIN_EMAIL` / `GARMIN_PASSWORD` to create the garth token
+cache in `GARTH_DIR`. After that the tokens refresh silently and the
+credentials can be removed.
 
-**Worth changing when you rebuild.** Two known limitations follow from that
-shape:
+Each activity is committed on its own, so a run that is interrupted or
+rate-limited keeps everything it already finished. `REQUEST_DELAY_S` throttles
+the pause between Garmin requests.
 
-1. **No distance per sample.** Elevation can only be plotted against time, so
-   profiles stretch on climbs and compress on descents. FIT `record` messages
-   carry a cumulative `distance` field that the old parser never read.
-2. **`track` points have no `t`.** Because track and elevation are thinned
-   separately they cannot be joined afterwards, so the detail page approximates
-   the hovered map marker by *fraction* of the way through the route.
+### The annotation rule
 
-Emitting one unified, once-downsampled record array fixes both:
+`activities` mixes synced columns with user-authored ones (`name`, `feeling`,
+`effort`, `notes`, `focus`, ...). Those exist nowhere else — Garmin has never
+seen them — so overwriting them is unrecoverable.
 
-```jsonc
-{ "records": [{ "t": 0, "d": 0, "alt": 1840, "hr": 132, "lat": 42.6, "lng": 0.7 }] }
+Upserts therefore list only `db.ACTIVITY_SYNCED_COLUMNS` in `DO UPDATE`.
+`name` and `subtype` are seeded on first insert and never updated again.
+`test_upserts_never_overwrite_user_columns` guards this; if you add an
+annotation column, add it to `ANNOTATION_COLUMNS` in the test too.
+
+### Samples
+
+`activity_samples` is a TimescaleDB hypertable holding one row per FIT record —
+nothing is downsampled, and every channel shares a timestamp:
+
+| column        | notes                                       |
+| ------------- | ------------------------------------------- |
+| `recorded_at` | hypertable time dimension                   |
+| `elapsed_s`   | seconds since the activity's first record   |
+| `hr`          | bpm                                         |
+| `altitude_m`  | metres                                      |
+| `distance_m`  | **cumulative** metres, straight from the FIT |
+| `geom`        | PostGIS `Point(4326)`, null when indoors     |
+
+Because distance and altitude now share a row, elevation can be plotted against
+*distance* rather than time, which is what stops profiles stretching on climbs.
+
+Time in an arbitrary HR range is a plain query — no zone table, because the
+bands are whatever you ask for at query time:
+
+```sql
+SELECT sum(delta) FROM (
+  SELECT recorded_at - lag(recorded_at) OVER (ORDER BY recorded_at) AS delta, hr
+  FROM activity_samples WHERE activity_id = $1
+) s WHERE hr BETWEEN 150 AND 160;
 ```
 
-Consumers: `dashboard/src/lib/queries.ts` (`ActivityStreamPayload`),
-`pages/ActivityDetail.tsx` (chart + map) and
-`components/calendar/elevation-sparkline.tsx`.
+### Gradient views
+
+`activity_sample_grades` adds a `grade_pct` per sample, measured across a
+15-sample lookback — raw point-to-point gradient is meaningless because GPS
+altitude jitters by metres between consecutive seconds.
+
+`grade_band(grade_pct)` classifies that into a signed band: `0` flat, `1..5`
+uphill, `-1..-5` down, at 3/8/15/25/35%. `activity_grade_segments` collapses
+contiguous runs of one band into segments with their own `ST_MakeLine`
+geometry — the "this part was uphill 3" markers — dropping anything under 50 m
+so band flapping around a threshold does not produce slivers.
+
+All of this is derived on read. Retuning a threshold is an edit to
+`grade_band`, never a re-sync.
+
+### Backfill (delete when done)
+
+`backfill` fetches full-resolution samples for GPS activities recorded before
+`activity_samples` existed.
+
+```sh
+make backfill-dry                 # list candidates, fetch nothing
+make backfill                     # run it
+make backfill ARGS="--limit 25"   # a bounded first pass
+```
+
+It is deliberately narrow: candidates come from the database
+(`start_lat IS NOT NULL AND samples_synced_at IS NULL`, so no Garmin requests
+to plan), it writes only `activity_samples`, and the one column it touches on
+`activities` is `samples_synced_at`. It never writes summaries or annotations.
+Re-running is safe — each activity's samples are replaced wholesale, and
+finished activities are skipped.
+
+Expect it to take several sessions and to hit rate limits. Rerun it; it resumes.
+
+**Once verified**, three cleanups remain, in order: point the dashboard at
+`activity_samples`, drop `activity_streams` and its jsonb payload, then delete
+the `backfill` command. Until then `activity_streams` is still the only thing
+the dashboard reads, and nothing reads `activity_samples`.
 
 ## Notes
 
