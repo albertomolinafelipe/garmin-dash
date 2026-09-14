@@ -1,10 +1,12 @@
--- timescaledb is a trusted extension, so the migration role can install it.
--- postgis is NOT trusted and needs a superuser, which the migration role is
--- not: create it once per environment before migrating (see README, "Database
--- bootstrap"). Once it exists this statement is a no-op the migration role is
--- allowed to run, so the migration stays portable.
+-- timescaledb is trusted, so the migration role installs it directly. postgis
+-- is not, and migrations run as nhost_hasura rather than a superuser; that role
+-- is a member of postgres, so it can borrow the privilege for one statement.
+-- Without SET ROLE this fails with "permission denied to create extension".
 CREATE EXTENSION IF NOT EXISTS timescaledb;
+
+SET ROLE postgres;
 CREATE EXTENSION IF NOT EXISTS postgis;
+RESET ROLE;
 
 -- Full-resolution activity stream: one row per FIT record message, every
 -- channel sharing a single timestamp. This replaces activity_streams.payload,

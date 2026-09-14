@@ -69,23 +69,13 @@ nhost config apply --subdomain <subdomain>   # nhost.toml
 # migrations + metadata: via the Nhost dashboard or CLI
 ```
 
-### Database bootstrap
+### Extensions
 
-**Once per environment, before migrating.** Migrations run as `nhost_hasura`,
-which is not a superuser. `timescaledb` is a trusted extension so it installs
-fine, but `postgis` is not and must be created by a superuser first:
-
-```sh
-# local (the stack's postgres role is a superuser)
-docker exec -i garmin-postgres-1 \
-  psql -U postgres -d local -c 'CREATE EXTENSION IF NOT EXISTS postgis;'
-
-# cloud: same statement, connected as the admin role from the Nhost dashboard
-```
-
-Skipping this makes migrations fail with `permission denied to create extension
-"postgis"`. Once it exists the migration's `CREATE EXTENSION IF NOT EXISTS` is
-a no-op that `nhost_hasura` is allowed to run.
+Migrations run as `nhost_hasura`, which is not a superuser. `timescaledb` is a
+trusted extension and installs directly; `postgis` is not, so the migration
+wraps it in `SET ROLE postgres` — `nhost_hasura` is a member of that role and
+can borrow the privilege for one statement. No manual bootstrap is needed, but
+dropping the `SET ROLE` would fail with `permission denied to create extension`.
 
 ## Data model
 
