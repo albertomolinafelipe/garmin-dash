@@ -7,36 +7,42 @@ import {
 	useState,
 } from "react";
 import { useSearchParams } from "react-router-dom";
-import { CalendarDays, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 
-import { AddObjectiveSheet } from "@/components/add-objective-sheet";
-import { AddDayPlanSheet } from "@/components/add-day-plan-sheet";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { SelectableCell } from "@/components/calendar/cell";
+import {
+	DayPlanDialog,
+	type DayPlanTarget,
+} from "@/components/calendar/day-plan-dialog";
+import { DayPlans } from "@/components/calendar/day-plans";
+import {
+	dayDropProps,
+	DayPlanDndProvider,
+	useDayPlanDnd,
+} from "@/components/calendar/dnd";
+import { DayEvent, DayRaces } from "@/components/calendar/events";
 import {
 	addDays,
-	computeWeekTotals,
-	DayEvent,
 	type DayPlan,
-	DayRaces,
-	dayDropProps,
-	DayPlans,
-	indexRaces,
-	indexObjectives,
-	indexDayPlans,
-	DayPlanDndProvider,
-	type Race,
-	useDayPlanDnd,
 	startOfWeek,
-	TotalRow,
-	WeekObjectives,
 	WEEKDAYS,
-} from "@/components/calendar-week";
+} from "@/components/calendar/model";
 import {
-	useDayPlansQuery,
-	useRacesQuery,
-	useWeekObjectivesQuery,
-} from "@/graphql/hooks";
+	ObjectiveDialog,
+	type ObjectiveTarget,
+} from "@/components/calendar/objective-dialog";
+import {
+	indexActivitiesByDay,
+	useCalendarData,
+} from "@/components/calendar/use-calendar-data";
+import {
+	TotalRow,
+	WeekNotePreview,
+	WeekObjectives,
+} from "@/components/calendar/week-column";
+import { WeekNoteDialog } from "@/components/calendar/week-note-dialog";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { toIsoWeek } from "@/lib/plans";
 import {
 	type Category,
@@ -46,7 +52,6 @@ import {
 	categoryOf,
 } from "@/lib/activity-types";
 import { dayKey } from "@/lib/format";
-import { type CalendarActivity, useActivities } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 
 export function Calendar() {
@@ -74,7 +79,7 @@ function ScrollableDayCell({
 	className,
 	contentClassName,
 	...props
-}: ComponentProps<"div"> & { contentClassName?: string }) {
+}: ComponentProps<typeof SelectableCell>) {
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const [hasMoreBelow, setHasMoreBelow] = useState(false);
 	const updateShadow = useCallback(() => {
@@ -95,7 +100,11 @@ function ScrollableDayCell({
 	});
 
 	return (
-		<div className={cn("relative min-h-0 min-w-0", className)} {...props}>
+		<SelectableCell
+			className={cn("min-h-0 min-w-0", className)}
+			contentClassName="h-full"
+			{...props}
+		>
 			<div
 				ref={scrollRef}
 				onScroll={updateShadow}
@@ -109,7 +118,7 @@ function ScrollableDayCell({
 			{hasMoreBelow ? (
 				<div className="pointer-events-none absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-black/20 to-transparent dark:from-black/40" />
 			) : null}
-		</div>
+		</SelectableCell>
 	);
 }
 
@@ -126,48 +135,29 @@ function CalendarInner() {
 		);
 	const [filter, setFilter] = useState<Category | null>(null);
 	const dnd = useDayPlanDnd();
-	const { data, isLoading } = useActivities();
-	const { data: dayPlans } = useDayPlansQuery();
-	const { data: objectives } = useWeekObjectivesQuery();
-	const { data: races } = useRacesQuery();
-	const [planDay, setPlanDay] = useState<Date | null>(null);
-	const [objectiveWeek, setObjectiveWeek] = useState<string | null>(null);
+	const {
+		activities,
+		isLoading,
+		dayPlansByDay,
+		objectivesByWeek,
+		noteByWeek,
+		racesByDay,
+		totalsByWeekStart,
+		activitiesByWeek,
+	} = useCalendarData();
+	const [planTarget, setPlanTarget] = useState<DayPlanTarget | null>(null);
+	const [objectiveTarget, setObjectiveTarget] =
+		useState<ObjectiveTarget | null>(null);
+	const [noteWeek, setNoteWeek] = useState<string | null>(null);
 
-	const activities = data?.activities ?? [];
-	const dayPlansByDay = useMemo(
-		() => indexDayPlans((dayPlans ?? []) as DayPlan[]),
-		[dayPlans],
+	const byDay = useMemo(
+		() =>
+			indexActivitiesByDay(
+				activities,
+				(a) => !filter || categoryOf(a.activity_type, a.subtype) === filter,
+			),
+		[activities, filter],
 	);
-	const racesByDay = useMemo(
-		() => indexRaces((races ?? []) as Race[]),
-		[races],
-	);
-	const objectivesByWeek = useMemo(
-		() => indexObjectives(objectives ?? []),
-		[objectives],
-	);
-	const activitiesByWeek = useMemo(() => {
-		const map = new Map<string, CalendarActivity[]>();
-		for (const a of activities) {
-			if (!a.start_time) continue;
-			const key = toIsoWeek(new Date(a.start_time));
-			(map.get(key) ?? map.set(key, []).get(key))?.push(a);
-		}
-		return map;
-	}, [activities]);
-
-	const byDay = useMemo(() => {
-		const map = new Map<string, CalendarActivity[]>();
-		for (const a of activities) {
-			if (!a.start_time) continue;
-			if (filter && categoryOf(a.activity_type, a.subtype) !== filter) continue;
-			const key = dayKey(new Date(a.start_time));
-			(map.get(key) ?? map.set(key, []).get(key))?.push(a);
-		}
-		return map;
-	}, [activities, filter]);
-
-	const totals = useMemo(() => computeWeekTotals(activities), [activities]);
 
 	const weeks = useMemo(() => {
 		const first = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
@@ -192,10 +182,15 @@ function CalendarInner() {
 
 	return (
 		<div className="flex h-full min-h-[520px] flex-col gap-4 p-4">
-			<AddDayPlanSheet day={planDay} onClose={() => setPlanDay(null)} />
-			<AddObjectiveSheet
-				week={objectiveWeek}
-				onClose={() => setObjectiveWeek(null)}
+			<DayPlanDialog target={planTarget} onClose={() => setPlanTarget(null)} />
+			<ObjectiveDialog
+				target={objectiveTarget}
+				onClose={() => setObjectiveTarget(null)}
+			/>
+			<WeekNoteDialog
+				week={noteWeek}
+				note={noteWeek ? noteByWeek.get(noteWeek) : undefined}
+				onClose={() => setNoteWeek(null)}
 			/>
 			{/* Toolbar */}
 			<div className="relative flex flex-wrap items-center justify-between gap-3">
@@ -293,6 +288,8 @@ function CalendarInner() {
 											<ScrollableDayCell
 												key={dayKey(day)}
 												{...dayDropProps(dnd, day)}
+												label={`Add plan on ${day.toLocaleDateString()}`}
+												onSelect={() => setPlanTarget({ day })}
 												className={cn(
 													"border-r last:border-r-0",
 													offMonth &&
@@ -301,28 +298,11 @@ function CalendarInner() {
 											>
 												<div
 													className={cn(
-														"bg-card sticky top-0 z-10 flex items-center justify-end gap-0.5 px-1 pt-1 pb-0.5",
-														offMonth &&
-															"bg-[color-mix(in_oklab,var(--muted)_30%,var(--card))]",
+														"text-muted-foreground px-1 pt-1 pb-0.5 text-right text-xs",
+														offMonth && "opacity-50",
 													)}
 												>
-													<Button
-														variant="ghost"
-														size="icon"
-														className="text-muted-foreground size-5 opacity-50 hover:opacity-100"
-														aria-label={`Add plan on ${day.toLocaleDateString()}`}
-														onClick={() => setPlanDay(day)}
-													>
-														<Plus className="size-3" />
-													</Button>
-													<div
-														className={cn(
-															"text-muted-foreground text-right text-xs",
-															offMonth && "opacity-50",
-														)}
-													>
-														{day.getDate()}
-													</div>
+													{day.getDate()}
 												</div>
 												<div className="flex min-h-0 flex-1 flex-col p-1 pt-0">
 													<div className="mt-2 flex flex-col gap-1">
@@ -341,7 +321,13 @@ function CalendarInner() {
 															/>
 														))}
 													</div>
-													<DayPlans day={day} byDay={dayPlansByDay} />
+													<DayPlans
+														day={day}
+														byDay={dayPlansByDay}
+														onEdit={(plan: DayPlan) =>
+															setPlanTarget({ day, plan })
+														}
+													/>
 												</div>
 											</ScrollableDayCell>
 										);
@@ -360,29 +346,23 @@ function CalendarInner() {
 
 					<div className="flex min-h-0 flex-1 flex-col">
 						{weeks.map((w) => {
-							const t = totals.get(dayKey(w));
+							const week = toIsoWeek(w);
+							const t = totalsByWeekStart.get(dayKey(w));
 							return (
 								<ScrollableDayCell
 									key={dayKey(w)}
+									label={`Edit note for ${week}`}
+									onSelect={() => setNoteWeek(week)}
 									className="min-h-0 flex-1 border-b last:border-b-0"
 									contentClassName="gap-1 p-2"
 								>
-									<Button
-										variant="ghost"
-										size="icon"
-										className="text-muted-foreground absolute top-1 right-1 size-5 opacity-50 hover:opacity-100"
-										aria-label={`Add objective for ${toIsoWeek(w)}`}
-										onClick={() => setObjectiveWeek(toIsoWeek(w))}
-									>
-										<Plus className="size-3" />
-									</Button>
 									<div className="flex items-start gap-1.5">
 										<categoryIcon.running
 											size={12}
 											className="mt-0.5 shrink-0"
 											style={{ color: categoryColor.running }}
 										/>
-										<div className="flex min-w-0 items-baseline gap-1 whitespace-nowrap leading-tight">
+										<div className="flex min-w-0 items-baseline gap-1 leading-tight whitespace-nowrap">
 											<span
 												className={cn(
 													"text-xs font-semibold",
@@ -407,9 +387,14 @@ function CalendarInner() {
 										value={`${(t?.weightsH ?? 0).toFixed(1)} h`}
 										zero={!t?.weightsH}
 									/>
+									<WeekNotePreview note={noteByWeek.get(week)} />
 									<WeekObjectives
-										objectives={objectivesByWeek.get(toIsoWeek(w)) ?? []}
-										activities={activitiesByWeek.get(toIsoWeek(w)) ?? []}
+										objectives={objectivesByWeek.get(week) ?? []}
+										activities={activitiesByWeek.get(week) ?? []}
+										onAdd={() => setObjectiveTarget({ week })}
+										onEdit={(objective) =>
+											setObjectiveTarget({ week, objective })
+										}
 									/>
 								</ScrollableDayCell>
 							);

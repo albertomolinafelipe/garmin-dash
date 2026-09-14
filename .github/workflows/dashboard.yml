@@ -53,6 +53,7 @@ jobs:
             VITE_HASURA_GRAPHQL_ENDPOINT=${{ vars.VITE_HASURA_GRAPHQL_ENDPOINT }}
             VITE_NHOST_AUTH_URL=${{ vars.VITE_NHOST_AUTH_URL }}
             VITE_MAPTILER_KEY=${{ secrets.VITE_MAPTILER_KEY }}
+            VITE_STADIA_API_KEY=${{ secrets.VITE_STADIA_API_KEY }}
 
       - uses: nhost-actions/install-nhost-cli@v1
 

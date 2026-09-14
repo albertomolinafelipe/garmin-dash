@@ -21,6 +21,7 @@ query CalendarActivities {
     duration_s
     distance_m
     elevation_gain_m
+    start_lat
     feeling
     effort
     caffeine

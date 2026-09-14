@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -12,17 +12,20 @@ import {
 	SelectTrigger,
 } from "@/components/ui/select";
 import {
-	Sheet,
-	SheetContent,
-	SheetDescription,
-	SheetFooter,
-	SheetHeader,
-	SheetTitle,
-} from "@/components/ui/sheet";
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
 import {
+	useDeleteWeekObjectiveMutation,
 	useInsertWeekObjectiveMutation,
 	useSportsQuery,
+	useUpdateWeekObjectiveMutation,
 } from "@/graphql/hooks";
+import type { WeekObjective } from "./model";
 import {
 	ALL_SPORTS,
 	type Metric,
@@ -31,18 +34,27 @@ import {
 	sportIcon,
 } from "@/lib/plans";
 
-// Adds a measurable weekly target to `week`. ALL_SPORTS stores NULL, meaning
-// the objective spans every sport.
-export function AddObjectiveSheet({
-	week,
+// Open on a week to add an objective, or on an existing one to edit it.
+export interface ObjectiveTarget {
+	week: string;
+	objective?: WeekObjective;
+}
+
+// A measurable weekly target. ALL_SPORTS stores NULL, meaning the objective
+// spans every sport.
+export function ObjectiveDialog({
+	target: dialogTarget,
 	onClose,
 }: {
-	week: string | null;
+	target: ObjectiveTarget | null;
 	onClose: () => void;
 }) {
 	const queryClient = useQueryClient();
 	const insert = useInsertWeekObjectiveMutation();
+	const update = useUpdateWeekObjectiveMutation();
+	const remove = useDeleteWeekObjectiveMutation();
 	const { data: sports } = useSportsQuery();
+	const editing = dialogTarget?.objective;
 	const [sport, setSport] = useState(ALL_SPORTS);
 	const [metric, setMetric] = useState<string>(METRICS[0]);
 	const [target, setTarget] = useState<number | null>(null);
@@ -50,45 +62,71 @@ export function AddObjectiveSheet({
 	const SportIcon = sportIcon(sport === ALL_SPORTS ? null : sport);
 	const sportLabel =
 		sports?.find((s) => s.value === sport)?.label ?? "All sports";
+	const busy = insert.isPending || update.isPending || remove.isPending;
+	const saveLabel = editing ? "Save" : "Add objective";
 
-	const resetAndClose = () => {
-		setSport(ALL_SPORTS);
-		setMetric(METRICS[0]);
-		setTarget(null);
-		onClose();
-	};
+	// Seed the form whenever the dialog opens on a different target. Stored targets
+	// are in base units, so convert back to the unit the form edits in.
+	useEffect(() => {
+		if (!dialogTarget) return;
+		const o = dialogTarget.objective;
+		setSport(o?.sport ?? ALL_SPORTS);
+		setMetric(o?.metric ?? METRICS[0]);
+		setTarget(
+			o ? METRIC_META[o.metric as Metric].fromBase(Number(o.target)) : null,
+		);
+	}, [dialogTarget]);
 
 	const save = async () => {
-		if (!week || target === null || insert.isPending) return;
+		if (!dialogTarget || target === null || busy) return;
+		const fields = {
+			sport: sport === ALL_SPORTS ? null : sport,
+			metric,
+			target: meta.toBase(target),
+		};
 		try {
-			await insert.mutateAsync({
-				object: {
-					week,
-					sport: sport === ALL_SPORTS ? null : sport,
-					metric,
-					target: meta.toBase(target),
-				},
-			});
+			if (editing) {
+				await update.mutateAsync({ id: editing.id, set: fields });
+			} else {
+				await insert.mutateAsync({
+					object: { week: dialogTarget.week, ...fields },
+				});
+			}
 			await queryClient.invalidateQueries({ queryKey: ["week-objectives"] });
-			resetAndClose();
+			onClose();
 		} catch {
-			toast.error("Could not add the objective");
+			toast.error("Could not save the objective");
+		}
+	};
+
+	const destroy = async () => {
+		if (!editing || busy) return;
+		try {
+			await remove.mutateAsync({ id: editing.id });
+			await queryClient.invalidateQueries({ queryKey: ["week-objectives"] });
+			onClose();
+		} catch {
+			toast.error("Could not delete the objective");
 		}
 	};
 
 	return (
-		<Sheet
-			open={week !== null}
-			onOpenChange={(open) => !open && resetAndClose()}
+		<Dialog
+			open={dialogTarget !== null}
+			onOpenChange={(open) => !open && onClose()}
 		>
-			<SheetContent side="right" className="gap-5 sm:max-w-md">
-				<SheetHeader>
-					<SheetTitle>Add objective</SheetTitle>
-					<SheetDescription>
-						{week ? `Weekly target for ${week}` : "Select a week"}
-					</SheetDescription>
-				</SheetHeader>
-				<div className="flex flex-col gap-4 px-4">
+			<DialogContent className="sm:max-w-md">
+				<DialogHeader>
+					<DialogTitle>
+						{editing ? "Edit objective" : "Add objective"}
+					</DialogTitle>
+					<DialogDescription>
+						{dialogTarget
+							? `Weekly target for ${dialogTarget.week}`
+							: "Select a week"}
+					</DialogDescription>
+				</DialogHeader>
+				<div className="flex flex-col gap-4">
 					<div className="flex flex-col gap-2">
 						<Label>Sport</Label>
 						<Select value={sport} onValueChange={setSport}>
@@ -165,18 +203,28 @@ export function AddObjectiveSheet({
 						</div>
 					</div>
 				</div>
-				<SheetFooter>
-					<Button
-						disabled={target === null || insert.isPending}
-						onClick={() => void save()}
-					>
-						{insert.isPending ? "Saving…" : "Add objective"}
-					</Button>
-					<Button variant="ghost" onClick={resetAndClose}>
+				<DialogFooter>
+					{editing ? (
+						<Button
+							variant="ghost"
+							className="text-destructive sm:mr-auto"
+							disabled={busy}
+							onClick={() => void destroy()}
+						>
+							Delete
+						</Button>
+					) : null}
+					<Button variant="ghost" onClick={onClose}>
 						Cancel
 					</Button>
-				</SheetFooter>
-			</SheetContent>
-		</Sheet>
+					<Button
+						disabled={target === null || busy}
+						onClick={() => void save()}
+					>
+						{busy ? "Saving…" : saveLabel}
+					</Button>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
 	);
 }

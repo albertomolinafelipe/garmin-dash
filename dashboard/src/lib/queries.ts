@@ -19,6 +19,9 @@ export interface CalendarActivity {
 	duration_s: number | string | null;
 	distance_m: number | string | null;
 	elevation_gain_m: number | string | null;
+	// Set only for GPS activities, so it tells us a route exists without fetching
+	// the much larger stream payload.
+	start_lat: number | string | null;
 	feeling: number | null;
 	effort: number | null;
 	caffeine: string | null;

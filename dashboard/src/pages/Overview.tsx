@@ -32,18 +32,17 @@ import {
 	ChartTooltip,
 	ChartTooltipContent,
 } from "@/components/ui/chart";
+import { DayPlanDndProvider } from "@/components/calendar/dnd";
 import {
 	addDays,
-	computeWeekTotals,
-	indexRaces,
-	indexDayPlans,
-	type DayPlan,
-	type WeekObjective,
-	DayPlanDndProvider,
-	type Race,
 	startOfWeek,
-	WeekStrip,
-} from "@/components/calendar-week";
+	type WeekObjective,
+} from "@/components/calendar/model";
+import {
+	indexActivitiesByDay,
+	useCalendarData,
+} from "@/components/calendar/use-calendar-data";
+import { WeekStrip } from "@/components/calendar/week-strip";
 import { categoryColor, categoryOf } from "@/lib/activity-types";
 import { dayKey, fmtDuration } from "@/lib/format";
 import {
@@ -54,11 +53,7 @@ import {
 	useReadiness,
 	useSleep,
 } from "@/lib/queries";
-import {
-	useDayPlansQuery,
-	useWeekObjectivesQuery,
-	useRacesQuery,
-} from "@/graphql/hooks";
+import { useWeekObjectivesQuery } from "@/graphql/hooks";
 import { type Metric, METRIC_META, type Sport, toIsoWeek } from "@/lib/plans";
 import { cn } from "@/lib/utils";
 
@@ -1083,42 +1078,25 @@ function ReadinessPanel() {
 // A slice of the calendar page pinned to the real current week (Mon–Sun).
 // Deliberately ignores WindowNav: this is a fixed "this week" snapshot.
 function WeekPanel({ className }: { className?: string }) {
-	const { data } = useActivities();
-	const { data: dayPlans } = useDayPlansQuery();
-	const { data: objectives } = useWeekObjectivesQuery();
-	const { data: races } = useRacesQuery();
-	const activities = data?.activities ?? [];
+	const {
+		activities,
+		dayPlansByDay,
+		objectivesByWeek,
+		noteByWeek,
+		racesByDay,
+		totalsByWeekStart,
+	} = useCalendarData();
 	const weekStart = useMemo(() => startOfWeek(new Date()), []);
-	const dayPlansByDay = useMemo(
-		() => indexDayPlans((dayPlans ?? []) as DayPlan[]),
-		[dayPlans],
-	);
-	const racesByDay = useMemo(
-		() => indexRaces((races ?? []) as Race[]),
-		[races],
-	);
-	const weekObjectives = useMemo(() => {
-		const iso = toIsoWeek(weekStart);
-		return (objectives ?? []).filter((o) => o.week === iso);
-	}, [objectives, weekStart]);
+	const week = toIsoWeek(weekStart);
 
 	const byDay = useMemo(() => {
-		const map = new Map<string, CalendarActivity[]>();
 		const startKey = dayKey(weekStart);
 		const endKey = dayKey(addDays(weekStart, 6));
-		for (const a of activities) {
-			if (!a.start_time) continue;
-			const key = dayKey(new Date(a.start_time));
-			if (key < startKey || key > endKey) continue;
-			(map.get(key) ?? map.set(key, []).get(key))?.push(a);
-		}
-		return map;
+		return indexActivitiesByDay(activities, (a) => {
+			const key = dayKey(new Date(a.start_time as string));
+			return key >= startKey && key <= endKey;
+		});
 	}, [activities, weekStart]);
-
-	const totals = useMemo(
-		() => computeWeekTotals(activities).get(dayKey(weekStart)),
-		[activities, weekStart],
-	);
 
 	return (
 		<div className={cn("min-h-0", className)}>
@@ -1128,8 +1106,9 @@ function WeekPanel({ className }: { className?: string }) {
 					byDay={byDay}
 					dayPlansByDay={dayPlansByDay}
 					racesByDay={racesByDay}
-					totals={totals}
-					objectives={weekObjectives}
+					totals={totalsByWeekStart.get(dayKey(weekStart))}
+					objectives={objectivesByWeek.get(week) ?? []}
+					weekNote={noteByWeek.get(week)}
 				/>
 			</DayPlanDndProvider>
 		</div>

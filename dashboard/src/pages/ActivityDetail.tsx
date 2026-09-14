@@ -51,6 +51,12 @@ import {
 	typeLabel,
 } from "@/lib/activity-types";
 import { fmtDate, fmtDistance, fmtDuration } from "@/lib/format";
+import {
+	STADIA_ATTRIBUTION,
+	STADIA_MAX_ZOOM,
+	STADIA_SATELLITE_TILE_URL,
+	STADIA_TERRAIN_TILE_URL,
+} from "@/lib/map-tiles";
 import { cn } from "@/lib/utils";
 import {
 	type ActivityDetail as Activity,
@@ -172,7 +178,7 @@ function RouteMap({
 	const bounds = positions as LatLngBoundsExpression;
 
 	return (
-		<Card className="gap-3 overflow-hidden py-4">
+		<Card className="flex h-full flex-col gap-3 overflow-hidden py-4">
 			<CardHeader className="flex flex-row items-center justify-between px-4">
 				<CardTitle className="text-sm">Route</CardTitle>
 				<ToggleGroup
@@ -186,12 +192,12 @@ function RouteMap({
 					<ToggleGroupItem value="3d">3D</ToggleGroupItem>
 				</ToggleGroup>
 			</CardHeader>
-			<CardContent className="px-4">
-				<div className="isolate overflow-hidden rounded-lg border">
+			<CardContent className="min-h-0 flex-1 px-4">
+				<div className="isolate h-full min-h-[320px] overflow-hidden rounded-lg border">
 					{mode === "3d" ? (
 						<Suspense
 							fallback={
-								<div className="text-muted-foreground flex h-[280px] items-center justify-center text-sm">
+								<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
 									Loading 3D terrain…
 								</div>
 							}
@@ -203,26 +209,25 @@ function RouteMap({
 							bounds={bounds}
 							boundsOptions={{ padding: [20, 20] }}
 							scrollWheelZoom={false}
-							attributionControl={false}
-							className="route-map"
-							style={{ height: 280, width: "100%" }}
+							className="route-map h-full w-full"
 						>
 							<TileLayer
-								url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-								subdomains="abcd"
-								className="route-map-basemap"
-								opacity={0.68}
+								url={STADIA_SATELLITE_TILE_URL}
+								detectRetina
+								maxNativeZoom={STADIA_MAX_ZOOM}
+								attribution={STADIA_ATTRIBUTION}
 								zIndex={1}
 							/>
 							<TileLayer
-								url="https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}"
-								className="route-map-hillshade"
-								opacity={0.28}
+								url={STADIA_TERRAIN_TILE_URL}
+								detectRetina
+								maxNativeZoom={STADIA_MAX_ZOOM}
+								className="route-map-terrain"
 								zIndex={2}
 							/>
 							<Polyline
 								positions={positions}
-								pathOptions={{ color: "#7FB4CA", weight: 4, opacity: 0.9 }}
+								pathOptions={{ color: "#E46876", weight: 4, opacity: 0.95 }}
 							/>
 							{marker && (
 								<CircleMarker
@@ -544,48 +549,54 @@ export function ActivityDetail() {
 					</CardContent>
 				</Card>
 			</div>
-			{(track.length > 1 || hasChart) && (
-				<div
-					className={cn(
-						"grid gap-4",
-						track.length > 1 && hasChart && "lg:grid-cols-2",
-					)}
-				>
-					{track.length > 1 && <RouteMap track={track} marker={hoverMarker} />}
+			{/* Map fills the left column, matching the height of the chart and notes
+			    cards stacked beside it. */}
+			<div
+				className={cn(
+					"grid items-stretch gap-4",
+					track.length > 1 ? "lg:grid-cols-2" : "lg:w-1/2",
+				)}
+			>
+				{track.length > 1 && <RouteMap track={track} marker={hoverMarker} />}
+				<div className="flex min-w-0 flex-col gap-4">
 					{hasChart && (
 						<StreamChart hr={hr} elevation={elevation} onHover={setHoverT} />
 					)}
+					<Card className="gap-4 py-4">
+						<CardHeader className="px-6">
+							<CardTitle className="text-sm">Notes & annotations</CardTitle>
+						</CardHeader>
+						<CardContent className="px-6">
+							{(() => {
+								if (category === "running") {
+									return (
+										<RunningAnnotation
+											activity={activity}
+											foodOptions={foodOptions}
+											onSave={save}
+										/>
+									);
+								}
+								if (category === "climbing") {
+									return (
+										<ClimbingAnnotation activity={activity} onSave={save} />
+									);
+								}
+								if (category === "strength") {
+									return (
+										<StrengthAnnotation activity={activity} onSave={save} />
+									);
+								}
+								return (
+									<p className="text-muted-foreground text-sm">
+										No annotations for this activity type yet.
+									</p>
+								);
+							})()}
+						</CardContent>
+					</Card>
 				</div>
-			)}
-			<Card className="gap-4 py-4 lg:w-1/2">
-				<CardHeader className="px-6">
-					<CardTitle className="text-sm">Notes & annotations</CardTitle>
-				</CardHeader>
-				<CardContent className="px-6">
-					{(() => {
-						if (category === "running") {
-							return (
-								<RunningAnnotation
-									activity={activity}
-									foodOptions={foodOptions}
-									onSave={save}
-								/>
-							);
-						}
-						if (category === "climbing") {
-							return <ClimbingAnnotation activity={activity} onSave={save} />;
-						}
-						if (category === "strength") {
-							return <StrengthAnnotation activity={activity} onSave={save} />;
-						}
-						return (
-							<p className="text-muted-foreground text-sm">
-								No annotations for this activity type yet.
-							</p>
-						);
-					})()}
-				</CardContent>
-			</Card>
+			</div>
 		</div>
 	);
 }

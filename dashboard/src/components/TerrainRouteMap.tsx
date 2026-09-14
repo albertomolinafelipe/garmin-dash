@@ -91,11 +91,11 @@ export function TerrainRouteMap({
 
 	if (!apiKey) {
 		return (
-			<div className="text-muted-foreground flex h-[280px] items-center justify-center text-sm">
+			<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
 				3D terrain unavailable: missing VITE_MAPTILER_KEY.
 			</div>
 		);
 	}
 
-	return <div ref={container} style={{ height: 280, width: "100%" }} />;
+	return <div ref={container} className="h-full w-full" />;
 }
