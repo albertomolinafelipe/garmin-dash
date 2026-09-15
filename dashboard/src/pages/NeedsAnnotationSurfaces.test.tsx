@@ -20,6 +20,7 @@ const fixtures: CalendarActivity[] = [
 		effort: null,
 		caffeine: null,
 		focus: null,
+		shoe_id: null,
 	},
 	{
 		id: "2",
@@ -35,6 +36,7 @@ const fixtures: CalendarActivity[] = [
 		effort: 3,
 		caffeine: null,
 		focus: null,
+		shoe_id: null,
 	},
 	{
 		id: "3",
@@ -50,6 +52,7 @@ const fixtures: CalendarActivity[] = [
 		effort: 4,
 		caffeine: "no",
 		focus: null,
+		shoe_id: null,
 	},
 ];
 

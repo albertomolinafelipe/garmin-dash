@@ -13,6 +13,7 @@ export interface AnnotationInput {
 	focus?: string | null;
 	hard_tries?: number | null;
 	strength_exercises?: StrengthEntry[] | null;
+	shoe_id?: number | null;
 }
 
 export interface StrengthEntry {
@@ -35,6 +36,7 @@ const WRITABLE_KEYS = [
 	"focus",
 	"hard_tries",
 	"strength_exercises",
+	"shoe_id",
 ] as const satisfies readonly (keyof AnnotationInput)[];
 
 const EMPTY_TO_NULL_KEYS = new Set<keyof AnnotationInput>([

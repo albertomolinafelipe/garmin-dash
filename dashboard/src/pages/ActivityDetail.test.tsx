@@ -44,6 +44,9 @@ vi.mock("@/lib/queries", () => ({
 vi.mock("@/graphql/hooks", () => ({
 	useFoodOptionsQuery: () => ({ data: { food_options: [] } }),
 }));
+vi.mock("@/lib/shoes", () => ({
+	useShoes: () => ({ data: { shoes: [] }, isLoading: false, isError: false }),
+}));
 vi.mock("@/components/annotations/use-annotation-save", () => ({
 	useAnnotationSave: () => save,
 }));

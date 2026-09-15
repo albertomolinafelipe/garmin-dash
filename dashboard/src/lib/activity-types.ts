@@ -154,6 +154,10 @@ export function needsSubtype(
 
 export const ANNOTATED_CUTOFF = "2026-07-13";
 
+// Recording a shoe became required on this date, for the sports run on foot/gear.
+export const SHOE_CUTOFF = "2026-09-15";
+const SHOE_SPORTS = new Set<Category>(["running", "hiking", "skiing"]);
+
 type AnnotationCompletenessActivity = {
 	start_time: string | null;
 	activity_type: string | null;
@@ -162,6 +166,7 @@ type AnnotationCompletenessActivity = {
 	effort: number | null;
 	caffeine: string | null;
 	focus: string | null;
+	shoe_id: number | string | null;
 };
 
 export function needsAnnotation(a: AnnotationCompletenessActivity): boolean {
@@ -169,8 +174,12 @@ export function needsAnnotation(a: AnnotationCompletenessActivity): boolean {
 		return false;
 	}
 	const category = categoryOf(a.activity_type, a.subtype);
+	const day = a.start_time?.slice(0, 10) ?? "";
+	const needsShoe =
+		SHOE_SPORTS.has(category) && day >= SHOE_CUTOFF && a.shoe_id == null;
 	if (category === "running") {
 		return (
+			needsShoe ||
 			needsSubtype(a.activity_type, a.subtype) ||
 			a.feeling == null ||
 			a.effort == null ||
@@ -183,7 +192,8 @@ export function needsAnnotation(a: AnnotationCompletenessActivity): boolean {
 	if (category === "strength") {
 		return a.feeling == null || a.effort == null;
 	}
-	return false;
+	// hiking and skiing only need the shoe.
+	return needsShoe;
 }
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);

@@ -26,6 +26,7 @@ query CalendarActivities {
     effort
     caffeine
     focus
+    shoe_id
   }
 }
 
@@ -55,6 +56,11 @@ query ActivityDetail($id: bigint!) {
     focus
     hard_tries
     strength_exercises
+    shoe_id
+    shoe {
+      id
+      name
+    }
     activity_streams {
       payload
     }

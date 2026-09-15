@@ -26,6 +26,7 @@ import {
 
 import { ClimbingAnnotation } from "@/components/annotations/ClimbingAnnotation";
 import { RunningAnnotation } from "@/components/annotations/RunningAnnotation";
+import { ShoeField } from "@/components/annotations/shoe-field";
 import { StrengthAnnotation } from "@/components/annotations/StrengthAnnotation";
 import { useAnnotationSave } from "@/components/annotations/use-annotation-save";
 import { Badge } from "@/components/ui/badge";
@@ -50,6 +51,7 @@ import {
 	categoryColor,
 	categoryOf,
 	needsAnnotation,
+	SHOE_CUTOFF,
 	typeLabel,
 } from "@/lib/activity-types";
 import { fmtDate, fmtDistance, fmtDuration } from "@/lib/format";
@@ -736,13 +738,31 @@ export function ActivityDetail() {
 						</CardHeader>
 						<CardContent className="px-6">
 							{(() => {
+								const shoeSport =
+									category === "running" ||
+									category === "hiking" ||
+									category === "skiing";
+								const shoeRequired =
+									shoeSport &&
+									(activity.start_time?.slice(0, 10) ?? "") >= SHOE_CUTOFF;
+								const shoe = shoeSport ? (
+									<ShoeField
+										activity={activity}
+										onSave={save}
+										required={shoeRequired}
+									/>
+								) : null;
+
 								if (category === "running") {
 									return (
-										<RunningAnnotation
-											activity={activity}
-											foodOptions={foodOptions}
-											onSave={save}
-										/>
+										<div className="space-y-3">
+											<RunningAnnotation
+												activity={activity}
+												foodOptions={foodOptions}
+												onSave={save}
+											/>
+											{shoe}
+										</div>
 									);
 								}
 								if (category === "climbing") {
@@ -755,6 +775,7 @@ export function ActivityDetail() {
 										<StrengthAnnotation activity={activity} onSave={save} />
 									);
 								}
+								if (shoe) return shoe;
 								return (
 									<p className="text-muted-foreground text-sm">
 										No annotations for this activity type yet.

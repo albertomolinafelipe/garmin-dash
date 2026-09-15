@@ -18,6 +18,7 @@ const complete = (
 	effort: 3,
 	caffeine: "no",
 	focus: null,
+	shoe_id: null,
 	...overrides,
 });
 
@@ -71,6 +72,36 @@ describe("needsAnnotation", () => {
 			"strength effort",
 			{ activity_type: "strength_training", subtype: null, effort: null },
 			true,
+		],
+		[
+			"running needs a shoe after the cutoff",
+			{ start_time: "2026-09-15T08:00:00Z", shoe_id: null },
+			true,
+		],
+		[
+			"running with a shoe after the cutoff",
+			{ start_time: "2026-09-15T08:00:00Z", shoe_id: 1 },
+			false,
+		],
+		[
+			"hiking needs a shoe after the cutoff",
+			{ activity_type: "hiking", start_time: "2026-09-16T08:00:00Z", shoe_id: null },
+			true,
+		],
+		[
+			"hiking with a shoe after the cutoff",
+			{ activity_type: "hiking", start_time: "2026-09-16T08:00:00Z", shoe_id: 2 },
+			false,
+		],
+		[
+			"skiing needs a shoe after the cutoff",
+			{ activity_type: "skiing", start_time: "2026-09-16T08:00:00Z", shoe_id: null },
+			true,
+		],
+		[
+			"hiking before the shoe cutoff is exempt",
+			{ activity_type: "hiking", start_time: "2026-09-14T08:00:00Z", shoe_id: null },
+			false,
 		],
 	] as const)("evaluates %s", (_name, overrides, expected) => {
 		expect(needsAnnotation(complete(overrides))).toBe(expected);

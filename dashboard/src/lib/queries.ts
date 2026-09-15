@@ -26,6 +26,7 @@ export interface CalendarActivity {
 	effort: number | null;
 	caffeine: string | null;
 	focus: string | null;
+	shoe_id: number | string | null;
 }
 
 export function useActivities(): UseQueryResult<
@@ -222,6 +223,7 @@ export interface ActivityDetail extends CalendarActivity {
 	focus: string | null;
 	hard_tries: number | null;
 	strength_exercises: unknown;
+	shoe: { id: number | string; name: string } | null;
 	activity_streams: { payload: ActivityStreamPayload }[];
 }
 
