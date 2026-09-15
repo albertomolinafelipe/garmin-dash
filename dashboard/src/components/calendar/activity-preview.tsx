@@ -1,8 +1,10 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useMemo } from "react";
 
 import { categoryColor, categoryIcon, categoryOf } from "@/lib/activity-types";
 import { fmtDistance, fmtDuration } from "@/lib/format";
-import { num, useActivity } from "@/lib/queries";
+import { num, useActivity, useActivitySamples } from "@/lib/queries";
+import { buildSamplePoints } from "@/lib/samples";
+import type { ProfilePoint } from "./elevation-sparkline";
 import { eventInfo } from "./model";
 
 // Leaflet drags in its own CSS bundle, so keep it out of the main chunk: the
@@ -38,6 +40,11 @@ function Stat({ label, value }: { label: string; value: string }) {
 // query and the map bundle are both deferred until hover.
 export function ActivityPreview({ id }: { id: string }) {
 	const { data: activity, isPending } = useActivity(id);
+	const { data: samplesData } = useActivitySamples(id);
+	const sample = useMemo(
+		() => buildSamplePoints(samplesData?.activity_samples ?? []),
+		[samplesData],
+	);
 
 	if (isPending) {
 		return (
@@ -52,8 +59,16 @@ export function ActivityPreview({ id }: { id: string }) {
 
 	const category = categoryOf(activity.activity_type, activity.subtype);
 	const Icon = categoryIcon[category];
-	const track = activity.activity_streams[0]?.payload?.track ?? [];
-	const profile = activity.activity_streams[0]?.payload?.elevation ?? [];
+	// Prefer full-resolution samples (distance-scaled profile, full-detail track);
+	// fall back to the legacy stream payload for activities predating them.
+	const useSamples = sample.points.length > 0;
+	const streamPayload = activity.activity_streams[0]?.payload;
+	const track = useSamples ? sample.track : (streamPayload?.track ?? []);
+	const profile: ProfilePoint[] = useSamples
+		? sample.points.flatMap((p) =>
+				p.elevation == null ? [] : [{ x: p.d, v: p.elevation }],
+			)
+		: (streamPayload?.elevation ?? []).map((s) => ({ x: s.t, v: s.v }));
 	const distance = num(activity.distance_m);
 	const duration = num(activity.duration_s);
 	const elevation = num(activity.elevation_gain_m);
@@ -107,7 +122,7 @@ export function ActivityPreview({ id }: { id: string }) {
 			{profile.length > 1 ? (
 				<Suspense fallback={<div className={PROFILE_HEIGHT} />}>
 					<ElevationSparkline
-						elevation={profile}
+						points={profile}
 						className={`${PROFILE_HEIGHT} w-full`}
 					/>
 				</Suspense>

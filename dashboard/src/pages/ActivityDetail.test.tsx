@@ -36,6 +36,7 @@ const activity = {
 
 vi.mock("@/lib/queries", () => ({
 	useActivity: () => ({ data: activity, isPending: false, isError: false }),
+	useActivitySamples: () => ({ data: { activity_samples: [] } }),
 	useRacesByDay: () => new Map(),
 	raceForStartTime: () => null,
 	num: (value: unknown) => Number(value ?? 0),

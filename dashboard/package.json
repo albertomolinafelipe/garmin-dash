@@ -37,6 +37,7 @@
     "date-fns": "^4.4.0",
     "graphql-request": "^7.4.0",
     "leaflet": "^1.9.4",
+    "leaflet-gesture-handling": "^1.2.2",
     "lucide-react": "^1.26.0",
     "radix-ui": "^1.6.7",
     "react": "19.1.0",

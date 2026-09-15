@@ -20,11 +20,6 @@ export const STADIA_DARK_TILE_URL = `https://tiles.stadiamaps.com/tiles/alidade_
 // Satellite imagery with peak names and elevations baked in.
 export const STADIA_SATELLITE_TILE_URL = `https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.jpg${suffix}`;
 
-// Shaded-relief terrain, laid over the satellite to bring out slope and ridge
-// lines that flat imagery hides. Opaque, so it is blended by CSS rather than
-// opacity alone (see .route-map-terrain).
-export const STADIA_TERRAIN_TILE_URL = `https://tiles.stadiamaps.com/tiles/stamen_terrain_background/{z}/{x}/{y}{r}.png${suffix}`;
-
 export const STADIA_MAX_ZOOM = 20;
 
 export const STADIA_ATTRIBUTION =

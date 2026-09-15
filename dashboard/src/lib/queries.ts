@@ -233,3 +233,44 @@ export function useActivity(
 		Error
 	>;
 }
+
+// One row per FIT record from the full-resolution hypertable. geom arrives as
+// GeoJSON; distance_m is cumulative, so the map and the elevation/HR profile can
+// both be plotted against distance. Kept as a raw request (not codegen) so the
+// generated types stay untouched.
+export interface ActivitySample {
+	elapsed_s: number;
+	distance_m: number | string | null;
+	altitude_m: number | string | null;
+	hr: number | null;
+	geom: { coordinates: [number, number] } | null;
+}
+
+const ACTIVITY_SAMPLES = `
+	query ActivitySamples($id: bigint!) {
+		activity_samples(
+			where: { activity_id: { _eq: $id } }
+			order_by: { elapsed_s: asc }
+		) {
+			elapsed_s
+			distance_m
+			altitude_m
+			hr
+			geom
+		}
+	}
+`;
+
+export function useActivitySamples(
+	id: string | undefined,
+): UseQueryResult<{ activity_samples: ActivitySample[] }, Error> {
+	return useQuery({
+		queryKey: ["activity-samples", id],
+		enabled: id != null,
+		queryFn: () =>
+			graphQLClient.request<{ activity_samples: ActivitySample[] }>(
+				ACTIVITY_SAMPLES,
+				{ id },
+			),
+	});
+}

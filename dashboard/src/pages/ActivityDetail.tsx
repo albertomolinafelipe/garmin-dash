@@ -13,6 +13,8 @@ import type { LatLngBoundsExpression, LatLngExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Link, useParams } from "react-router-dom";
 import { CircleMarker, MapContainer, Polyline, TileLayer } from "react-leaflet";
+
+import "@/lib/leaflet-gesture";
 import {
 	Area,
 	CartesianGrid,
@@ -55,7 +57,6 @@ import {
 	STADIA_ATTRIBUTION,
 	STADIA_MAX_ZOOM,
 	STADIA_SATELLITE_TILE_URL,
-	STADIA_TERRAIN_TILE_URL,
 } from "@/lib/map-tiles";
 import { cn } from "@/lib/utils";
 import {
@@ -64,8 +65,10 @@ import {
 	num,
 	raceForStartTime,
 	useActivity,
+	useActivitySamples,
 	useRacesByDay,
 } from "@/lib/queries";
+import { type SamplePoint, buildSamplePoints } from "@/lib/samples";
 import { raceIcon as RaceIcon } from "@/lib/plans";
 
 const HR = "#E46876";
@@ -208,7 +211,7 @@ function RouteMap({
 						<MapContainer
 							bounds={bounds}
 							boundsOptions={{ padding: [20, 20] }}
-							scrollWheelZoom={false}
+							gestureHandling
 							className="route-map h-full w-full"
 						>
 							<TileLayer
@@ -217,13 +220,6 @@ function RouteMap({
 								maxNativeZoom={STADIA_MAX_ZOOM}
 								attribution={STADIA_ATTRIBUTION}
 								zIndex={1}
-							/>
-							<TileLayer
-								url={STADIA_TERRAIN_TILE_URL}
-								detectRetina
-								maxNativeZoom={STADIA_MAX_ZOOM}
-								className="route-map-terrain"
-								zIndex={2}
 							/>
 							<Polyline
 								positions={positions}
@@ -403,6 +399,141 @@ function StreamChart({
 	);
 }
 
+// Heart rate and elevation against distance (km), from full-resolution samples.
+function SampleChart({
+	points,
+	hasHr,
+	hasElevation,
+	onHover,
+}: {
+	points: SamplePoint[];
+	hasHr: boolean;
+	hasElevation: boolean;
+	onHover?: (index: number | null) => void;
+}) {
+	return (
+		<Card className="gap-3 py-4">
+			<CardHeader className="px-4">
+				<CardTitle className="text-sm">
+					{hasElevation ? "Heart rate & elevation" : "Heart rate"}
+				</CardTitle>
+			</CardHeader>
+			<CardContent className="h-[296px] px-4 pb-1">
+				<ChartContainer config={streamConfig} className="aspect-auto h-full w-full">
+					<ComposedChart
+						data={points}
+						margin={{ top: 5, right: 2, left: 0 }}
+						onMouseMove={(state) =>
+							onHover?.(
+								typeof state?.activeTooltipIndex === "number"
+									? state.activeTooltipIndex
+									: null,
+							)
+						}
+						onMouseLeave={() => onHover?.(null)}
+					>
+						<defs>
+							<linearGradient id="activity-elevation" x1="0" y1="0" x2="0" y2="1">
+								<stop offset="0%" stopColor={ELEVATION} stopOpacity={0.35} />
+								<stop offset="100%" stopColor={ELEVATION} stopOpacity={0.03} />
+							</linearGradient>
+							<linearGradient id="activity-hr" x1="0" y1="0" x2="0" y2="1">
+								<stop offset="0%" stopColor={HR} stopOpacity={0.3} />
+								<stop offset="100%" stopColor={HR} stopOpacity={0.03} />
+							</linearGradient>
+						</defs>
+						<CartesianGrid strokeDasharray="3 3" vertical={false} />
+						<XAxis
+							dataKey="d"
+							type="number"
+							domain={[0, "dataMax"]}
+							tickFormatter={(d) => `${Number(d).toFixed(1)}`}
+							tickLine={false}
+							axisLine={false}
+							minTickGap={35}
+							unit=" km"
+						/>
+						<YAxis
+							yAxisId="hr"
+							width={34}
+							tickLine={false}
+							axisLine={false}
+							hide={!hasHr}
+						/>
+						<YAxis
+							yAxisId="elevation"
+							orientation="right"
+							width={38}
+							tickLine={false}
+							axisLine={false}
+							hide={!hasElevation}
+						/>
+						<ChartTooltip
+							content={
+								<ChartTooltipContent
+									labelFormatter={(_, payload) => {
+										const d = payload?.[0]?.payload?.d;
+										return d == null ? "" : `${Number(d).toFixed(2)} km`;
+									}}
+									formatter={(value, name) => {
+										if (value == null || Number.isNaN(Number(value)))
+											return null;
+										const isHr = name === "hr" || name === "Heart rate";
+										return (
+											<div className="flex w-full items-center justify-between gap-4">
+												<span className="text-muted-foreground">
+													{isHr ? "Heart rate" : "Elevation"}
+												</span>
+												<span className="text-foreground font-mono font-medium tabular-nums">
+													{Math.round(Number(value))} {isHr ? "bpm" : "m"}
+												</span>
+											</div>
+										);
+									}}
+								/>
+							}
+						/>
+						{hasElevation && (
+							<Area
+								yAxisId="elevation"
+								type="monotone"
+								dataKey="elevation"
+								stroke={ELEVATION}
+								fill="url(#activity-elevation)"
+								dot={false}
+								connectNulls
+							/>
+						)}
+						{hasHr &&
+							(hasElevation ? (
+								<Line
+									yAxisId="hr"
+									type="monotone"
+									dataKey="hr"
+									stroke={HR}
+									strokeWidth={2}
+									dot={false}
+									connectNulls
+								/>
+							) : (
+								<Area
+									yAxisId="hr"
+									type="monotone"
+									dataKey="hr"
+									stroke={HR}
+									fill="url(#activity-hr)"
+									strokeWidth={2}
+									dot={false}
+									connectNulls
+								/>
+							))}
+					</ComposedChart>
+				</ChartContainer>
+			</CardContent>
+		</Card>
+	);
+}
+
 function EditableName({
 	activity,
 	onSave,
@@ -466,6 +597,12 @@ export function ActivityDetail() {
 	const save = useAnnotationSave(id ?? "");
 	const racesByDay = useRacesByDay();
 	const [hoverT, setHoverT] = useState<number | null>(null);
+	const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+	const { data: samplesData } = useActivitySamples(id);
+	const sample = useMemo(
+		() => buildSamplePoints(samplesData?.activity_samples ?? []),
+		[samplesData],
+	);
 
 	if (isPending)
 		return (
@@ -484,24 +621,43 @@ export function ActivityDetail() {
 		);
 
 	const category = categoryOf(activity.activity_type, activity.subtype);
-	const payload = activity.activity_streams[0]?.payload ?? {};
-	const hr = payload.hr ?? [];
-	const elevation = payload.elevation ?? [];
-	const track = payload.track ?? [];
-	const hasChart = hr.length > 0 || elevation.length > 0;
 
-	// Track points carry no timestamps, so approximate the hovered fix by mapping
-	// the hovered elapsed time onto the uniformly-thinned track by fraction.
-	const maxT = Math.max(hr.at(-1)?.t ?? 0, elevation.at(-1)?.t ?? 0);
-	const hoverMarker =
-		hoverT != null && track.length > 0 && maxT > 0
-			? track[
-					Math.min(
-						track.length - 1,
-						Math.max(0, Math.round((hoverT / maxT) * (track.length - 1))),
-					)
-				]
-			: null;
+	// Prefer full-resolution samples (distance-scaled chart, full-detail track);
+	// fall back to the legacy stream payload for activities predating them.
+	const useSamples = sample.points.length > 0;
+	const payload = activity.activity_streams[0]?.payload ?? {};
+	const streamHr = payload.hr ?? [];
+	const streamElevation = payload.elevation ?? [];
+
+	const track = useSamples ? sample.track : (payload.track ?? []);
+	const hasChart = useSamples
+		? sample.hasHr || sample.hasElevation
+		: streamHr.length > 0 || streamElevation.length > 0;
+
+	let hoverMarker: { lat: number; lng: number } | null = null;
+	if (useSamples) {
+		const point = hoverIdx == null ? null : sample.points[hoverIdx];
+		hoverMarker =
+			point?.lat != null && point.lng != null
+				? { lat: point.lat, lng: point.lng }
+				: null;
+	} else {
+		// Stream points carry no timestamps, so approximate the hovered fix by
+		// mapping the hovered elapsed time onto the thinned track by fraction.
+		const maxT = Math.max(
+			streamHr.at(-1)?.t ?? 0,
+			streamElevation.at(-1)?.t ?? 0,
+		);
+		hoverMarker =
+			hoverT != null && track.length > 0 && maxT > 0
+				? (track[
+						Math.min(
+							track.length - 1,
+							Math.max(0, Math.round((hoverT / maxT) * (track.length - 1))),
+						)
+					] ?? null)
+				: null;
+	}
 
 	return (
 		<div className="space-y-4 p-4">
@@ -559,9 +715,21 @@ export function ActivityDetail() {
 			>
 				{track.length > 1 && <RouteMap track={track} marker={hoverMarker} />}
 				<div className="flex min-w-0 flex-col gap-4">
-					{hasChart && (
-						<StreamChart hr={hr} elevation={elevation} onHover={setHoverT} />
-					)}
+					{hasChart &&
+						(useSamples ? (
+							<SampleChart
+								points={sample.points}
+								hasHr={sample.hasHr}
+								hasElevation={sample.hasElevation}
+								onHover={setHoverIdx}
+							/>
+						) : (
+							<StreamChart
+								hr={streamHr}
+								elevation={streamElevation}
+								onHover={setHoverT}
+							/>
+						))}
 					<Card className="gap-4 py-4">
 						<CardHeader className="px-6">
 							<CardTitle className="text-sm">Notes & annotations</CardTitle>
