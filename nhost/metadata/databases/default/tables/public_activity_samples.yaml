@@ -1,0 +1,16 @@
+table:
+  name: activity_samples
+  schema: public
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - activity_id
+        - recorded_at
+        - elapsed_s
+        - hr
+        - altitude_m
+        - distance_m
+        - geom
+      filter: {}
+      allow_aggregations: true
