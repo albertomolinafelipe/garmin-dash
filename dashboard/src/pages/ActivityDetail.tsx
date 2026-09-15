@@ -712,7 +712,7 @@ export function ActivityDetail() {
 				{activity.start_time && (
 					<DaySleepPanel
 						date={dayKey(new Date(activity.start_time))}
-						className="w-full max-w-[14rem] lg:h-full lg:w-auto lg:max-w-none"
+						className="w-full max-w-[14rem] lg:size-52 lg:max-w-none"
 					/>
 				)}
 			</div>

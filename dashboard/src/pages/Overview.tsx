@@ -601,7 +601,7 @@ const sleepConfig = {
 } satisfies ChartConfig;
 
 // Stages stacked bottom → top as filled bands; score overlaid on its own axis.
-const STAGE_ORDER = ["awake", "light", "rem", "deep"] as const;
+const STAGE_ORDER = ["deep", "light", "awake", "rem"] as const;
 
 function SleepPanel() {
 	const { data, isPending } = useSleep(HISTORY_DAYS);
