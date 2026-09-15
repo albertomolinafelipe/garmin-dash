@@ -17,8 +17,11 @@ export type Scalars = {
   citext: { input: unknown; output: unknown; }
   date: { input: unknown; output: unknown; }
   float8: { input: unknown; output: unknown; }
+  geography: { input: unknown; output: unknown; }
+  geometry: { input: unknown; output: unknown; }
   jsonb: { input: unknown; output: unknown; }
   numeric: { input: unknown; output: unknown; }
+  smallint: { input: unknown; output: unknown; }
   timestamptz: { input: unknown; output: unknown; }
   uuid: { input: unknown; output: unknown; }
 };
@@ -34,6 +37,19 @@ export type Boolean_Comparison_Exp = {
   _lte?: InputMaybe<Scalars['Boolean']['input']>;
   _neq?: InputMaybe<Scalars['Boolean']['input']>;
   _nin?: InputMaybe<Array<Scalars['Boolean']['input']>>;
+};
+
+/** Boolean expression to compare columns of type "Float". All fields are combined with logical 'AND'. */
+export type Float_Comparison_Exp = {
+  _eq?: InputMaybe<Scalars['Float']['input']>;
+  _gt?: InputMaybe<Scalars['Float']['input']>;
+  _gte?: InputMaybe<Scalars['Float']['input']>;
+  _in?: InputMaybe<Array<Scalars['Float']['input']>>;
+  _is_null?: InputMaybe<Scalars['Boolean']['input']>;
+  _lt?: InputMaybe<Scalars['Float']['input']>;
+  _lte?: InputMaybe<Scalars['Float']['input']>;
+  _neq?: InputMaybe<Scalars['Float']['input']>;
+  _nin?: InputMaybe<Array<Scalars['Float']['input']>>;
 };
 
 /** Boolean expression to compare columns of type "Int". All fields are combined with logical 'AND'. */
@@ -126,6 +142,10 @@ export type Activities = {
   max_hr?: Maybe<Scalars['Int']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   notes?: Maybe<Scalars['String']['output']>;
+  samples_synced_at?: Maybe<Scalars['timestamptz']['output']>;
+  /** An object relationship */
+  shoe?: Maybe<Shoes>;
+  shoe_id?: Maybe<Scalars['bigint']['output']>;
   start_lat?: Maybe<Scalars['float8']['output']>;
   start_lng?: Maybe<Scalars['float8']['output']>;
   start_time?: Maybe<Scalars['timestamptz']['output']>;
@@ -168,6 +188,91 @@ export type Activities_Aggregate = {
   nodes: Array<Activities>;
 };
 
+export type Activities_Aggregate_Bool_Exp = {
+  avg?: InputMaybe<Activities_Aggregate_Bool_Exp_Avg>;
+  corr?: InputMaybe<Activities_Aggregate_Bool_Exp_Corr>;
+  count?: InputMaybe<Activities_Aggregate_Bool_Exp_Count>;
+  covar_samp?: InputMaybe<Activities_Aggregate_Bool_Exp_Covar_Samp>;
+  max?: InputMaybe<Activities_Aggregate_Bool_Exp_Max>;
+  min?: InputMaybe<Activities_Aggregate_Bool_Exp_Min>;
+  stddev_samp?: InputMaybe<Activities_Aggregate_Bool_Exp_Stddev_Samp>;
+  sum?: InputMaybe<Activities_Aggregate_Bool_Exp_Sum>;
+  var_samp?: InputMaybe<Activities_Aggregate_Bool_Exp_Var_Samp>;
+};
+
+export type Activities_Aggregate_Bool_Exp_Avg = {
+  arguments: Activities_Select_Column_Activities_Aggregate_Bool_Exp_Avg_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+  filter?: InputMaybe<Activities_Bool_Exp>;
+  predicate: Float8_Comparison_Exp;
+};
+
+export type Activities_Aggregate_Bool_Exp_Corr = {
+  arguments: Activities_Aggregate_Bool_Exp_Corr_Arguments;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+  filter?: InputMaybe<Activities_Bool_Exp>;
+  predicate: Float8_Comparison_Exp;
+};
+
+export type Activities_Aggregate_Bool_Exp_Corr_Arguments = {
+  X: Activities_Select_Column_Activities_Aggregate_Bool_Exp_Corr_Arguments_Columns;
+  Y: Activities_Select_Column_Activities_Aggregate_Bool_Exp_Corr_Arguments_Columns;
+};
+
+export type Activities_Aggregate_Bool_Exp_Count = {
+  arguments?: InputMaybe<Array<Activities_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+  filter?: InputMaybe<Activities_Bool_Exp>;
+  predicate: Int_Comparison_Exp;
+};
+
+export type Activities_Aggregate_Bool_Exp_Covar_Samp = {
+  arguments: Activities_Aggregate_Bool_Exp_Covar_Samp_Arguments;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+  filter?: InputMaybe<Activities_Bool_Exp>;
+  predicate: Float8_Comparison_Exp;
+};
+
+export type Activities_Aggregate_Bool_Exp_Covar_Samp_Arguments = {
+  X: Activities_Select_Column_Activities_Aggregate_Bool_Exp_Covar_Samp_Arguments_Columns;
+  Y: Activities_Select_Column_Activities_Aggregate_Bool_Exp_Covar_Samp_Arguments_Columns;
+};
+
+export type Activities_Aggregate_Bool_Exp_Max = {
+  arguments: Activities_Select_Column_Activities_Aggregate_Bool_Exp_Max_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+  filter?: InputMaybe<Activities_Bool_Exp>;
+  predicate: Float8_Comparison_Exp;
+};
+
+export type Activities_Aggregate_Bool_Exp_Min = {
+  arguments: Activities_Select_Column_Activities_Aggregate_Bool_Exp_Min_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+  filter?: InputMaybe<Activities_Bool_Exp>;
+  predicate: Float8_Comparison_Exp;
+};
+
+export type Activities_Aggregate_Bool_Exp_Stddev_Samp = {
+  arguments: Activities_Select_Column_Activities_Aggregate_Bool_Exp_Stddev_Samp_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+  filter?: InputMaybe<Activities_Bool_Exp>;
+  predicate: Float8_Comparison_Exp;
+};
+
+export type Activities_Aggregate_Bool_Exp_Sum = {
+  arguments: Activities_Select_Column_Activities_Aggregate_Bool_Exp_Sum_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+  filter?: InputMaybe<Activities_Bool_Exp>;
+  predicate: Float8_Comparison_Exp;
+};
+
+export type Activities_Aggregate_Bool_Exp_Var_Samp = {
+  arguments: Activities_Select_Column_Activities_Aggregate_Bool_Exp_Var_Samp_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+  filter?: InputMaybe<Activities_Bool_Exp>;
+  predicate: Float8_Comparison_Exp;
+};
+
 /** aggregate fields of "activities" */
 export type Activities_Aggregate_Fields = {
   __typename?: 'activities_aggregate_fields';
@@ -191,9 +296,31 @@ export type Activities_Aggregate_FieldsCountArgs = {
   distinct?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
+/** order by aggregate values of table "activities" */
+export type Activities_Aggregate_Order_By = {
+  avg?: InputMaybe<Activities_Avg_Order_By>;
+  count?: InputMaybe<Order_By>;
+  max?: InputMaybe<Activities_Max_Order_By>;
+  min?: InputMaybe<Activities_Min_Order_By>;
+  stddev?: InputMaybe<Activities_Stddev_Order_By>;
+  stddev_pop?: InputMaybe<Activities_Stddev_Pop_Order_By>;
+  stddev_samp?: InputMaybe<Activities_Stddev_Samp_Order_By>;
+  sum?: InputMaybe<Activities_Sum_Order_By>;
+  var_pop?: InputMaybe<Activities_Var_Pop_Order_By>;
+  var_samp?: InputMaybe<Activities_Var_Samp_Order_By>;
+  variance?: InputMaybe<Activities_Variance_Order_By>;
+};
+
 /** append existing jsonb value of filtered columns with new jsonb value */
 export type Activities_Append_Input = {
   strength_exercises?: InputMaybe<Scalars['jsonb']['input']>;
+};
+
+/** input type for inserting array relation for remote table "activities" */
+export type Activities_Arr_Rel_Insert_Input = {
+  data: Array<Activities_Insert_Input>;
+  /** upsert condition */
+  on_conflict?: InputMaybe<Activities_On_Conflict>;
 };
 
 /** aggregate avg on columns */
@@ -212,8 +339,29 @@ export type Activities_Avg_Fields = {
   hard_tries?: Maybe<Scalars['Float']['output']>;
   id?: Maybe<Scalars['Float']['output']>;
   max_hr?: Maybe<Scalars['Float']['output']>;
+  shoe_id?: Maybe<Scalars['Float']['output']>;
   start_lat?: Maybe<Scalars['Float']['output']>;
   start_lng?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by avg() on columns of table "activities" */
+export type Activities_Avg_Order_By = {
+  avg_hr?: InputMaybe<Order_By>;
+  avg_power_w?: InputMaybe<Order_By>;
+  avg_speed_mps?: InputMaybe<Order_By>;
+  calories?: InputMaybe<Order_By>;
+  distance_m?: InputMaybe<Order_By>;
+  duration_s?: InputMaybe<Order_By>;
+  effort?: InputMaybe<Order_By>;
+  elevation_gain_m?: InputMaybe<Order_By>;
+  feeling?: InputMaybe<Order_By>;
+  garmin_activity_id?: InputMaybe<Order_By>;
+  hard_tries?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  max_hr?: InputMaybe<Order_By>;
+  shoe_id?: InputMaybe<Order_By>;
+  start_lat?: InputMaybe<Order_By>;
+  start_lng?: InputMaybe<Order_By>;
 };
 
 /** Boolean expression to filter rows from the table "activities". All fields are combined with a logical 'AND'. */
@@ -243,6 +391,9 @@ export type Activities_Bool_Exp = {
   max_hr?: InputMaybe<Int_Comparison_Exp>;
   name?: InputMaybe<String_Comparison_Exp>;
   notes?: InputMaybe<String_Comparison_Exp>;
+  samples_synced_at?: InputMaybe<Timestamptz_Comparison_Exp>;
+  shoe?: InputMaybe<Shoes_Bool_Exp>;
+  shoe_id?: InputMaybe<Bigint_Comparison_Exp>;
   start_lat?: InputMaybe<Float8_Comparison_Exp>;
   start_lng?: InputMaybe<Float8_Comparison_Exp>;
   start_time?: InputMaybe<Timestamptz_Comparison_Exp>;
@@ -289,6 +440,7 @@ export type Activities_Inc_Input = {
   garmin_activity_id?: InputMaybe<Scalars['bigint']['input']>;
   hard_tries?: InputMaybe<Scalars['Int']['input']>;
   max_hr?: InputMaybe<Scalars['Int']['input']>;
+  shoe_id?: InputMaybe<Scalars['bigint']['input']>;
   start_lat?: InputMaybe<Scalars['float8']['input']>;
   start_lng?: InputMaybe<Scalars['float8']['input']>;
 };
@@ -315,6 +467,9 @@ export type Activities_Insert_Input = {
   max_hr?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   notes?: InputMaybe<Scalars['String']['input']>;
+  samples_synced_at?: InputMaybe<Scalars['timestamptz']['input']>;
+  shoe?: InputMaybe<Shoes_Obj_Rel_Insert_Input>;
+  shoe_id?: InputMaybe<Scalars['bigint']['input']>;
   start_lat?: InputMaybe<Scalars['float8']['input']>;
   start_lng?: InputMaybe<Scalars['float8']['input']>;
   start_time?: InputMaybe<Scalars['timestamptz']['input']>;
@@ -347,12 +502,46 @@ export type Activities_Max_Fields = {
   max_hr?: Maybe<Scalars['Int']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   notes?: Maybe<Scalars['String']['output']>;
+  samples_synced_at?: Maybe<Scalars['timestamptz']['output']>;
+  shoe_id?: Maybe<Scalars['bigint']['output']>;
   start_lat?: Maybe<Scalars['float8']['output']>;
   start_lng?: Maybe<Scalars['float8']['output']>;
   start_time?: Maybe<Scalars['timestamptz']['output']>;
   subtype?: Maybe<Scalars['String']['output']>;
   synced_at?: Maybe<Scalars['timestamptz']['output']>;
   weather?: Maybe<Scalars['String']['output']>;
+};
+
+/** order by max() on columns of table "activities" */
+export type Activities_Max_Order_By = {
+  activity_type?: InputMaybe<Order_By>;
+  avg_hr?: InputMaybe<Order_By>;
+  avg_power_w?: InputMaybe<Order_By>;
+  avg_speed_mps?: InputMaybe<Order_By>;
+  caffeine?: InputMaybe<Order_By>;
+  calories?: InputMaybe<Order_By>;
+  distance_m?: InputMaybe<Order_By>;
+  duration_s?: InputMaybe<Order_By>;
+  effort?: InputMaybe<Order_By>;
+  elevation_gain_m?: InputMaybe<Order_By>;
+  feeling?: InputMaybe<Order_By>;
+  focus?: InputMaybe<Order_By>;
+  food_after?: InputMaybe<Order_By>;
+  food_during?: InputMaybe<Order_By>;
+  garmin_activity_id?: InputMaybe<Order_By>;
+  hard_tries?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  max_hr?: InputMaybe<Order_By>;
+  name?: InputMaybe<Order_By>;
+  notes?: InputMaybe<Order_By>;
+  samples_synced_at?: InputMaybe<Order_By>;
+  shoe_id?: InputMaybe<Order_By>;
+  start_lat?: InputMaybe<Order_By>;
+  start_lng?: InputMaybe<Order_By>;
+  start_time?: InputMaybe<Order_By>;
+  subtype?: InputMaybe<Order_By>;
+  synced_at?: InputMaybe<Order_By>;
+  weather?: InputMaybe<Order_By>;
 };
 
 /** aggregate min on columns */
@@ -378,12 +567,46 @@ export type Activities_Min_Fields = {
   max_hr?: Maybe<Scalars['Int']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   notes?: Maybe<Scalars['String']['output']>;
+  samples_synced_at?: Maybe<Scalars['timestamptz']['output']>;
+  shoe_id?: Maybe<Scalars['bigint']['output']>;
   start_lat?: Maybe<Scalars['float8']['output']>;
   start_lng?: Maybe<Scalars['float8']['output']>;
   start_time?: Maybe<Scalars['timestamptz']['output']>;
   subtype?: Maybe<Scalars['String']['output']>;
   synced_at?: Maybe<Scalars['timestamptz']['output']>;
   weather?: Maybe<Scalars['String']['output']>;
+};
+
+/** order by min() on columns of table "activities" */
+export type Activities_Min_Order_By = {
+  activity_type?: InputMaybe<Order_By>;
+  avg_hr?: InputMaybe<Order_By>;
+  avg_power_w?: InputMaybe<Order_By>;
+  avg_speed_mps?: InputMaybe<Order_By>;
+  caffeine?: InputMaybe<Order_By>;
+  calories?: InputMaybe<Order_By>;
+  distance_m?: InputMaybe<Order_By>;
+  duration_s?: InputMaybe<Order_By>;
+  effort?: InputMaybe<Order_By>;
+  elevation_gain_m?: InputMaybe<Order_By>;
+  feeling?: InputMaybe<Order_By>;
+  focus?: InputMaybe<Order_By>;
+  food_after?: InputMaybe<Order_By>;
+  food_during?: InputMaybe<Order_By>;
+  garmin_activity_id?: InputMaybe<Order_By>;
+  hard_tries?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  max_hr?: InputMaybe<Order_By>;
+  name?: InputMaybe<Order_By>;
+  notes?: InputMaybe<Order_By>;
+  samples_synced_at?: InputMaybe<Order_By>;
+  shoe_id?: InputMaybe<Order_By>;
+  start_lat?: InputMaybe<Order_By>;
+  start_lng?: InputMaybe<Order_By>;
+  start_time?: InputMaybe<Order_By>;
+  subtype?: InputMaybe<Order_By>;
+  synced_at?: InputMaybe<Order_By>;
+  weather?: InputMaybe<Order_By>;
 };
 
 /** response of any mutation on the table "activities" */
@@ -432,6 +655,9 @@ export type Activities_Order_By = {
   max_hr?: InputMaybe<Order_By>;
   name?: InputMaybe<Order_By>;
   notes?: InputMaybe<Order_By>;
+  samples_synced_at?: InputMaybe<Order_By>;
+  shoe?: InputMaybe<Shoes_Order_By>;
+  shoe_id?: InputMaybe<Order_By>;
   start_lat?: InputMaybe<Order_By>;
   start_lng?: InputMaybe<Order_By>;
   start_time?: InputMaybe<Order_By>;
@@ -494,6 +720,10 @@ export enum Activities_Select_Column {
   /** column name */
   Notes = 'notes',
   /** column name */
+  SamplesSyncedAt = 'samples_synced_at',
+  /** column name */
+  ShoeId = 'shoe_id',
+  /** column name */
   StartLat = 'start_lat',
   /** column name */
   StartLng = 'start_lng',
@@ -507,6 +737,150 @@ export enum Activities_Select_Column {
   SyncedAt = 'synced_at',
   /** column name */
   Weather = 'weather'
+}
+
+/** select "activities_aggregate_bool_exp_avg_arguments_columns" columns of table "activities" */
+export enum Activities_Select_Column_Activities_Aggregate_Bool_Exp_Avg_Arguments_Columns {
+  /** column name */
+  AvgPowerW = 'avg_power_w',
+  /** column name */
+  AvgSpeedMps = 'avg_speed_mps',
+  /** column name */
+  DistanceM = 'distance_m',
+  /** column name */
+  DurationS = 'duration_s',
+  /** column name */
+  ElevationGainM = 'elevation_gain_m',
+  /** column name */
+  StartLat = 'start_lat',
+  /** column name */
+  StartLng = 'start_lng'
+}
+
+/** select "activities_aggregate_bool_exp_corr_arguments_columns" columns of table "activities" */
+export enum Activities_Select_Column_Activities_Aggregate_Bool_Exp_Corr_Arguments_Columns {
+  /** column name */
+  AvgPowerW = 'avg_power_w',
+  /** column name */
+  AvgSpeedMps = 'avg_speed_mps',
+  /** column name */
+  DistanceM = 'distance_m',
+  /** column name */
+  DurationS = 'duration_s',
+  /** column name */
+  ElevationGainM = 'elevation_gain_m',
+  /** column name */
+  StartLat = 'start_lat',
+  /** column name */
+  StartLng = 'start_lng'
+}
+
+/** select "activities_aggregate_bool_exp_covar_samp_arguments_columns" columns of table "activities" */
+export enum Activities_Select_Column_Activities_Aggregate_Bool_Exp_Covar_Samp_Arguments_Columns {
+  /** column name */
+  AvgPowerW = 'avg_power_w',
+  /** column name */
+  AvgSpeedMps = 'avg_speed_mps',
+  /** column name */
+  DistanceM = 'distance_m',
+  /** column name */
+  DurationS = 'duration_s',
+  /** column name */
+  ElevationGainM = 'elevation_gain_m',
+  /** column name */
+  StartLat = 'start_lat',
+  /** column name */
+  StartLng = 'start_lng'
+}
+
+/** select "activities_aggregate_bool_exp_max_arguments_columns" columns of table "activities" */
+export enum Activities_Select_Column_Activities_Aggregate_Bool_Exp_Max_Arguments_Columns {
+  /** column name */
+  AvgPowerW = 'avg_power_w',
+  /** column name */
+  AvgSpeedMps = 'avg_speed_mps',
+  /** column name */
+  DistanceM = 'distance_m',
+  /** column name */
+  DurationS = 'duration_s',
+  /** column name */
+  ElevationGainM = 'elevation_gain_m',
+  /** column name */
+  StartLat = 'start_lat',
+  /** column name */
+  StartLng = 'start_lng'
+}
+
+/** select "activities_aggregate_bool_exp_min_arguments_columns" columns of table "activities" */
+export enum Activities_Select_Column_Activities_Aggregate_Bool_Exp_Min_Arguments_Columns {
+  /** column name */
+  AvgPowerW = 'avg_power_w',
+  /** column name */
+  AvgSpeedMps = 'avg_speed_mps',
+  /** column name */
+  DistanceM = 'distance_m',
+  /** column name */
+  DurationS = 'duration_s',
+  /** column name */
+  ElevationGainM = 'elevation_gain_m',
+  /** column name */
+  StartLat = 'start_lat',
+  /** column name */
+  StartLng = 'start_lng'
+}
+
+/** select "activities_aggregate_bool_exp_stddev_samp_arguments_columns" columns of table "activities" */
+export enum Activities_Select_Column_Activities_Aggregate_Bool_Exp_Stddev_Samp_Arguments_Columns {
+  /** column name */
+  AvgPowerW = 'avg_power_w',
+  /** column name */
+  AvgSpeedMps = 'avg_speed_mps',
+  /** column name */
+  DistanceM = 'distance_m',
+  /** column name */
+  DurationS = 'duration_s',
+  /** column name */
+  ElevationGainM = 'elevation_gain_m',
+  /** column name */
+  StartLat = 'start_lat',
+  /** column name */
+  StartLng = 'start_lng'
+}
+
+/** select "activities_aggregate_bool_exp_sum_arguments_columns" columns of table "activities" */
+export enum Activities_Select_Column_Activities_Aggregate_Bool_Exp_Sum_Arguments_Columns {
+  /** column name */
+  AvgPowerW = 'avg_power_w',
+  /** column name */
+  AvgSpeedMps = 'avg_speed_mps',
+  /** column name */
+  DistanceM = 'distance_m',
+  /** column name */
+  DurationS = 'duration_s',
+  /** column name */
+  ElevationGainM = 'elevation_gain_m',
+  /** column name */
+  StartLat = 'start_lat',
+  /** column name */
+  StartLng = 'start_lng'
+}
+
+/** select "activities_aggregate_bool_exp_var_samp_arguments_columns" columns of table "activities" */
+export enum Activities_Select_Column_Activities_Aggregate_Bool_Exp_Var_Samp_Arguments_Columns {
+  /** column name */
+  AvgPowerW = 'avg_power_w',
+  /** column name */
+  AvgSpeedMps = 'avg_speed_mps',
+  /** column name */
+  DistanceM = 'distance_m',
+  /** column name */
+  DurationS = 'duration_s',
+  /** column name */
+  ElevationGainM = 'elevation_gain_m',
+  /** column name */
+  StartLat = 'start_lat',
+  /** column name */
+  StartLng = 'start_lng'
 }
 
 /** input type for updating data in table "activities" */
@@ -530,6 +904,8 @@ export type Activities_Set_Input = {
   max_hr?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   notes?: InputMaybe<Scalars['String']['input']>;
+  samples_synced_at?: InputMaybe<Scalars['timestamptz']['input']>;
+  shoe_id?: InputMaybe<Scalars['bigint']['input']>;
   start_lat?: InputMaybe<Scalars['float8']['input']>;
   start_lng?: InputMaybe<Scalars['float8']['input']>;
   start_time?: InputMaybe<Scalars['timestamptz']['input']>;
@@ -555,8 +931,29 @@ export type Activities_Stddev_Fields = {
   hard_tries?: Maybe<Scalars['Float']['output']>;
   id?: Maybe<Scalars['Float']['output']>;
   max_hr?: Maybe<Scalars['Float']['output']>;
+  shoe_id?: Maybe<Scalars['Float']['output']>;
   start_lat?: Maybe<Scalars['Float']['output']>;
   start_lng?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by stddev() on columns of table "activities" */
+export type Activities_Stddev_Order_By = {
+  avg_hr?: InputMaybe<Order_By>;
+  avg_power_w?: InputMaybe<Order_By>;
+  avg_speed_mps?: InputMaybe<Order_By>;
+  calories?: InputMaybe<Order_By>;
+  distance_m?: InputMaybe<Order_By>;
+  duration_s?: InputMaybe<Order_By>;
+  effort?: InputMaybe<Order_By>;
+  elevation_gain_m?: InputMaybe<Order_By>;
+  feeling?: InputMaybe<Order_By>;
+  garmin_activity_id?: InputMaybe<Order_By>;
+  hard_tries?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  max_hr?: InputMaybe<Order_By>;
+  shoe_id?: InputMaybe<Order_By>;
+  start_lat?: InputMaybe<Order_By>;
+  start_lng?: InputMaybe<Order_By>;
 };
 
 /** aggregate stddev_pop on columns */
@@ -575,8 +972,29 @@ export type Activities_Stddev_Pop_Fields = {
   hard_tries?: Maybe<Scalars['Float']['output']>;
   id?: Maybe<Scalars['Float']['output']>;
   max_hr?: Maybe<Scalars['Float']['output']>;
+  shoe_id?: Maybe<Scalars['Float']['output']>;
   start_lat?: Maybe<Scalars['Float']['output']>;
   start_lng?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by stddev_pop() on columns of table "activities" */
+export type Activities_Stddev_Pop_Order_By = {
+  avg_hr?: InputMaybe<Order_By>;
+  avg_power_w?: InputMaybe<Order_By>;
+  avg_speed_mps?: InputMaybe<Order_By>;
+  calories?: InputMaybe<Order_By>;
+  distance_m?: InputMaybe<Order_By>;
+  duration_s?: InputMaybe<Order_By>;
+  effort?: InputMaybe<Order_By>;
+  elevation_gain_m?: InputMaybe<Order_By>;
+  feeling?: InputMaybe<Order_By>;
+  garmin_activity_id?: InputMaybe<Order_By>;
+  hard_tries?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  max_hr?: InputMaybe<Order_By>;
+  shoe_id?: InputMaybe<Order_By>;
+  start_lat?: InputMaybe<Order_By>;
+  start_lng?: InputMaybe<Order_By>;
 };
 
 /** aggregate stddev_samp on columns */
@@ -595,8 +1013,29 @@ export type Activities_Stddev_Samp_Fields = {
   hard_tries?: Maybe<Scalars['Float']['output']>;
   id?: Maybe<Scalars['Float']['output']>;
   max_hr?: Maybe<Scalars['Float']['output']>;
+  shoe_id?: Maybe<Scalars['Float']['output']>;
   start_lat?: Maybe<Scalars['Float']['output']>;
   start_lng?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by stddev_samp() on columns of table "activities" */
+export type Activities_Stddev_Samp_Order_By = {
+  avg_hr?: InputMaybe<Order_By>;
+  avg_power_w?: InputMaybe<Order_By>;
+  avg_speed_mps?: InputMaybe<Order_By>;
+  calories?: InputMaybe<Order_By>;
+  distance_m?: InputMaybe<Order_By>;
+  duration_s?: InputMaybe<Order_By>;
+  effort?: InputMaybe<Order_By>;
+  elevation_gain_m?: InputMaybe<Order_By>;
+  feeling?: InputMaybe<Order_By>;
+  garmin_activity_id?: InputMaybe<Order_By>;
+  hard_tries?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  max_hr?: InputMaybe<Order_By>;
+  shoe_id?: InputMaybe<Order_By>;
+  start_lat?: InputMaybe<Order_By>;
+  start_lng?: InputMaybe<Order_By>;
 };
 
 /** Streaming cursor of the table "activities" */
@@ -629,6 +1068,8 @@ export type Activities_Stream_Cursor_Value_Input = {
   max_hr?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   notes?: InputMaybe<Scalars['String']['input']>;
+  samples_synced_at?: InputMaybe<Scalars['timestamptz']['input']>;
+  shoe_id?: InputMaybe<Scalars['bigint']['input']>;
   start_lat?: InputMaybe<Scalars['float8']['input']>;
   start_lng?: InputMaybe<Scalars['float8']['input']>;
   start_time?: InputMaybe<Scalars['timestamptz']['input']>;
@@ -654,8 +1095,29 @@ export type Activities_Sum_Fields = {
   hard_tries?: Maybe<Scalars['Int']['output']>;
   id?: Maybe<Scalars['bigint']['output']>;
   max_hr?: Maybe<Scalars['Int']['output']>;
+  shoe_id?: Maybe<Scalars['bigint']['output']>;
   start_lat?: Maybe<Scalars['float8']['output']>;
   start_lng?: Maybe<Scalars['float8']['output']>;
+};
+
+/** order by sum() on columns of table "activities" */
+export type Activities_Sum_Order_By = {
+  avg_hr?: InputMaybe<Order_By>;
+  avg_power_w?: InputMaybe<Order_By>;
+  avg_speed_mps?: InputMaybe<Order_By>;
+  calories?: InputMaybe<Order_By>;
+  distance_m?: InputMaybe<Order_By>;
+  duration_s?: InputMaybe<Order_By>;
+  effort?: InputMaybe<Order_By>;
+  elevation_gain_m?: InputMaybe<Order_By>;
+  feeling?: InputMaybe<Order_By>;
+  garmin_activity_id?: InputMaybe<Order_By>;
+  hard_tries?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  max_hr?: InputMaybe<Order_By>;
+  shoe_id?: InputMaybe<Order_By>;
+  start_lat?: InputMaybe<Order_By>;
+  start_lng?: InputMaybe<Order_By>;
 };
 
 /** update columns of table "activities" */
@@ -698,6 +1160,10 @@ export enum Activities_Update_Column {
   Name = 'name',
   /** column name */
   Notes = 'notes',
+  /** column name */
+  SamplesSyncedAt = 'samples_synced_at',
+  /** column name */
+  ShoeId = 'shoe_id',
   /** column name */
   StartLat = 'start_lat',
   /** column name */
@@ -749,8 +1215,29 @@ export type Activities_Var_Pop_Fields = {
   hard_tries?: Maybe<Scalars['Float']['output']>;
   id?: Maybe<Scalars['Float']['output']>;
   max_hr?: Maybe<Scalars['Float']['output']>;
+  shoe_id?: Maybe<Scalars['Float']['output']>;
   start_lat?: Maybe<Scalars['Float']['output']>;
   start_lng?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by var_pop() on columns of table "activities" */
+export type Activities_Var_Pop_Order_By = {
+  avg_hr?: InputMaybe<Order_By>;
+  avg_power_w?: InputMaybe<Order_By>;
+  avg_speed_mps?: InputMaybe<Order_By>;
+  calories?: InputMaybe<Order_By>;
+  distance_m?: InputMaybe<Order_By>;
+  duration_s?: InputMaybe<Order_By>;
+  effort?: InputMaybe<Order_By>;
+  elevation_gain_m?: InputMaybe<Order_By>;
+  feeling?: InputMaybe<Order_By>;
+  garmin_activity_id?: InputMaybe<Order_By>;
+  hard_tries?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  max_hr?: InputMaybe<Order_By>;
+  shoe_id?: InputMaybe<Order_By>;
+  start_lat?: InputMaybe<Order_By>;
+  start_lng?: InputMaybe<Order_By>;
 };
 
 /** aggregate var_samp on columns */
@@ -769,8 +1256,29 @@ export type Activities_Var_Samp_Fields = {
   hard_tries?: Maybe<Scalars['Float']['output']>;
   id?: Maybe<Scalars['Float']['output']>;
   max_hr?: Maybe<Scalars['Float']['output']>;
+  shoe_id?: Maybe<Scalars['Float']['output']>;
   start_lat?: Maybe<Scalars['Float']['output']>;
   start_lng?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by var_samp() on columns of table "activities" */
+export type Activities_Var_Samp_Order_By = {
+  avg_hr?: InputMaybe<Order_By>;
+  avg_power_w?: InputMaybe<Order_By>;
+  avg_speed_mps?: InputMaybe<Order_By>;
+  calories?: InputMaybe<Order_By>;
+  distance_m?: InputMaybe<Order_By>;
+  duration_s?: InputMaybe<Order_By>;
+  effort?: InputMaybe<Order_By>;
+  elevation_gain_m?: InputMaybe<Order_By>;
+  feeling?: InputMaybe<Order_By>;
+  garmin_activity_id?: InputMaybe<Order_By>;
+  hard_tries?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  max_hr?: InputMaybe<Order_By>;
+  shoe_id?: InputMaybe<Order_By>;
+  start_lat?: InputMaybe<Order_By>;
+  start_lng?: InputMaybe<Order_By>;
 };
 
 /** aggregate variance on columns */
@@ -789,8 +1297,321 @@ export type Activities_Variance_Fields = {
   hard_tries?: Maybe<Scalars['Float']['output']>;
   id?: Maybe<Scalars['Float']['output']>;
   max_hr?: Maybe<Scalars['Float']['output']>;
+  shoe_id?: Maybe<Scalars['Float']['output']>;
   start_lat?: Maybe<Scalars['Float']['output']>;
   start_lng?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by variance() on columns of table "activities" */
+export type Activities_Variance_Order_By = {
+  avg_hr?: InputMaybe<Order_By>;
+  avg_power_w?: InputMaybe<Order_By>;
+  avg_speed_mps?: InputMaybe<Order_By>;
+  calories?: InputMaybe<Order_By>;
+  distance_m?: InputMaybe<Order_By>;
+  duration_s?: InputMaybe<Order_By>;
+  effort?: InputMaybe<Order_By>;
+  elevation_gain_m?: InputMaybe<Order_By>;
+  feeling?: InputMaybe<Order_By>;
+  garmin_activity_id?: InputMaybe<Order_By>;
+  hard_tries?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  max_hr?: InputMaybe<Order_By>;
+  shoe_id?: InputMaybe<Order_By>;
+  start_lat?: InputMaybe<Order_By>;
+  start_lng?: InputMaybe<Order_By>;
+};
+
+/** columns and relationships of "activity_samples" */
+export type Activity_Samples = {
+  __typename?: 'activity_samples';
+  activity_id: Scalars['bigint']['output'];
+  altitude_m?: Maybe<Scalars['Float']['output']>;
+  distance_m?: Maybe<Scalars['Float']['output']>;
+  elapsed_s: Scalars['Int']['output'];
+  geom?: Maybe<Scalars['geometry']['output']>;
+  hr?: Maybe<Scalars['smallint']['output']>;
+  recorded_at: Scalars['timestamptz']['output'];
+};
+
+/** aggregated selection of "activity_samples" */
+export type Activity_Samples_Aggregate = {
+  __typename?: 'activity_samples_aggregate';
+  aggregate?: Maybe<Activity_Samples_Aggregate_Fields>;
+  nodes: Array<Activity_Samples>;
+};
+
+/** aggregate fields of "activity_samples" */
+export type Activity_Samples_Aggregate_Fields = {
+  __typename?: 'activity_samples_aggregate_fields';
+  avg?: Maybe<Activity_Samples_Avg_Fields>;
+  count: Scalars['Int']['output'];
+  max?: Maybe<Activity_Samples_Max_Fields>;
+  min?: Maybe<Activity_Samples_Min_Fields>;
+  stddev?: Maybe<Activity_Samples_Stddev_Fields>;
+  stddev_pop?: Maybe<Activity_Samples_Stddev_Pop_Fields>;
+  stddev_samp?: Maybe<Activity_Samples_Stddev_Samp_Fields>;
+  sum?: Maybe<Activity_Samples_Sum_Fields>;
+  var_pop?: Maybe<Activity_Samples_Var_Pop_Fields>;
+  var_samp?: Maybe<Activity_Samples_Var_Samp_Fields>;
+  variance?: Maybe<Activity_Samples_Variance_Fields>;
+};
+
+
+/** aggregate fields of "activity_samples" */
+export type Activity_Samples_Aggregate_FieldsCountArgs = {
+  columns?: InputMaybe<Array<Activity_Samples_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+/** aggregate avg on columns */
+export type Activity_Samples_Avg_Fields = {
+  __typename?: 'activity_samples_avg_fields';
+  activity_id?: Maybe<Scalars['Float']['output']>;
+  altitude_m?: Maybe<Scalars['Float']['output']>;
+  distance_m?: Maybe<Scalars['Float']['output']>;
+  elapsed_s?: Maybe<Scalars['Float']['output']>;
+  hr?: Maybe<Scalars['Float']['output']>;
+};
+
+/** Boolean expression to filter rows from the table "activity_samples". All fields are combined with a logical 'AND'. */
+export type Activity_Samples_Bool_Exp = {
+  _and?: InputMaybe<Array<Activity_Samples_Bool_Exp>>;
+  _not?: InputMaybe<Activity_Samples_Bool_Exp>;
+  _or?: InputMaybe<Array<Activity_Samples_Bool_Exp>>;
+  activity_id?: InputMaybe<Bigint_Comparison_Exp>;
+  altitude_m?: InputMaybe<Float_Comparison_Exp>;
+  distance_m?: InputMaybe<Float_Comparison_Exp>;
+  elapsed_s?: InputMaybe<Int_Comparison_Exp>;
+  geom?: InputMaybe<Geometry_Comparison_Exp>;
+  hr?: InputMaybe<Smallint_Comparison_Exp>;
+  recorded_at?: InputMaybe<Timestamptz_Comparison_Exp>;
+};
+
+/** unique or primary key constraints on table "activity_samples" */
+export enum Activity_Samples_Constraint {
+  /** unique or primary key constraint on columns "recorded_at", "activity_id" */
+  ActivitySamplesPkey = 'activity_samples_pkey'
+}
+
+/** input type for incrementing numeric columns in table "activity_samples" */
+export type Activity_Samples_Inc_Input = {
+  activity_id?: InputMaybe<Scalars['bigint']['input']>;
+  altitude_m?: InputMaybe<Scalars['Float']['input']>;
+  distance_m?: InputMaybe<Scalars['Float']['input']>;
+  elapsed_s?: InputMaybe<Scalars['Int']['input']>;
+  hr?: InputMaybe<Scalars['smallint']['input']>;
+};
+
+/** input type for inserting data into table "activity_samples" */
+export type Activity_Samples_Insert_Input = {
+  activity_id?: InputMaybe<Scalars['bigint']['input']>;
+  altitude_m?: InputMaybe<Scalars['Float']['input']>;
+  distance_m?: InputMaybe<Scalars['Float']['input']>;
+  elapsed_s?: InputMaybe<Scalars['Int']['input']>;
+  geom?: InputMaybe<Scalars['geometry']['input']>;
+  hr?: InputMaybe<Scalars['smallint']['input']>;
+  recorded_at?: InputMaybe<Scalars['timestamptz']['input']>;
+};
+
+/** aggregate max on columns */
+export type Activity_Samples_Max_Fields = {
+  __typename?: 'activity_samples_max_fields';
+  activity_id?: Maybe<Scalars['bigint']['output']>;
+  altitude_m?: Maybe<Scalars['Float']['output']>;
+  distance_m?: Maybe<Scalars['Float']['output']>;
+  elapsed_s?: Maybe<Scalars['Int']['output']>;
+  hr?: Maybe<Scalars['smallint']['output']>;
+  recorded_at?: Maybe<Scalars['timestamptz']['output']>;
+};
+
+/** aggregate min on columns */
+export type Activity_Samples_Min_Fields = {
+  __typename?: 'activity_samples_min_fields';
+  activity_id?: Maybe<Scalars['bigint']['output']>;
+  altitude_m?: Maybe<Scalars['Float']['output']>;
+  distance_m?: Maybe<Scalars['Float']['output']>;
+  elapsed_s?: Maybe<Scalars['Int']['output']>;
+  hr?: Maybe<Scalars['smallint']['output']>;
+  recorded_at?: Maybe<Scalars['timestamptz']['output']>;
+};
+
+/** response of any mutation on the table "activity_samples" */
+export type Activity_Samples_Mutation_Response = {
+  __typename?: 'activity_samples_mutation_response';
+  /** number of rows affected by the mutation */
+  affected_rows: Scalars['Int']['output'];
+  /** data from the rows affected by the mutation */
+  returning: Array<Activity_Samples>;
+};
+
+/** on_conflict condition type for table "activity_samples" */
+export type Activity_Samples_On_Conflict = {
+  constraint: Activity_Samples_Constraint;
+  update_columns?: Array<Activity_Samples_Update_Column>;
+  where?: InputMaybe<Activity_Samples_Bool_Exp>;
+};
+
+/** Ordering options when selecting data from "activity_samples". */
+export type Activity_Samples_Order_By = {
+  activity_id?: InputMaybe<Order_By>;
+  altitude_m?: InputMaybe<Order_By>;
+  distance_m?: InputMaybe<Order_By>;
+  elapsed_s?: InputMaybe<Order_By>;
+  geom?: InputMaybe<Order_By>;
+  hr?: InputMaybe<Order_By>;
+  recorded_at?: InputMaybe<Order_By>;
+};
+
+/** primary key columns input for table: activity_samples */
+export type Activity_Samples_Pk_Columns_Input = {
+  activity_id: Scalars['bigint']['input'];
+  recorded_at: Scalars['timestamptz']['input'];
+};
+
+/** select columns of table "activity_samples" */
+export enum Activity_Samples_Select_Column {
+  /** column name */
+  ActivityId = 'activity_id',
+  /** column name */
+  AltitudeM = 'altitude_m',
+  /** column name */
+  DistanceM = 'distance_m',
+  /** column name */
+  ElapsedS = 'elapsed_s',
+  /** column name */
+  Geom = 'geom',
+  /** column name */
+  Hr = 'hr',
+  /** column name */
+  RecordedAt = 'recorded_at'
+}
+
+/** input type for updating data in table "activity_samples" */
+export type Activity_Samples_Set_Input = {
+  activity_id?: InputMaybe<Scalars['bigint']['input']>;
+  altitude_m?: InputMaybe<Scalars['Float']['input']>;
+  distance_m?: InputMaybe<Scalars['Float']['input']>;
+  elapsed_s?: InputMaybe<Scalars['Int']['input']>;
+  geom?: InputMaybe<Scalars['geometry']['input']>;
+  hr?: InputMaybe<Scalars['smallint']['input']>;
+  recorded_at?: InputMaybe<Scalars['timestamptz']['input']>;
+};
+
+/** aggregate stddev on columns */
+export type Activity_Samples_Stddev_Fields = {
+  __typename?: 'activity_samples_stddev_fields';
+  activity_id?: Maybe<Scalars['Float']['output']>;
+  altitude_m?: Maybe<Scalars['Float']['output']>;
+  distance_m?: Maybe<Scalars['Float']['output']>;
+  elapsed_s?: Maybe<Scalars['Float']['output']>;
+  hr?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate stddev_pop on columns */
+export type Activity_Samples_Stddev_Pop_Fields = {
+  __typename?: 'activity_samples_stddev_pop_fields';
+  activity_id?: Maybe<Scalars['Float']['output']>;
+  altitude_m?: Maybe<Scalars['Float']['output']>;
+  distance_m?: Maybe<Scalars['Float']['output']>;
+  elapsed_s?: Maybe<Scalars['Float']['output']>;
+  hr?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate stddev_samp on columns */
+export type Activity_Samples_Stddev_Samp_Fields = {
+  __typename?: 'activity_samples_stddev_samp_fields';
+  activity_id?: Maybe<Scalars['Float']['output']>;
+  altitude_m?: Maybe<Scalars['Float']['output']>;
+  distance_m?: Maybe<Scalars['Float']['output']>;
+  elapsed_s?: Maybe<Scalars['Float']['output']>;
+  hr?: Maybe<Scalars['Float']['output']>;
+};
+
+/** Streaming cursor of the table "activity_samples" */
+export type Activity_Samples_Stream_Cursor_Input = {
+  /** Stream column input with initial value */
+  initial_value: Activity_Samples_Stream_Cursor_Value_Input;
+  /** cursor ordering */
+  ordering?: InputMaybe<Cursor_Ordering>;
+};
+
+/** Initial value of the column from where the streaming should start */
+export type Activity_Samples_Stream_Cursor_Value_Input = {
+  activity_id?: InputMaybe<Scalars['bigint']['input']>;
+  altitude_m?: InputMaybe<Scalars['Float']['input']>;
+  distance_m?: InputMaybe<Scalars['Float']['input']>;
+  elapsed_s?: InputMaybe<Scalars['Int']['input']>;
+  geom?: InputMaybe<Scalars['geometry']['input']>;
+  hr?: InputMaybe<Scalars['smallint']['input']>;
+  recorded_at?: InputMaybe<Scalars['timestamptz']['input']>;
+};
+
+/** aggregate sum on columns */
+export type Activity_Samples_Sum_Fields = {
+  __typename?: 'activity_samples_sum_fields';
+  activity_id?: Maybe<Scalars['bigint']['output']>;
+  altitude_m?: Maybe<Scalars['Float']['output']>;
+  distance_m?: Maybe<Scalars['Float']['output']>;
+  elapsed_s?: Maybe<Scalars['Int']['output']>;
+  hr?: Maybe<Scalars['smallint']['output']>;
+};
+
+/** update columns of table "activity_samples" */
+export enum Activity_Samples_Update_Column {
+  /** column name */
+  ActivityId = 'activity_id',
+  /** column name */
+  AltitudeM = 'altitude_m',
+  /** column name */
+  DistanceM = 'distance_m',
+  /** column name */
+  ElapsedS = 'elapsed_s',
+  /** column name */
+  Geom = 'geom',
+  /** column name */
+  Hr = 'hr',
+  /** column name */
+  RecordedAt = 'recorded_at'
+}
+
+export type Activity_Samples_Updates = {
+  /** increments the numeric columns with given value of the filtered values */
+  _inc?: InputMaybe<Activity_Samples_Inc_Input>;
+  /** sets the columns of the filtered rows to the given values */
+  _set?: InputMaybe<Activity_Samples_Set_Input>;
+  /** filter the rows which have to be updated */
+  where: Activity_Samples_Bool_Exp;
+};
+
+/** aggregate var_pop on columns */
+export type Activity_Samples_Var_Pop_Fields = {
+  __typename?: 'activity_samples_var_pop_fields';
+  activity_id?: Maybe<Scalars['Float']['output']>;
+  altitude_m?: Maybe<Scalars['Float']['output']>;
+  distance_m?: Maybe<Scalars['Float']['output']>;
+  elapsed_s?: Maybe<Scalars['Float']['output']>;
+  hr?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate var_samp on columns */
+export type Activity_Samples_Var_Samp_Fields = {
+  __typename?: 'activity_samples_var_samp_fields';
+  activity_id?: Maybe<Scalars['Float']['output']>;
+  altitude_m?: Maybe<Scalars['Float']['output']>;
+  distance_m?: Maybe<Scalars['Float']['output']>;
+  elapsed_s?: Maybe<Scalars['Float']['output']>;
+  hr?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate variance on columns */
+export type Activity_Samples_Variance_Fields = {
+  __typename?: 'activity_samples_variance_fields';
+  activity_id?: Maybe<Scalars['Float']['output']>;
+  altitude_m?: Maybe<Scalars['Float']['output']>;
+  distance_m?: Maybe<Scalars['Float']['output']>;
+  elapsed_s?: Maybe<Scalars['Float']['output']>;
+  hr?: Maybe<Scalars['Float']['output']>;
 };
 
 /** columns and relationships of "activity_streams" */
@@ -6335,6 +7156,66 @@ export type Food_Options_Stream_Cursor_Value_Input = {
   value?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type Geography_Cast_Exp = {
+  geometry?: InputMaybe<Geometry_Comparison_Exp>;
+};
+
+/** Boolean expression to compare columns of type "geography". All fields are combined with logical 'AND'. */
+export type Geography_Comparison_Exp = {
+  _cast?: InputMaybe<Geography_Cast_Exp>;
+  _eq?: InputMaybe<Scalars['geography']['input']>;
+  _gt?: InputMaybe<Scalars['geography']['input']>;
+  _gte?: InputMaybe<Scalars['geography']['input']>;
+  _in?: InputMaybe<Array<Scalars['geography']['input']>>;
+  _is_null?: InputMaybe<Scalars['Boolean']['input']>;
+  _lt?: InputMaybe<Scalars['geography']['input']>;
+  _lte?: InputMaybe<Scalars['geography']['input']>;
+  _neq?: InputMaybe<Scalars['geography']['input']>;
+  _nin?: InputMaybe<Array<Scalars['geography']['input']>>;
+  /** is the column within a given distance from the given geography value */
+  _st_d_within?: InputMaybe<St_D_Within_Geography_Input>;
+  /** does the column spatially intersect the given geography value */
+  _st_intersects?: InputMaybe<Scalars['geography']['input']>;
+};
+
+export type Geometry_Cast_Exp = {
+  geography?: InputMaybe<Geography_Comparison_Exp>;
+};
+
+/** Boolean expression to compare columns of type "geometry". All fields are combined with logical 'AND'. */
+export type Geometry_Comparison_Exp = {
+  _cast?: InputMaybe<Geometry_Cast_Exp>;
+  _eq?: InputMaybe<Scalars['geometry']['input']>;
+  _gt?: InputMaybe<Scalars['geometry']['input']>;
+  _gte?: InputMaybe<Scalars['geometry']['input']>;
+  _in?: InputMaybe<Array<Scalars['geometry']['input']>>;
+  _is_null?: InputMaybe<Scalars['Boolean']['input']>;
+  _lt?: InputMaybe<Scalars['geometry']['input']>;
+  _lte?: InputMaybe<Scalars['geometry']['input']>;
+  _neq?: InputMaybe<Scalars['geometry']['input']>;
+  _nin?: InputMaybe<Array<Scalars['geometry']['input']>>;
+  /** is the column within a given 3D distance from the given geometry value */
+  _st_3d_d_within?: InputMaybe<St_D_Within_Input>;
+  /** does the column spatially intersect the given geometry value in 3D */
+  _st_3d_intersects?: InputMaybe<Scalars['geometry']['input']>;
+  /** does the column contain the given geometry value */
+  _st_contains?: InputMaybe<Scalars['geometry']['input']>;
+  /** does the column cross the given geometry value */
+  _st_crosses?: InputMaybe<Scalars['geometry']['input']>;
+  /** is the column within a given distance from the given geometry value */
+  _st_d_within?: InputMaybe<St_D_Within_Input>;
+  /** is the column equal to given geometry value (directionality is ignored) */
+  _st_equals?: InputMaybe<Scalars['geometry']['input']>;
+  /** does the column spatially intersect the given geometry value */
+  _st_intersects?: InputMaybe<Scalars['geometry']['input']>;
+  /** does the column 'spatially overlap' (intersect but not completely contain) the given geometry value */
+  _st_overlaps?: InputMaybe<Scalars['geometry']['input']>;
+  /** does the column have atleast one point in common with the given geometry value */
+  _st_touches?: InputMaybe<Scalars['geometry']['input']>;
+  /** is the column contained in the given geometry value */
+  _st_within?: InputMaybe<Scalars['geometry']['input']>;
+};
+
 export type Jsonb_Cast_Exp = {
   String?: InputMaybe<String_Comparison_Exp>;
 };
@@ -6434,6 +7315,10 @@ export type Mutation_Root = {
   delete_activities?: Maybe<Activities_Mutation_Response>;
   /** delete single row from the table: "activities" */
   delete_activities_by_pk?: Maybe<Activities>;
+  /** delete data from the table: "activity_samples" */
+  delete_activity_samples?: Maybe<Activity_Samples_Mutation_Response>;
+  /** delete single row from the table: "activity_samples" */
+  delete_activity_samples_by_pk?: Maybe<Activity_Samples>;
   /** delete data from the table: "activity_streams" */
   delete_activity_streams?: Maybe<Activity_Streams_Mutation_Response>;
   /** delete single row from the table: "activity_streams" */
@@ -6458,6 +7343,10 @@ export type Mutation_Root = {
   delete_races?: Maybe<Races_Mutation_Response>;
   /** delete single row from the table: "races" */
   delete_races_by_pk?: Maybe<Races>;
+  /** delete data from the table: "shoes" */
+  delete_shoes?: Maybe<Shoes_Mutation_Response>;
+  /** delete single row from the table: "shoes" */
+  delete_shoes_by_pk?: Maybe<Shoes>;
   /** delete data from the table: "sleep" */
   delete_sleep?: Maybe<Sleep_Mutation_Response>;
   /** delete single row from the table: "sleep" */
@@ -6546,6 +7435,10 @@ export type Mutation_Root = {
   insert_activities?: Maybe<Activities_Mutation_Response>;
   /** insert a single row into the table: "activities" */
   insert_activities_one?: Maybe<Activities>;
+  /** insert data into the table: "activity_samples" */
+  insert_activity_samples?: Maybe<Activity_Samples_Mutation_Response>;
+  /** insert a single row into the table: "activity_samples" */
+  insert_activity_samples_one?: Maybe<Activity_Samples>;
   /** insert data into the table: "activity_streams" */
   insert_activity_streams?: Maybe<Activity_Streams_Mutation_Response>;
   /** insert a single row into the table: "activity_streams" */
@@ -6570,6 +7463,10 @@ export type Mutation_Root = {
   insert_races?: Maybe<Races_Mutation_Response>;
   /** insert a single row into the table: "races" */
   insert_races_one?: Maybe<Races>;
+  /** insert data into the table: "shoes" */
+  insert_shoes?: Maybe<Shoes_Mutation_Response>;
+  /** insert a single row into the table: "shoes" */
+  insert_shoes_one?: Maybe<Shoes>;
   /** insert data into the table: "sleep" */
   insert_sleep?: Maybe<Sleep_Mutation_Response>;
   /** insert a single row into the table: "sleep" */
@@ -6660,6 +7557,12 @@ export type Mutation_Root = {
   update_activities_by_pk?: Maybe<Activities>;
   /** update multiples rows of table: "activities" */
   update_activities_many?: Maybe<Array<Maybe<Activities_Mutation_Response>>>;
+  /** update data of the table: "activity_samples" */
+  update_activity_samples?: Maybe<Activity_Samples_Mutation_Response>;
+  /** update single row of the table: "activity_samples" */
+  update_activity_samples_by_pk?: Maybe<Activity_Samples>;
+  /** update multiples rows of table: "activity_samples" */
+  update_activity_samples_many?: Maybe<Array<Maybe<Activity_Samples_Mutation_Response>>>;
   /** update data of the table: "activity_streams" */
   update_activity_streams?: Maybe<Activity_Streams_Mutation_Response>;
   /** update single row of the table: "activity_streams" */
@@ -6724,6 +7627,12 @@ export type Mutation_Root = {
   update_races_by_pk?: Maybe<Races>;
   /** update multiples rows of table: "races" */
   update_races_many?: Maybe<Array<Maybe<Races_Mutation_Response>>>;
+  /** update data of the table: "shoes" */
+  update_shoes?: Maybe<Shoes_Mutation_Response>;
+  /** update single row of the table: "shoes" */
+  update_shoes_by_pk?: Maybe<Shoes>;
+  /** update multiples rows of table: "shoes" */
+  update_shoes_many?: Maybe<Array<Maybe<Shoes_Mutation_Response>>>;
   /** update data of the table: "sleep" */
   update_sleep?: Maybe<Sleep_Mutation_Response>;
   /** update single row of the table: "sleep" */
@@ -6966,6 +7875,19 @@ export type Mutation_RootDelete_Activities_By_PkArgs = {
 
 
 /** mutation root */
+export type Mutation_RootDelete_Activity_SamplesArgs = {
+  where: Activity_Samples_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_Activity_Samples_By_PkArgs = {
+  activity_id: Scalars['bigint']['input'];
+  recorded_at: Scalars['timestamptz']['input'];
+};
+
+
+/** mutation root */
 export type Mutation_RootDelete_Activity_StreamsArgs = {
   where: Activity_Streams_Bool_Exp;
 };
@@ -7033,6 +7955,18 @@ export type Mutation_RootDelete_RacesArgs = {
 
 /** mutation root */
 export type Mutation_RootDelete_Races_By_PkArgs = {
+  id: Scalars['bigint']['input'];
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_ShoesArgs = {
+  where: Shoes_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_Shoes_By_PkArgs = {
   id: Scalars['bigint']['input'];
 };
 
@@ -7336,6 +8270,20 @@ export type Mutation_RootInsert_Activities_OneArgs = {
 
 
 /** mutation root */
+export type Mutation_RootInsert_Activity_SamplesArgs = {
+  objects: Array<Activity_Samples_Insert_Input>;
+  on_conflict?: InputMaybe<Activity_Samples_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_Activity_Samples_OneArgs = {
+  object: Activity_Samples_Insert_Input;
+  on_conflict?: InputMaybe<Activity_Samples_On_Conflict>;
+};
+
+
+/** mutation root */
 export type Mutation_RootInsert_Activity_StreamsArgs = {
   objects: Array<Activity_Streams_Insert_Input>;
   on_conflict?: InputMaybe<Activity_Streams_On_Conflict>;
@@ -7416,6 +8364,20 @@ export type Mutation_RootInsert_RacesArgs = {
 export type Mutation_RootInsert_Races_OneArgs = {
   object: Races_Insert_Input;
   on_conflict?: InputMaybe<Races_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_ShoesArgs = {
+  objects: Array<Shoes_Insert_Input>;
+  on_conflict?: InputMaybe<Shoes_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_Shoes_OneArgs = {
+  object: Shoes_Insert_Input;
+  on_conflict?: InputMaybe<Shoes_On_Conflict>;
 };
 
 
@@ -7812,6 +8774,28 @@ export type Mutation_RootUpdate_Activities_ManyArgs = {
 
 
 /** mutation root */
+export type Mutation_RootUpdate_Activity_SamplesArgs = {
+  _inc?: InputMaybe<Activity_Samples_Inc_Input>;
+  _set?: InputMaybe<Activity_Samples_Set_Input>;
+  where: Activity_Samples_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Activity_Samples_By_PkArgs = {
+  _inc?: InputMaybe<Activity_Samples_Inc_Input>;
+  _set?: InputMaybe<Activity_Samples_Set_Input>;
+  pk_columns: Activity_Samples_Pk_Columns_Input;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Activity_Samples_ManyArgs = {
+  updates: Array<Activity_Samples_Updates>;
+};
+
+
+/** mutation root */
 export type Mutation_RootUpdate_Activity_StreamsArgs = {
   _append?: InputMaybe<Activity_Streams_Append_Input>;
   _delete_at_path?: InputMaybe<Activity_Streams_Delete_At_Path_Input>;
@@ -8042,6 +9026,28 @@ export type Mutation_RootUpdate_Races_ManyArgs = {
 
 
 /** mutation root */
+export type Mutation_RootUpdate_ShoesArgs = {
+  _inc?: InputMaybe<Shoes_Inc_Input>;
+  _set?: InputMaybe<Shoes_Set_Input>;
+  where: Shoes_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Shoes_By_PkArgs = {
+  _inc?: InputMaybe<Shoes_Inc_Input>;
+  _set?: InputMaybe<Shoes_Set_Input>;
+  pk_columns: Shoes_Pk_Columns_Input;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Shoes_ManyArgs = {
+  updates: Array<Shoes_Updates>;
+};
+
+
+/** mutation root */
 export type Mutation_RootUpdate_SleepArgs = {
   _inc?: InputMaybe<Sleep_Inc_Input>;
   _set?: InputMaybe<Sleep_Set_Input>;
@@ -8191,12 +9197,18 @@ export enum Order_By {
 
 export type Query_Root = {
   __typename?: 'query_root';
-  /** fetch data from the table: "activities" */
+  /** An array relationship */
   activities: Array<Activities>;
-  /** fetch aggregated fields from the table: "activities" */
+  /** An aggregate relationship */
   activities_aggregate: Activities_Aggregate;
   /** fetch data from the table: "activities" using primary key columns */
   activities_by_pk?: Maybe<Activities>;
+  /** fetch data from the table: "activity_samples" */
+  activity_samples: Array<Activity_Samples>;
+  /** fetch aggregated fields from the table: "activity_samples" */
+  activity_samples_aggregate: Activity_Samples_Aggregate;
+  /** fetch data from the table: "activity_samples" using primary key columns */
+  activity_samples_by_pk?: Maybe<Activity_Samples>;
   /** An array relationship */
   activity_streams: Array<Activity_Streams>;
   /** An aggregate relationship */
@@ -8321,6 +9333,12 @@ export type Query_Root = {
   races_aggregate: Races_Aggregate;
   /** fetch data from the table: "races" using primary key columns */
   races_by_pk?: Maybe<Races>;
+  /** fetch data from the table: "shoes" */
+  shoes: Array<Shoes>;
+  /** fetch aggregated fields from the table: "shoes" */
+  shoes_aggregate: Shoes_Aggregate;
+  /** fetch data from the table: "shoes" using primary key columns */
+  shoes_by_pk?: Maybe<Shoes>;
   /** fetch data from the table: "sleep" */
   sleep: Array<Sleep>;
   /** fetch aggregated fields from the table: "sleep" */
@@ -8386,6 +9404,30 @@ export type Query_RootActivities_AggregateArgs = {
 
 export type Query_RootActivities_By_PkArgs = {
   id: Scalars['bigint']['input'];
+};
+
+
+export type Query_RootActivity_SamplesArgs = {
+  distinct_on?: InputMaybe<Array<Activity_Samples_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Activity_Samples_Order_By>>;
+  where?: InputMaybe<Activity_Samples_Bool_Exp>;
+};
+
+
+export type Query_RootActivity_Samples_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Activity_Samples_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Activity_Samples_Order_By>>;
+  where?: InputMaybe<Activity_Samples_Bool_Exp>;
+};
+
+
+export type Query_RootActivity_Samples_By_PkArgs = {
+  activity_id: Scalars['bigint']['input'];
+  recorded_at: Scalars['timestamptz']['input'];
 };
 
 
@@ -8867,6 +9909,29 @@ export type Query_RootRaces_By_PkArgs = {
 };
 
 
+export type Query_RootShoesArgs = {
+  distinct_on?: InputMaybe<Array<Shoes_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Shoes_Order_By>>;
+  where?: InputMaybe<Shoes_Bool_Exp>;
+};
+
+
+export type Query_RootShoes_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Shoes_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Shoes_Order_By>>;
+  where?: InputMaybe<Shoes_Bool_Exp>;
+};
+
+
+export type Query_RootShoes_By_PkArgs = {
+  id: Scalars['bigint']['input'];
+};
+
+
 export type Query_RootSleepArgs = {
   distinct_on?: InputMaybe<Array<Sleep_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -9273,6 +10338,266 @@ export type Races_Variance_Fields = {
   id?: Maybe<Scalars['Float']['output']>;
 };
 
+/** columns and relationships of "shoes" */
+export type Shoes = {
+  __typename?: 'shoes';
+  /** An array relationship */
+  activities: Array<Activities>;
+  /** An aggregate relationship */
+  activities_aggregate: Activities_Aggregate;
+  id: Scalars['bigint']['output'];
+  image_url?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  starting_km: Scalars['numeric']['output'];
+};
+
+
+/** columns and relationships of "shoes" */
+export type ShoesActivitiesArgs = {
+  distinct_on?: InputMaybe<Array<Activities_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Activities_Order_By>>;
+  where?: InputMaybe<Activities_Bool_Exp>;
+};
+
+
+/** columns and relationships of "shoes" */
+export type ShoesActivities_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Activities_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Activities_Order_By>>;
+  where?: InputMaybe<Activities_Bool_Exp>;
+};
+
+/** aggregated selection of "shoes" */
+export type Shoes_Aggregate = {
+  __typename?: 'shoes_aggregate';
+  aggregate?: Maybe<Shoes_Aggregate_Fields>;
+  nodes: Array<Shoes>;
+};
+
+/** aggregate fields of "shoes" */
+export type Shoes_Aggregate_Fields = {
+  __typename?: 'shoes_aggregate_fields';
+  avg?: Maybe<Shoes_Avg_Fields>;
+  count: Scalars['Int']['output'];
+  max?: Maybe<Shoes_Max_Fields>;
+  min?: Maybe<Shoes_Min_Fields>;
+  stddev?: Maybe<Shoes_Stddev_Fields>;
+  stddev_pop?: Maybe<Shoes_Stddev_Pop_Fields>;
+  stddev_samp?: Maybe<Shoes_Stddev_Samp_Fields>;
+  sum?: Maybe<Shoes_Sum_Fields>;
+  var_pop?: Maybe<Shoes_Var_Pop_Fields>;
+  var_samp?: Maybe<Shoes_Var_Samp_Fields>;
+  variance?: Maybe<Shoes_Variance_Fields>;
+};
+
+
+/** aggregate fields of "shoes" */
+export type Shoes_Aggregate_FieldsCountArgs = {
+  columns?: InputMaybe<Array<Shoes_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+/** aggregate avg on columns */
+export type Shoes_Avg_Fields = {
+  __typename?: 'shoes_avg_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+  starting_km?: Maybe<Scalars['Float']['output']>;
+};
+
+/** Boolean expression to filter rows from the table "shoes". All fields are combined with a logical 'AND'. */
+export type Shoes_Bool_Exp = {
+  _and?: InputMaybe<Array<Shoes_Bool_Exp>>;
+  _not?: InputMaybe<Shoes_Bool_Exp>;
+  _or?: InputMaybe<Array<Shoes_Bool_Exp>>;
+  activities?: InputMaybe<Activities_Bool_Exp>;
+  activities_aggregate?: InputMaybe<Activities_Aggregate_Bool_Exp>;
+  id?: InputMaybe<Bigint_Comparison_Exp>;
+  image_url?: InputMaybe<String_Comparison_Exp>;
+  name?: InputMaybe<String_Comparison_Exp>;
+  starting_km?: InputMaybe<Numeric_Comparison_Exp>;
+};
+
+/** unique or primary key constraints on table "shoes" */
+export enum Shoes_Constraint {
+  /** unique or primary key constraint on columns "id" */
+  ShoesPkey = 'shoes_pkey'
+}
+
+/** input type for incrementing numeric columns in table "shoes" */
+export type Shoes_Inc_Input = {
+  starting_km?: InputMaybe<Scalars['numeric']['input']>;
+};
+
+/** input type for inserting data into table "shoes" */
+export type Shoes_Insert_Input = {
+  activities?: InputMaybe<Activities_Arr_Rel_Insert_Input>;
+  image_url?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  starting_km?: InputMaybe<Scalars['numeric']['input']>;
+};
+
+/** aggregate max on columns */
+export type Shoes_Max_Fields = {
+  __typename?: 'shoes_max_fields';
+  id?: Maybe<Scalars['bigint']['output']>;
+  image_url?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  starting_km?: Maybe<Scalars['numeric']['output']>;
+};
+
+/** aggregate min on columns */
+export type Shoes_Min_Fields = {
+  __typename?: 'shoes_min_fields';
+  id?: Maybe<Scalars['bigint']['output']>;
+  image_url?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  starting_km?: Maybe<Scalars['numeric']['output']>;
+};
+
+/** response of any mutation on the table "shoes" */
+export type Shoes_Mutation_Response = {
+  __typename?: 'shoes_mutation_response';
+  /** number of rows affected by the mutation */
+  affected_rows: Scalars['Int']['output'];
+  /** data from the rows affected by the mutation */
+  returning: Array<Shoes>;
+};
+
+/** input type for inserting object relation for remote table "shoes" */
+export type Shoes_Obj_Rel_Insert_Input = {
+  data: Shoes_Insert_Input;
+  /** upsert condition */
+  on_conflict?: InputMaybe<Shoes_On_Conflict>;
+};
+
+/** on_conflict condition type for table "shoes" */
+export type Shoes_On_Conflict = {
+  constraint: Shoes_Constraint;
+  update_columns?: Array<Shoes_Update_Column>;
+  where?: InputMaybe<Shoes_Bool_Exp>;
+};
+
+/** Ordering options when selecting data from "shoes". */
+export type Shoes_Order_By = {
+  activities_aggregate?: InputMaybe<Activities_Aggregate_Order_By>;
+  id?: InputMaybe<Order_By>;
+  image_url?: InputMaybe<Order_By>;
+  name?: InputMaybe<Order_By>;
+  starting_km?: InputMaybe<Order_By>;
+};
+
+/** primary key columns input for table: shoes */
+export type Shoes_Pk_Columns_Input = {
+  id: Scalars['bigint']['input'];
+};
+
+/** select columns of table "shoes" */
+export enum Shoes_Select_Column {
+  /** column name */
+  Id = 'id',
+  /** column name */
+  ImageUrl = 'image_url',
+  /** column name */
+  Name = 'name',
+  /** column name */
+  StartingKm = 'starting_km'
+}
+
+/** input type for updating data in table "shoes" */
+export type Shoes_Set_Input = {
+  image_url?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  starting_km?: InputMaybe<Scalars['numeric']['input']>;
+};
+
+/** aggregate stddev on columns */
+export type Shoes_Stddev_Fields = {
+  __typename?: 'shoes_stddev_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+  starting_km?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate stddev_pop on columns */
+export type Shoes_Stddev_Pop_Fields = {
+  __typename?: 'shoes_stddev_pop_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+  starting_km?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate stddev_samp on columns */
+export type Shoes_Stddev_Samp_Fields = {
+  __typename?: 'shoes_stddev_samp_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+  starting_km?: Maybe<Scalars['Float']['output']>;
+};
+
+/** Streaming cursor of the table "shoes" */
+export type Shoes_Stream_Cursor_Input = {
+  /** Stream column input with initial value */
+  initial_value: Shoes_Stream_Cursor_Value_Input;
+  /** cursor ordering */
+  ordering?: InputMaybe<Cursor_Ordering>;
+};
+
+/** Initial value of the column from where the streaming should start */
+export type Shoes_Stream_Cursor_Value_Input = {
+  id?: InputMaybe<Scalars['bigint']['input']>;
+  image_url?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  starting_km?: InputMaybe<Scalars['numeric']['input']>;
+};
+
+/** aggregate sum on columns */
+export type Shoes_Sum_Fields = {
+  __typename?: 'shoes_sum_fields';
+  id?: Maybe<Scalars['bigint']['output']>;
+  starting_km?: Maybe<Scalars['numeric']['output']>;
+};
+
+/** update columns of table "shoes" */
+export enum Shoes_Update_Column {
+  /** column name */
+  ImageUrl = 'image_url',
+  /** column name */
+  Name = 'name',
+  /** column name */
+  StartingKm = 'starting_km'
+}
+
+export type Shoes_Updates = {
+  /** increments the numeric columns with given value of the filtered values */
+  _inc?: InputMaybe<Shoes_Inc_Input>;
+  /** sets the columns of the filtered rows to the given values */
+  _set?: InputMaybe<Shoes_Set_Input>;
+  /** filter the rows which have to be updated */
+  where: Shoes_Bool_Exp;
+};
+
+/** aggregate var_pop on columns */
+export type Shoes_Var_Pop_Fields = {
+  __typename?: 'shoes_var_pop_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+  starting_km?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate var_samp on columns */
+export type Shoes_Var_Samp_Fields = {
+  __typename?: 'shoes_var_samp_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+  starting_km?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate variance on columns */
+export type Shoes_Variance_Fields = {
+  __typename?: 'shoes_variance_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+  starting_km?: Maybe<Scalars['Float']['output']>;
+};
+
 /** columns and relationships of "sleep" */
 export type Sleep = {
   __typename?: 'sleep';
@@ -9671,6 +10996,19 @@ export type Sleep_Variance_Fields = {
   total_sleep_s?: Maybe<Scalars['Float']['output']>;
 };
 
+/** Boolean expression to compare columns of type "smallint". All fields are combined with logical 'AND'. */
+export type Smallint_Comparison_Exp = {
+  _eq?: InputMaybe<Scalars['smallint']['input']>;
+  _gt?: InputMaybe<Scalars['smallint']['input']>;
+  _gte?: InputMaybe<Scalars['smallint']['input']>;
+  _in?: InputMaybe<Array<Scalars['smallint']['input']>>;
+  _is_null?: InputMaybe<Scalars['Boolean']['input']>;
+  _lt?: InputMaybe<Scalars['smallint']['input']>;
+  _lte?: InputMaybe<Scalars['smallint']['input']>;
+  _neq?: InputMaybe<Scalars['smallint']['input']>;
+  _nin?: InputMaybe<Array<Scalars['smallint']['input']>>;
+};
+
 /** columns and relationships of "sports" */
 export type Sports = {
   __typename?: 'sports';
@@ -9945,16 +11283,35 @@ export type Sports_Variance_Fields = {
   sort_order?: Maybe<Scalars['Float']['output']>;
 };
 
+export type St_D_Within_Geography_Input = {
+  distance: Scalars['Float']['input'];
+  from: Scalars['geography']['input'];
+  use_spheroid?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type St_D_Within_Input = {
+  distance: Scalars['Float']['input'];
+  from: Scalars['geometry']['input'];
+};
+
 export type Subscription_Root = {
   __typename?: 'subscription_root';
-  /** fetch data from the table: "activities" */
+  /** An array relationship */
   activities: Array<Activities>;
-  /** fetch aggregated fields from the table: "activities" */
+  /** An aggregate relationship */
   activities_aggregate: Activities_Aggregate;
   /** fetch data from the table: "activities" using primary key columns */
   activities_by_pk?: Maybe<Activities>;
   /** fetch data from the table in a streaming manner: "activities" */
   activities_stream: Array<Activities>;
+  /** fetch data from the table: "activity_samples" */
+  activity_samples: Array<Activity_Samples>;
+  /** fetch aggregated fields from the table: "activity_samples" */
+  activity_samples_aggregate: Activity_Samples_Aggregate;
+  /** fetch data from the table: "activity_samples" using primary key columns */
+  activity_samples_by_pk?: Maybe<Activity_Samples>;
+  /** fetch data from the table in a streaming manner: "activity_samples" */
+  activity_samples_stream: Array<Activity_Samples>;
   /** An array relationship */
   activity_streams: Array<Activity_Streams>;
   /** An aggregate relationship */
@@ -10121,6 +11478,14 @@ export type Subscription_Root = {
   races_by_pk?: Maybe<Races>;
   /** fetch data from the table in a streaming manner: "races" */
   races_stream: Array<Races>;
+  /** fetch data from the table: "shoes" */
+  shoes: Array<Shoes>;
+  /** fetch aggregated fields from the table: "shoes" */
+  shoes_aggregate: Shoes_Aggregate;
+  /** fetch data from the table: "shoes" using primary key columns */
+  shoes_by_pk?: Maybe<Shoes>;
+  /** fetch data from the table in a streaming manner: "shoes" */
+  shoes_stream: Array<Shoes>;
   /** fetch data from the table: "sleep" */
   sleep: Array<Sleep>;
   /** fetch aggregated fields from the table: "sleep" */
@@ -10207,6 +11572,37 @@ export type Subscription_RootActivities_StreamArgs = {
   batch_size: Scalars['Int']['input'];
   cursor: Array<InputMaybe<Activities_Stream_Cursor_Input>>;
   where?: InputMaybe<Activities_Bool_Exp>;
+};
+
+
+export type Subscription_RootActivity_SamplesArgs = {
+  distinct_on?: InputMaybe<Array<Activity_Samples_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Activity_Samples_Order_By>>;
+  where?: InputMaybe<Activity_Samples_Bool_Exp>;
+};
+
+
+export type Subscription_RootActivity_Samples_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Activity_Samples_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Activity_Samples_Order_By>>;
+  where?: InputMaybe<Activity_Samples_Bool_Exp>;
+};
+
+
+export type Subscription_RootActivity_Samples_By_PkArgs = {
+  activity_id: Scalars['bigint']['input'];
+  recorded_at: Scalars['timestamptz']['input'];
+};
+
+
+export type Subscription_RootActivity_Samples_StreamArgs = {
+  batch_size: Scalars['Int']['input'];
+  cursor: Array<InputMaybe<Activity_Samples_Stream_Cursor_Input>>;
+  where?: InputMaybe<Activity_Samples_Bool_Exp>;
 };
 
 
@@ -10832,6 +12228,36 @@ export type Subscription_RootRaces_StreamArgs = {
   batch_size: Scalars['Int']['input'];
   cursor: Array<InputMaybe<Races_Stream_Cursor_Input>>;
   where?: InputMaybe<Races_Bool_Exp>;
+};
+
+
+export type Subscription_RootShoesArgs = {
+  distinct_on?: InputMaybe<Array<Shoes_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Shoes_Order_By>>;
+  where?: InputMaybe<Shoes_Bool_Exp>;
+};
+
+
+export type Subscription_RootShoes_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Shoes_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Shoes_Order_By>>;
+  where?: InputMaybe<Shoes_Bool_Exp>;
+};
+
+
+export type Subscription_RootShoes_By_PkArgs = {
+  id: Scalars['bigint']['input'];
+};
+
+
+export type Subscription_RootShoes_StreamArgs = {
+  batch_size: Scalars['Int']['input'];
+  cursor: Array<InputMaybe<Shoes_Stream_Cursor_Input>>;
+  where?: InputMaybe<Shoes_Bool_Exp>;
 };
 
 
@@ -13214,6 +14640,8 @@ export type GeneratedActivities_Set_Input = {
   max_hr?: number | null | undefined;
   name?: string | null | undefined;
   notes?: string | null | undefined;
+  samples_synced_at?: unknown;
+  shoe_id?: unknown;
   start_lat?: unknown;
   start_lng?: unknown;
   start_time?: unknown;
@@ -13519,14 +14947,14 @@ export type GeneratedActivitiesSmokeQuery = { activities: Array<{ id: unknown, g
 export type GeneratedCalendarActivitiesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GeneratedCalendarActivitiesQuery = { activities: Array<{ id: unknown, name: string | null, activity_type: string | null, subtype: string | null, start_time: unknown, duration_s: unknown, distance_m: unknown, elevation_gain_m: unknown, start_lat: unknown, feeling: number | null, effort: number | null, caffeine: string | null, focus: string | null }> };
+export type GeneratedCalendarActivitiesQuery = { activities: Array<{ id: unknown, name: string | null, activity_type: string | null, subtype: string | null, start_time: unknown, duration_s: unknown, distance_m: unknown, elevation_gain_m: unknown, start_lat: unknown, feeling: number | null, effort: number | null, caffeine: string | null, focus: string | null, shoe_id: unknown }> };
 
 export type GeneratedActivityDetailQueryVariables = Exact<{
   id: unknown;
 }>;
 
 
-export type GeneratedActivityDetailQuery = { activities_by_pk: { id: unknown, garmin_activity_id: unknown, name: string | null, activity_type: string | null, subtype: string | null, start_time: unknown, duration_s: unknown, distance_m: unknown, elevation_gain_m: unknown, avg_hr: number | null, max_hr: number | null, calories: number | null, avg_speed_mps: unknown, avg_power_w: unknown, feeling: number | null, effort: number | null, food_during: Array<string> | null, food_after: Array<string> | null, caffeine: string | null, weather: string | null, notes: string | null, focus: string | null, hard_tries: number | null, strength_exercises: unknown, activity_streams: Array<{ payload: unknown }> } | null };
+export type GeneratedActivityDetailQuery = { activities_by_pk: { id: unknown, garmin_activity_id: unknown, name: string | null, activity_type: string | null, subtype: string | null, start_time: unknown, duration_s: unknown, distance_m: unknown, elevation_gain_m: unknown, avg_hr: number | null, max_hr: number | null, calories: number | null, avg_speed_mps: unknown, avg_power_w: unknown, feeling: number | null, effort: number | null, food_during: Array<string> | null, food_after: Array<string> | null, caffeine: string | null, weather: string | null, notes: string | null, focus: string | null, hard_tries: number | null, strength_exercises: unknown, shoe_id: unknown, shoe: { id: unknown, name: string } | null, activity_streams: Array<{ payload: unknown }> } | null };
 
 export type GeneratedUpdateActivityMutationVariables = Exact<{
   id: unknown;
@@ -13534,7 +14962,7 @@ export type GeneratedUpdateActivityMutationVariables = Exact<{
 }>;
 
 
-export type GeneratedUpdateActivityMutation = { update_activities_by_pk: { id: unknown, name: string | null, subtype: string | null, feeling: number | null, effort: number | null, food_during: Array<string> | null, food_after: Array<string> | null, caffeine: string | null, weather: string | null, notes: string | null, focus: string | null, hard_tries: number | null, strength_exercises: unknown } | null };
+export type GeneratedUpdateActivityMutation = { update_activities_by_pk: { id: unknown, name: string | null, subtype: string | null, feeling: number | null, effort: number | null, food_during: Array<string> | null, food_after: Array<string> | null, caffeine: string | null, weather: string | null, notes: string | null, focus: string | null, hard_tries: number | null, strength_exercises: unknown, shoe_id: unknown, shoe: { id: unknown, name: string } | null } | null };
 
 export type GeneratedFoodOptionsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -13676,9 +15104,9 @@ export type GeneratedDeleteWeekObjectiveMutation = { delete_week_objectives_by_p
 
 
 export const ActivitiesSmokeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ActivitiesSmoke"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"activities"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"start_time"},"value":{"kind":"EnumValue","value":"desc_nulls_last"}}]}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"25"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"garmin_activity_id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"activity_type"}},{"kind":"Field","name":{"kind":"Name","value":"subtype"}},{"kind":"Field","name":{"kind":"Name","value":"start_time"}},{"kind":"Field","name":{"kind":"Name","value":"duration_s"}},{"kind":"Field","name":{"kind":"Name","value":"distance_m"}}]}}]}}]} as unknown as DocumentNode<GeneratedActivitiesSmokeQuery, GeneratedActivitiesSmokeQueryVariables>;
-export const CalendarActivitiesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CalendarActivities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"activities"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"start_time"},"value":{"kind":"EnumValue","value":"desc_nulls_last"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"activity_type"}},{"kind":"Field","name":{"kind":"Name","value":"subtype"}},{"kind":"Field","name":{"kind":"Name","value":"start_time"}},{"kind":"Field","name":{"kind":"Name","value":"duration_s"}},{"kind":"Field","name":{"kind":"Name","value":"distance_m"}},{"kind":"Field","name":{"kind":"Name","value":"elevation_gain_m"}},{"kind":"Field","name":{"kind":"Name","value":"start_lat"}},{"kind":"Field","name":{"kind":"Name","value":"feeling"}},{"kind":"Field","name":{"kind":"Name","value":"effort"}},{"kind":"Field","name":{"kind":"Name","value":"caffeine"}},{"kind":"Field","name":{"kind":"Name","value":"focus"}}]}}]}}]} as unknown as DocumentNode<GeneratedCalendarActivitiesQuery, GeneratedCalendarActivitiesQueryVariables>;
-export const ActivityDetailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ActivityDetail"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"activities_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"garmin_activity_id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"activity_type"}},{"kind":"Field","name":{"kind":"Name","value":"subtype"}},{"kind":"Field","name":{"kind":"Name","value":"start_time"}},{"kind":"Field","name":{"kind":"Name","value":"duration_s"}},{"kind":"Field","name":{"kind":"Name","value":"distance_m"}},{"kind":"Field","name":{"kind":"Name","value":"elevation_gain_m"}},{"kind":"Field","name":{"kind":"Name","value":"avg_hr"}},{"kind":"Field","name":{"kind":"Name","value":"max_hr"}},{"kind":"Field","name":{"kind":"Name","value":"calories"}},{"kind":"Field","name":{"kind":"Name","value":"avg_speed_mps"}},{"kind":"Field","name":{"kind":"Name","value":"avg_power_w"}},{"kind":"Field","name":{"kind":"Name","value":"feeling"}},{"kind":"Field","name":{"kind":"Name","value":"effort"}},{"kind":"Field","name":{"kind":"Name","value":"food_during"}},{"kind":"Field","name":{"kind":"Name","value":"food_after"}},{"kind":"Field","name":{"kind":"Name","value":"caffeine"}},{"kind":"Field","name":{"kind":"Name","value":"weather"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}},{"kind":"Field","name":{"kind":"Name","value":"focus"}},{"kind":"Field","name":{"kind":"Name","value":"hard_tries"}},{"kind":"Field","name":{"kind":"Name","value":"strength_exercises"}},{"kind":"Field","name":{"kind":"Name","value":"activity_streams"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"payload"}}]}}]}}]}}]} as unknown as DocumentNode<GeneratedActivityDetailQuery, GeneratedActivityDetailQueryVariables>;
-export const UpdateActivityDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateActivity"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"set"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"activities_set_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"update_activities_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"pk_columns"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}},{"kind":"Argument","name":{"kind":"Name","value":"_set"},"value":{"kind":"Variable","name":{"kind":"Name","value":"set"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"subtype"}},{"kind":"Field","name":{"kind":"Name","value":"feeling"}},{"kind":"Field","name":{"kind":"Name","value":"effort"}},{"kind":"Field","name":{"kind":"Name","value":"food_during"}},{"kind":"Field","name":{"kind":"Name","value":"food_after"}},{"kind":"Field","name":{"kind":"Name","value":"caffeine"}},{"kind":"Field","name":{"kind":"Name","value":"weather"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}},{"kind":"Field","name":{"kind":"Name","value":"focus"}},{"kind":"Field","name":{"kind":"Name","value":"hard_tries"}},{"kind":"Field","name":{"kind":"Name","value":"strength_exercises"}}]}}]}}]} as unknown as DocumentNode<GeneratedUpdateActivityMutation, GeneratedUpdateActivityMutationVariables>;
+export const CalendarActivitiesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CalendarActivities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"activities"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"start_time"},"value":{"kind":"EnumValue","value":"desc_nulls_last"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"activity_type"}},{"kind":"Field","name":{"kind":"Name","value":"subtype"}},{"kind":"Field","name":{"kind":"Name","value":"start_time"}},{"kind":"Field","name":{"kind":"Name","value":"duration_s"}},{"kind":"Field","name":{"kind":"Name","value":"distance_m"}},{"kind":"Field","name":{"kind":"Name","value":"elevation_gain_m"}},{"kind":"Field","name":{"kind":"Name","value":"start_lat"}},{"kind":"Field","name":{"kind":"Name","value":"feeling"}},{"kind":"Field","name":{"kind":"Name","value":"effort"}},{"kind":"Field","name":{"kind":"Name","value":"caffeine"}},{"kind":"Field","name":{"kind":"Name","value":"focus"}},{"kind":"Field","name":{"kind":"Name","value":"shoe_id"}}]}}]}}]} as unknown as DocumentNode<GeneratedCalendarActivitiesQuery, GeneratedCalendarActivitiesQueryVariables>;
+export const ActivityDetailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ActivityDetail"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"activities_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"garmin_activity_id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"activity_type"}},{"kind":"Field","name":{"kind":"Name","value":"subtype"}},{"kind":"Field","name":{"kind":"Name","value":"start_time"}},{"kind":"Field","name":{"kind":"Name","value":"duration_s"}},{"kind":"Field","name":{"kind":"Name","value":"distance_m"}},{"kind":"Field","name":{"kind":"Name","value":"elevation_gain_m"}},{"kind":"Field","name":{"kind":"Name","value":"avg_hr"}},{"kind":"Field","name":{"kind":"Name","value":"max_hr"}},{"kind":"Field","name":{"kind":"Name","value":"calories"}},{"kind":"Field","name":{"kind":"Name","value":"avg_speed_mps"}},{"kind":"Field","name":{"kind":"Name","value":"avg_power_w"}},{"kind":"Field","name":{"kind":"Name","value":"feeling"}},{"kind":"Field","name":{"kind":"Name","value":"effort"}},{"kind":"Field","name":{"kind":"Name","value":"food_during"}},{"kind":"Field","name":{"kind":"Name","value":"food_after"}},{"kind":"Field","name":{"kind":"Name","value":"caffeine"}},{"kind":"Field","name":{"kind":"Name","value":"weather"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}},{"kind":"Field","name":{"kind":"Name","value":"focus"}},{"kind":"Field","name":{"kind":"Name","value":"hard_tries"}},{"kind":"Field","name":{"kind":"Name","value":"strength_exercises"}},{"kind":"Field","name":{"kind":"Name","value":"shoe_id"}},{"kind":"Field","name":{"kind":"Name","value":"shoe"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"activity_streams"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"payload"}}]}}]}}]}}]} as unknown as DocumentNode<GeneratedActivityDetailQuery, GeneratedActivityDetailQueryVariables>;
+export const UpdateActivityDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateActivity"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"set"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"activities_set_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"update_activities_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"pk_columns"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}},{"kind":"Argument","name":{"kind":"Name","value":"_set"},"value":{"kind":"Variable","name":{"kind":"Name","value":"set"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"subtype"}},{"kind":"Field","name":{"kind":"Name","value":"feeling"}},{"kind":"Field","name":{"kind":"Name","value":"effort"}},{"kind":"Field","name":{"kind":"Name","value":"food_during"}},{"kind":"Field","name":{"kind":"Name","value":"food_after"}},{"kind":"Field","name":{"kind":"Name","value":"caffeine"}},{"kind":"Field","name":{"kind":"Name","value":"weather"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}},{"kind":"Field","name":{"kind":"Name","value":"focus"}},{"kind":"Field","name":{"kind":"Name","value":"hard_tries"}},{"kind":"Field","name":{"kind":"Name","value":"strength_exercises"}},{"kind":"Field","name":{"kind":"Name","value":"shoe_id"}},{"kind":"Field","name":{"kind":"Name","value":"shoe"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GeneratedUpdateActivityMutation, GeneratedUpdateActivityMutationVariables>;
 export const FoodOptionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"FoodOptions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"food_options"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"value"},"value":{"kind":"EnumValue","value":"asc"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}}]} as unknown as DocumentNode<GeneratedFoodOptionsQuery, GeneratedFoodOptionsQueryVariables>;
 export const ExercisesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Exercises"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"exercises"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"name"},"value":{"kind":"EnumValue","value":"asc"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"categories"}}]}}]}}]} as unknown as DocumentNode<GeneratedExercisesQuery, GeneratedExercisesQueryVariables>;
 export const InsertExerciseDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"InsertExercise"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"name"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"categories"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"insert_exercises_one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"object"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"name"},"value":{"kind":"Variable","name":{"kind":"Name","value":"name"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"categories"},"value":{"kind":"Variable","name":{"kind":"Name","value":"categories"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"categories"}}]}}]}}]} as unknown as DocumentNode<GeneratedInsertExerciseMutation, GeneratedInsertExerciseMutationVariables>;
