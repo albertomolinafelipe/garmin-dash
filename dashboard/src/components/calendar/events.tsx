@@ -135,7 +135,11 @@ export function DayEvent({
 			style={isRace ? undefined : { borderLeftColor: color }}
 		>
 			<div className="flex items-center justify-center gap-1.5 md:justify-start">
-				<Icon size={16} className="shrink-0" />
+				<Icon
+					size={16}
+					className="shrink-0"
+					style={isRace ? undefined : { color }}
+				/>
 				<span className="hidden truncate text-sm font-medium md:inline">
 					{a.name ?? a.activity_type ?? "Activity"}
 				</span>

@@ -690,15 +690,15 @@ export function ActivityDetail() {
 								activity.activity_type,
 								activity.subtype,
 							);
-							const label = sub ?? category;
 							return (
-								<Badge
-									variant="outline"
-									className="gap-1.5 py-1 pl-1.5 text-sm"
-								>
-									<Icon size={24} style={{ color: categoryColor[category] }} />
-									{label[0].toUpperCase() + label.slice(1)}
-								</Badge>
+								<span className="flex items-center gap-1.5">
+									<Icon size={30} style={{ color: categoryColor[category] }} />
+									{sub && (
+										<span className="text-muted-foreground text-xs tracking-wide uppercase">
+											{sub}
+										</span>
+									)}
+								</span>
 							);
 						})()}
 						{(() => {
