@@ -43,6 +43,7 @@ import {
 	useCalendarData,
 } from "@/components/calendar/use-calendar-data";
 import { WeekStrip } from "@/components/calendar/week-strip";
+import { WeeklyHrZones } from "@/components/weekly-hr-zones";
 import { categoryColor, categoryOf } from "@/lib/activity-types";
 import { dayKey, fmtDuration } from "@/lib/format";
 import {
@@ -479,12 +480,7 @@ function LoadPanel({
 							axisLine={false}
 							tickMargin={6}
 						/>
-						<YAxis
-							yAxisId="left"
-							width={32}
-							tickLine={false}
-							axisLine={false}
-						/>
+						<YAxis yAxisId="left" width={32} tickLine={false} axisLine={false} />
 						{usesRight && (
 							<YAxis
 								yAxisId="right"
@@ -662,10 +658,7 @@ function SleepPanel() {
 				isEmpty={rows.length === 0}
 				emptyText="No sleep synced yet."
 			>
-				<ChartContainer
-					config={sleepConfig}
-					className="aspect-auto h-full w-full"
-				>
+				<ChartContainer config={sleepConfig} className="aspect-auto h-full w-full">
 					<ComposedChart data={rows} margin={{ top: 6, right: 0, left: 0 }}>
 						<defs>
 							{STAGE_ORDER.map((k) => (
@@ -677,16 +670,8 @@ function SleepPanel() {
 									x2="0"
 									y2="1"
 								>
-									<stop
-										offset="0%"
-										stopColor={SLEEP_COLORS[k]}
-										stopOpacity={0.55}
-									/>
-									<stop
-										offset="100%"
-										stopColor={SLEEP_COLORS[k]}
-										stopOpacity={0.15}
-									/>
+									<stop offset="0%" stopColor={SLEEP_COLORS[k]} stopOpacity={0.55} />
+									<stop offset="100%" stopColor={SLEEP_COLORS[k]} stopOpacity={0.15} />
 								</linearGradient>
 							))}
 						</defs>
@@ -713,9 +698,7 @@ function SleepPanel() {
 										const key = String(name);
 										const cfg = sleepConfig[key as keyof typeof sleepConfig];
 										const text =
-											key === "score"
-												? String(value)
-												: fmtDuration(Number(value) * 3600);
+											key === "score" ? String(value) : fmtDuration(Number(value) * 3600);
 										return (
 											<TooltipItem
 												color={cfg?.color}
@@ -814,39 +797,18 @@ function HrvPanel() {
 	);
 
 	return (
-		<Panel
-			title="HRV"
-			action={legend}
-			className="h-[280px] md:h-full md:flex-1"
-		>
+		<Panel title="HRV" action={legend} className="h-[280px] md:h-full md:flex-1">
 			<PanelBody
 				isPending={isPending}
 				isEmpty={rows.length === 0}
 				emptyText="No HRV synced yet."
 			>
-				<ChartContainer
-					config={hrvConfig}
-					className="aspect-auto h-full w-full"
-				>
+				<ChartContainer config={hrvConfig} className="aspect-auto h-full w-full">
 					<ComposedChart data={rows} margin={{ top: 6, right: 0, left: 0 }}>
 						<defs>
-							<linearGradient
-								id="fill-hrv-baseline"
-								x1="0"
-								y1="0"
-								x2="0"
-								y2="1"
-							>
-								<stop
-									offset="0%"
-									stopColor={HRV_COLORS.baseline}
-									stopOpacity={0.3}
-								/>
-								<stop
-									offset="100%"
-									stopColor={HRV_COLORS.baseline}
-									stopOpacity={0.1}
-								/>
+							<linearGradient id="fill-hrv-baseline" x1="0" y1="0" x2="0" y2="1">
+								<stop offset="0%" stopColor={HRV_COLORS.baseline} stopOpacity={0.3} />
+								<stop offset="100%" stopColor={HRV_COLORS.baseline} stopOpacity={0.1} />
 							</linearGradient>
 						</defs>
 						<CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -1016,8 +978,7 @@ function ReadinessPanel() {
 								<ChartTooltipContent
 									formatter={(value, name) => {
 										const key = String(name);
-										const cfg =
-											readinessConfig[key as keyof typeof readinessConfig];
+										const cfg = readinessConfig[key as keyof typeof readinessConfig];
 										const text =
 											key === "score" || key === "acuteLoad"
 												? String(value)
@@ -1151,6 +1112,7 @@ function OverviewPanels() {
 			</div>
 			<div className={cn("flex flex-col gap-4 md:flex-row", ROW)}>
 				<ReadinessPanel />
+				<WeeklyHrZones className="aspect-square h-[280px] md:h-full md:shrink-0" />
 			</div>
 		</div>
 	);
