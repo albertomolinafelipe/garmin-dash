@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Settings } from "./Settings";
@@ -33,6 +34,11 @@ vi.mock("@/graphql/hooks", () => ({
 		mutateAsync: mocks.remove,
 		isPending: false,
 	}),
+	useRacesQuery: () => ({ data: [], isLoading: false, isError: false }),
+	useInsertRaceMutation: () => ({ mutateAsync: mocks.insert, isPending: false }),
+	useUpdateRaceMutation: () => ({ mutateAsync: mocks.update, isPending: false }),
+	useDeleteRaceMutation: () => ({ mutateAsync: mocks.remove, isPending: false }),
+	useCalendarActivitiesQuery: () => ({ data: { activities: [] } }),
 }));
 
 function setup() {
@@ -44,7 +50,9 @@ function setup() {
 		.mockResolvedValue(undefined);
 	render(
 		<QueryClientProvider client={client}>
-			<Settings />
+			<MemoryRouter>
+				<Settings />
+			</MemoryRouter>
 		</QueryClientProvider>,
 	);
 	return { invalidate };
