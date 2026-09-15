@@ -1,16 +1,47 @@
+import { useEffect, useState } from "react";
+import { Check, ChevronsUpDown, Footprints } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+} from "@/components/ui/command";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 import type { AnnotationInput } from "@/lib/annotations";
-import { useShoes } from "@/lib/shoes";
+import { type Shoe, useShoes } from "@/lib/shoes";
+import { cn } from "@/lib/utils";
 import { Field } from "./fields";
 
-// Which shoe an activity was run in. Shown for running, hiking and skiing;
-// required (a red hint) once past the shoe cutoff.
+// White background so shoe photos with transparent cutouts read cleanly, and
+// object-contain so the whole shoe shows rather than being cropped.
+function ShoeThumb({ shoe, className }: { shoe?: Shoe; className?: string }) {
+	return (
+		<div
+			className={cn(
+				"flex shrink-0 items-center justify-center overflow-hidden rounded-md border bg-white",
+				className,
+			)}
+		>
+			{shoe?.image_url ? (
+				// biome-ignore lint/a11y/useAltText: decorative shoe thumbnail
+				<img src={shoe.image_url} alt="" className="size-full object-contain" />
+			) : (
+				<Footprints className="size-[55%] text-neutral-400" />
+			)}
+		</div>
+	);
+}
+
+// Shoe picker with thumbnails and search. Keeps a local selection so the choice
+// shows immediately, independent of when the activity query refetches it.
 export function ShoeField({
 	activity,
 	onSave,
@@ -21,33 +52,81 @@ export function ShoeField({
 	required?: boolean;
 }) {
 	const shoes = useShoes();
-	const value = activity.shoe_id == null ? "" : String(activity.shoe_id);
+	const [open, setOpen] = useState(false);
+	const [selected, setSelected] = useState(
+		activity.shoe_id == null ? "" : String(activity.shoe_id),
+	);
+	useEffect(() => {
+		setSelected(activity.shoe_id == null ? "" : String(activity.shoe_id));
+	}, [activity.shoe_id]);
+
+	const list = shoes.data?.shoes ?? [];
+	const current = list.find((shoe) => String(shoe.id) === selected);
+
+	const pick = (id: string) => {
+		setSelected(id);
+		setOpen(false);
+		void onSave({ shoe_id: id ? Number(id) : null });
+	};
+
 	return (
 		<Field
 			label="Shoe"
-			error={
-				required && activity.shoe_id == null
-					? "Pick the shoe you used."
-					: undefined
-			}
+			error={required && !selected ? "Pick the shoe you used." : undefined}
 		>
-			<Select
-				value={value}
-				onValueChange={(next) =>
-					void onSave({ shoe_id: next ? Number(next) : null })
-				}
-			>
-				<SelectTrigger className="w-full">
-					<SelectValue placeholder="Choose a shoe" />
-				</SelectTrigger>
-				<SelectContent>
-					{shoes.data?.shoes.map((shoe) => (
-						<SelectItem key={String(shoe.id)} value={String(shoe.id)}>
-							{shoe.name}
-						</SelectItem>
-					))}
-				</SelectContent>
-			</Select>
+			<Popover open={open} onOpenChange={setOpen}>
+				<PopoverTrigger asChild>
+					<Button
+						variant="outline"
+						// biome-ignore lint/a11y/useSemanticElements: combobox trigger
+						role="combobox"
+						aria-expanded={open}
+						className="h-auto w-full justify-between py-1.5"
+					>
+						{current ? (
+							<span className="flex min-w-0 items-center gap-2">
+								<ShoeThumb shoe={current} className="size-8" />
+								<span className="truncate">{current.name}</span>
+							</span>
+						) : (
+							<span className="text-muted-foreground">Choose a shoe</span>
+						)}
+						<ChevronsUpDown className="size-4 shrink-0 opacity-50" />
+					</Button>
+				</PopoverTrigger>
+				<PopoverContent
+					className="w-[var(--radix-popover-trigger-width)] p-0"
+					align="start"
+				>
+					<Command>
+						<CommandInput placeholder="Search shoes…" />
+						<CommandList>
+							<CommandEmpty>No shoes — add one in Settings.</CommandEmpty>
+							<CommandGroup>
+								{list.map((shoe) => (
+									<CommandItem
+										key={String(shoe.id)}
+										value={shoe.name}
+										onSelect={() => pick(String(shoe.id))}
+										className="gap-2"
+									>
+										<ShoeThumb shoe={shoe} className="size-10" />
+										<span className="truncate">{shoe.name}</span>
+										<Check
+											className={cn(
+												"ml-auto size-4",
+												selected === String(shoe.id)
+													? "opacity-100"
+													: "opacity-0",
+											)}
+										/>
+									</CommandItem>
+								))}
+							</CommandGroup>
+						</CommandList>
+					</Command>
+				</PopoverContent>
+			</Popover>
 		</Field>
 	);
 }

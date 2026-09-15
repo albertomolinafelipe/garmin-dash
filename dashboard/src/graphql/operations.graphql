@@ -82,6 +82,11 @@ mutation UpdateActivity($id: bigint!, $set: activities_set_input!) {
     focus
     hard_tries
     strength_exercises
+    shoe_id
+    shoe {
+      id
+      name
+    }
   }
 }
 
