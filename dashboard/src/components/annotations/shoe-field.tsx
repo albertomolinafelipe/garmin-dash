@@ -76,7 +76,7 @@ export function ShoeField({
 		>
 			<div className="space-y-2">
 			{current ? (
-				<div className="flex aspect-square w-full items-center justify-center overflow-hidden rounded-lg border bg-white">
+				<div className="flex size-40 items-center justify-center overflow-hidden rounded-lg border bg-white">
 					{current.image_url ? (
 						// biome-ignore lint/a11y/useAltText: decorative shoe preview
 						<img
