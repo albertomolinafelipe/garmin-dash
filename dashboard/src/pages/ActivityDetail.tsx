@@ -24,6 +24,7 @@ import {
 	YAxis,
 } from "recharts";
 
+import { DaySleepPanel } from "@/components/day-sleep-panel";
 import { ClimbingAnnotation } from "@/components/annotations/ClimbingAnnotation";
 import { RunningAnnotation } from "@/components/annotations/RunningAnnotation";
 import { ShoeField } from "@/components/annotations/shoe-field";
@@ -54,7 +55,7 @@ import {
 	SHOE_CUTOFF,
 	typeLabel,
 } from "@/lib/activity-types";
-import { fmtDate, fmtDistance, fmtDuration } from "@/lib/format";
+import { dayKey, fmtDate, fmtDistance, fmtDuration } from "@/lib/format";
 import {
 	STADIA_ATTRIBUTION,
 	STADIA_MAX_ZOOM,
@@ -706,6 +707,9 @@ export function ActivityDetail() {
 						<Metrics activity={activity} />
 					</CardContent>
 				</Card>
+				{activity.start_time && (
+					<DaySleepPanel date={dayKey(new Date(activity.start_time))} />
+				)}
 			</div>
 			{/* Map fills the left column, matching the height of the chart and notes
 			    cards stacked beside it. */}

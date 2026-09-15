@@ -47,6 +47,7 @@ vi.mock("@/graphql/hooks", () => ({
 vi.mock("@/lib/shoes", () => ({
 	useShoes: () => ({ data: { shoes: [] }, isLoading: false, isError: false }),
 }));
+vi.mock("@/components/day-sleep-panel", () => ({ DaySleepPanel: () => null }));
 vi.mock("@/components/annotations/use-annotation-save", () => ({
 	useAnnotationSave: () => save,
 }));
