@@ -6,6 +6,7 @@
 - "!include public_exercises.yaml"
 - "!include public_food_options.yaml"
 - "!include public_races.yaml"
+- "!include public_shoes.yaml"
 - "!include public_sleep.yaml"
 - "!include public_sports.yaml"
 - "!include public_training_readiness.yaml"

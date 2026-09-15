@@ -29,6 +29,7 @@ ANNOTATION_COLUMNS = (
     "hard_tries",
     "strength_exercises",
     "samples_synced_at",
+    "shoe_id",
 )
 
 

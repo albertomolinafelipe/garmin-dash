@@ -1,17 +1,13 @@
 table:
-  name: activities
+  name: shoes
   schema: public
-object_relationships:
-  - name: shoe
-    using:
-      foreign_key_constraint_on: shoe_id
 array_relationships:
-  - name: activity_streams
+  - name: activities
     using:
       foreign_key_constraint_on:
-        column: activity_id
+        column: shoe_id
         table:
-          name: activity_streams
+          name: activities
           schema: public
 select_permissions:
   - role: user
