@@ -2,8 +2,8 @@
 // donut. Blue for asleep (dark deep, lighter light), fuchsia for the rest (dark
 // REM, light awake) — muted to sit with the Kanagawa theme.
 export const SLEEP_STAGE_COLORS = {
-	deep: "#2D4F67",
-	light: "#7E9CD8",
-	rem: "#A24E86",
-	awake: "#D9A6CE",
+	deep: "#2D4F67", // waveBlue2
+	light: "#7E9CD8", // crystalBlue
+	rem: "#957FB8", // oniViolet
+	awake: "#D27E99", // sakuraPink
 } as const;

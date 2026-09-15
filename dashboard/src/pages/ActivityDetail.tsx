@@ -680,10 +680,10 @@ export function ActivityDetail() {
 						</CardTitle>
 					</CardHeader>
 					<CardContent className="flex flex-wrap items-center gap-2 px-4">
-						<span className="text-muted-foreground text-sm">
+						<span className="text-foreground text-base font-medium">
 							{fmtDate(activity.start_time)}
 						</span>
-						<Badge variant="outline">
+						<Badge variant="outline" className="text-sm">
 							{typeLabel(activity.activity_type, activity.subtype)}
 						</Badge>
 						{(() => {

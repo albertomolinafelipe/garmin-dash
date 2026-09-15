@@ -1,15 +1,7 @@
 import { type ReactNode, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import {
-	Bar,
-	BarChart,
-	CartesianGrid,
-	Cell,
-	LabelList,
-	XAxis,
-	YAxis,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -122,6 +114,33 @@ function accumulate(data: SamplesRow | undefined) {
 const chartConfig = {
 	seconds: { label: "Time" },
 } satisfies ChartConfig;
+
+// A bar drawn with a rounded top and only top + side borders (no baseline),
+// matching the faded-fill-with-stroke look of the other charts.
+function ZoneBar(props: {
+	x?: number;
+	y?: number;
+	width?: number;
+	height?: number;
+	fill?: string;
+}) {
+	const { x = 0, y = 0, width = 0, height = 0, fill } = props;
+	if (height <= 0 || width <= 0) return null;
+	const r = Math.min(4, width / 2, height);
+	const outline = `M ${x} ${y + height} L ${x} ${y + r} Q ${x} ${y} ${x + r} ${y} L ${x + width - r} ${y} Q ${x + width} ${y} ${x + width} ${y + r} L ${x + width} ${y + height}`;
+	return (
+		<g>
+			<path d={`${outline} Z`} fill={fill} stroke="none" />
+			<path
+				d={outline}
+				fill="none"
+				stroke={RED}
+				strokeWidth={1.5}
+				strokeLinejoin="round"
+			/>
+		</g>
+	);
+}
 
 function Message({ children }: { children: ReactNode }) {
 	return (
@@ -275,6 +294,12 @@ function ZoneChart({
 	return (
 		<ChartContainer config={chartConfig} className="aspect-square h-full w-full">
 			<BarChart data={rows} margin={{ top: 20, right: 8, left: 8, bottom: 4 }}>
+				<defs>
+					<linearGradient id="hr-zone-fill" x1="0" y1="0" x2="0" y2="1">
+						<stop offset="0%" stopColor={RED} stopOpacity={0.5} />
+						<stop offset="100%" stopColor={RED} stopOpacity={0.05} />
+					</linearGradient>
+				</defs>
 				<CartesianGrid vertical={false} strokeDasharray="3 3" />
 				<XAxis
 					dataKey="zone"
@@ -301,10 +326,12 @@ function ZoneChart({
 						/>
 					}
 				/>
-				<Bar dataKey="seconds" radius={[4, 4, 0, 0]} isAnimationActive={false}>
-					{rows.map((r) => (
-						<Cell key={r.zone} fill={RED} fillOpacity={r.opacity} />
-					))}
+				<Bar
+					dataKey="seconds"
+					shape={<ZoneBar />}
+					fill="url(#hr-zone-fill)"
+					isAnimationActive={false}
+				>
 					<LabelList
 						dataKey="text"
 						position="top"
