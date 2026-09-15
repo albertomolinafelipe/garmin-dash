@@ -50,10 +50,11 @@ import {
 import { useFoodOptionsQuery } from "@/graphql/hooks";
 import {
 	categoryColor,
+	categoryIcon,
 	categoryOf,
+	effectiveSubtype,
 	needsAnnotation,
 	SHOE_CUTOFF,
-	typeLabel,
 } from "@/lib/activity-types";
 import { dayKey, fmtDate, fmtDistance, fmtDuration } from "@/lib/format";
 import {
@@ -683,9 +684,20 @@ export function ActivityDetail() {
 						<span className="text-foreground text-base font-medium">
 							{fmtDate(activity.start_time)}
 						</span>
-						<Badge variant="outline" className="text-sm">
-							{typeLabel(activity.activity_type, activity.subtype)}
-						</Badge>
+						{(() => {
+							const Icon = categoryIcon[category];
+							const sub = effectiveSubtype(
+								activity.activity_type,
+								activity.subtype,
+							);
+							const label = sub ?? category;
+							return (
+								<Badge variant="outline" className="gap-1.5 text-sm">
+									<Icon size={16} style={{ color: categoryColor[category] }} />
+									{label[0].toUpperCase() + label.slice(1)}
+								</Badge>
+							);
+						})()}
 						{(() => {
 							const race = raceForStartTime(racesByDay, activity.start_time);
 							return race ? (
