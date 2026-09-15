@@ -608,7 +608,7 @@ function ShoeRow({ shoe }: { shoe: Shoe }) {
 
 	return (
 		<div className="hover:bg-muted/40 group flex items-center gap-3 px-3 py-2.5">
-			<div className="bg-muted flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md">
+			<div className="bg-muted flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-md">
 				{shoe.image_url ? (
 					// biome-ignore lint/a11y/useAltText: decorative shoe thumbnail
 					<img
@@ -617,7 +617,7 @@ function ShoeRow({ shoe }: { shoe: Shoe }) {
 						className="size-full object-cover"
 					/>
 				) : (
-					<Footprints className="text-muted-foreground size-5" />
+					<Footprints className="text-muted-foreground size-7" />
 				)}
 			</div>
 			<div className="min-w-0 flex-1">
