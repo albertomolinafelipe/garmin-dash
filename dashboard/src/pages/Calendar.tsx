@@ -51,7 +51,8 @@ import {
 	categoryIcon,
 	categoryOf,
 } from "@/lib/activity-types";
-import { dayKey } from "@/lib/format";
+import { dayKey, fmtDuration } from "@/lib/format";
+import { useWeekZ2, type WeekRuns } from "@/components/calendar/use-week-z2";
 import { cn } from "@/lib/utils";
 
 export function Calendar() {
@@ -174,6 +175,21 @@ function CalendarInner() {
 		for (const a of activities) set.add(categoryOf(a.activity_type, a.subtype));
 		return CATEGORY_ORDER.filter((c) => set.has(c));
 	}, [activities]);
+
+	// Running activity ids per visible week, so the zone-2 aggregate stays scoped
+	// to the month on screen.
+	const weekRuns = useMemo<WeekRuns[]>(
+		() =>
+			weeks.map((w) => {
+				const iso = toIsoWeek(w);
+				const ids = (activitiesByWeek.get(iso) ?? [])
+					.filter((a) => categoryOf(a.activity_type, a.subtype) === "running")
+					.map((a) => Number(a.id));
+				return { key: iso, ids };
+			}),
+		[weeks, activitiesByWeek],
+	);
+	const z2ByWeek = useWeekZ2(weekRuns);
 
 	const month = cursor.toLocaleDateString(undefined, {
 		month: "long",
@@ -362,19 +378,27 @@ function CalendarInner() {
 											className="mt-0.5 shrink-0"
 											style={{ color: categoryColor.running }}
 										/>
-										<div className="flex min-w-0 items-baseline gap-1 leading-tight whitespace-nowrap">
-											<span
-												className={cn(
-													"text-xs font-semibold",
-													!t?.runKm && "text-muted-foreground font-normal",
+										<div className="min-w-0 leading-tight whitespace-nowrap">
+											<div className="text-xs">
+												<span
+													className={cn(
+														"font-semibold",
+														!t?.runKm && "text-muted-foreground font-normal",
+													)}
+												>
+													{(t?.runKm ?? 0).toFixed(1)} km
+												</span>
+												<span className="text-muted-foreground font-normal">
+													{" · "}
+													{Math.round(t?.runVert ?? 0)} m
+												</span>
+											</div>
+											<div className="text-muted-foreground text-[11px]">
+												{(t?.runH ?? 0).toFixed(1)} h
+												{(z2ByWeek.get(week) ?? 0) > 0 && (
+													<> · Z2 {fmtDuration(z2ByWeek.get(week) ?? 0)}</>
 												)}
-											>
-												{(t?.runKm ?? 0).toFixed(1)} km
-											</span>
-											<span className="text-muted-foreground text-[11px]">
-												· {(t?.runH ?? 0).toFixed(1)} h ·{" "}
-												{Math.round(t?.runVert ?? 0)} m
-											</span>
+											</div>
 										</div>
 									</div>
 									<TotalRow
