@@ -14,6 +14,12 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("sonner", () => ({ toast: { error: mocks.toastError } }));
+vi.mock("@/lib/shoes", () => ({
+	useShoes: () => ({ data: { shoes: [] }, isLoading: false, isError: false }),
+	useInsertShoe: () => ({ mutateAsync: mocks.insert, isPending: false }),
+	useDeleteShoe: () => ({ mutateAsync: mocks.remove, isPending: false }),
+	lifetimeKm: () => 0,
+}));
 vi.mock("@/graphql/hooks", () => ({
 	useExercisesQuery: () => ({
 		data: {

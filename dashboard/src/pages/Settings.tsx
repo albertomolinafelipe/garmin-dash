@@ -2,7 +2,7 @@ import { type FocusEvent, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
-import { Plus, Trash2 } from "lucide-react";
+import { Footprints, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -41,6 +41,13 @@ import { TagsInput } from "@/components/ui/tags-input";
 import { TimelineList } from "@/components/timeline-list";
 import { useActivities } from "@/lib/queries";
 import { dayKey } from "@/lib/format";
+import {
+	type Shoe,
+	lifetimeKm,
+	useDeleteShoe,
+	useInsertShoe,
+	useShoes,
+} from "@/lib/shoes";
 import { cn } from "@/lib/utils";
 import {
 	useDeleteExerciseMutation,
@@ -498,11 +505,204 @@ function RacesCard() {
 	);
 }
 
+// --- Shoes --------------------------------------------------------------------
+
+function ShoeDialog({
+	open,
+	onOpenChange,
+}: {
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+}) {
+	const queryClient = useQueryClient();
+	const insert = useInsertShoe();
+	const [name, setName] = useState("");
+	const [imageUrl, setImageUrl] = useState("");
+	const [startingKm, setStartingKm] = useState<number | null>(null);
+
+	const valid = name.trim() !== "";
+
+	const create = async () => {
+		if (!valid || insert.isPending) return;
+		try {
+			await insert.mutateAsync({
+				name: name.trim(),
+				image_url: imageUrl.trim() || null,
+				starting_km: startingKm ?? 0,
+			});
+			await queryClient.invalidateQueries({ queryKey: ["shoes"] });
+			setName("");
+			setImageUrl("");
+			setStartingKm(null);
+			onOpenChange(false);
+		} catch {
+			toast.error("Could not add the shoe");
+		}
+	};
+
+	return (
+		<Dialog open={open} onOpenChange={onOpenChange}>
+			<DialogContent className="sm:max-w-md">
+				<DialogHeader>
+					<DialogTitle>New shoe</DialogTitle>
+					<DialogDescription>
+						Starting km seeds distance run before importing.
+					</DialogDescription>
+				</DialogHeader>
+				<div className="space-y-5">
+					<div className="grid gap-2">
+						<Label htmlFor="shoe-name">Name</Label>
+						<Input
+							id="shoe-name"
+							value={name}
+							placeholder="e.g. Saucony Peregrine 14"
+							disabled={insert.isPending}
+							onChange={(event) => setName(event.target.value)}
+						/>
+					</div>
+					<div className="grid gap-2">
+						<Label htmlFor="shoe-image">Image URL</Label>
+						<Input
+							id="shoe-image"
+							value={imageUrl}
+							placeholder="https://…"
+							disabled={insert.isPending}
+							onChange={(event) => setImageUrl(event.target.value)}
+						/>
+					</div>
+					<div className="grid gap-2">
+						<Label htmlFor="shoe-starting-km">Starting km</Label>
+						<NumberInput
+							id="shoe-starting-km"
+							nonNegative
+							value={startingKm}
+							disabled={insert.isPending}
+							onChange={setStartingKm}
+						/>
+					</div>
+				</div>
+				<DialogFooter>
+					<Button disabled={!valid || insert.isPending} onClick={() => void create()}>
+						{insert.isPending ? "Adding…" : "Add shoe"}
+					</Button>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
+	);
+}
+
+function ShoeRow({ shoe }: { shoe: Shoe }) {
+	const queryClient = useQueryClient();
+	const remove = useDeleteShoe();
+	const km = lifetimeKm(shoe);
+	const count = shoe.activities_aggregate.aggregate?.count ?? 0;
+
+	const deleteShoe = async () => {
+		try {
+			await remove.mutateAsync(shoe.id);
+			await queryClient.invalidateQueries({ queryKey: ["shoes"] });
+		} catch {
+			toast.error("Could not delete the shoe");
+		}
+	};
+
+	return (
+		<div className="hover:bg-muted/40 group flex items-center gap-3 px-3 py-2.5">
+			<div className="bg-muted flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md">
+				{shoe.image_url ? (
+					// biome-ignore lint/a11y/useAltText: decorative shoe thumbnail
+					<img
+						src={shoe.image_url}
+						alt={shoe.name}
+						className="size-full object-cover"
+					/>
+				) : (
+					<Footprints className="text-muted-foreground size-5" />
+				)}
+			</div>
+			<div className="min-w-0 flex-1">
+				<div className="truncate text-sm font-medium">{shoe.name}</div>
+				<div className="text-muted-foreground text-xs tabular-nums">
+					{km.toFixed(0)} km · {count} {count === 1 ? "activity" : "activities"}
+				</div>
+			</div>
+			<AlertDialog>
+				<AlertDialogTrigger asChild>
+					<Button
+						variant="ghost"
+						size="icon"
+						aria-label={`Delete ${shoe.name}`}
+						className="text-muted-foreground hover:text-destructive shrink-0 sm:opacity-0 sm:group-hover:opacity-100"
+					>
+						<Trash2 className="size-4" />
+					</Button>
+				</AlertDialogTrigger>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Delete {shoe.name}?</AlertDialogTitle>
+						<AlertDialogDescription>
+							Activities logged in this shoe keep their record but lose the link.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogAction onClick={() => void deleteShoe()}>
+							Delete
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
+		</div>
+	);
+}
+
+function ShoesCard() {
+	const shoes = useShoes();
+	const [createOpen, setCreateOpen] = useState(false);
+	const rows = shoes.data?.shoes ?? [];
+
+	return (
+		<Card>
+			<CardHeader>
+				<CardTitle>Shoes</CardTitle>
+				<CardDescription>
+					Gear for tracking mileage; pick one when annotating a run, hike or ski.
+				</CardDescription>
+				<CardAction>
+					<Button size="sm" onClick={() => setCreateOpen(true)}>
+						<Plus className="size-4" />
+						New shoe
+					</Button>
+				</CardAction>
+			</CardHeader>
+			<CardContent>
+				{shoes.isLoading ? (
+					<p className="text-muted-foreground text-sm">Loading shoes…</p>
+				) : shoes.isError ? (
+					<p className="text-destructive text-sm">Could not load shoes.</p>
+				) : rows.length === 0 ? (
+					<p className="text-muted-foreground py-6 text-center text-sm">
+						No shoes yet.
+					</p>
+				) : (
+					<div className="divide-y rounded-lg border">
+						{rows.map((shoe) => (
+							<ShoeRow key={String(shoe.id)} shoe={shoe} />
+						))}
+					</div>
+				)}
+				<ShoeDialog open={createOpen} onOpenChange={setCreateOpen} />
+			</CardContent>
+		</Card>
+	);
+}
+
 export function Settings() {
 	return (
 		<div className="grid items-start gap-4 p-4 lg:grid-cols-2">
 			<ExercisesCard />
 			<RacesCard />
+			<ShoesCard />
 		</div>
 	);
 }
