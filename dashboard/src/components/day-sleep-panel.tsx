@@ -19,10 +19,10 @@ import { cn } from "@/lib/utils";
 
 // Kanagawa sleep-stage tones, matching the overview sleep chart.
 const STAGES = [
-	{ key: "deep", label: "Deep", field: "deep_sleep_s", color: "#658594" },
-	{ key: "light", label: "Light", field: "light_sleep_s", color: "#7E9CD8" },
-	{ key: "rem", label: "REM", field: "rem_sleep_s", color: "#957FB8" },
-	{ key: "awake", label: "Awake", field: "awake_s", color: "#54546D" },
+	{ key: "deep", label: "Deep", field: "deep_sleep_s", color: "#2E5AAC" },
+	{ key: "light", label: "Light", field: "light_sleep_s", color: "#7FA8E4" },
+	{ key: "rem", label: "REM", field: "rem_sleep_s", color: "#B23A82" },
+	{ key: "awake", label: "Awake", field: "awake_s", color: "#E39BD1" },
 ] as const;
 
 interface Night {
@@ -78,7 +78,7 @@ export function DaySleepPanel({
 	const total = num(night?.total_sleep_s);
 
 	return (
-		<Card className={cn("aspect-square gap-2 py-3", className)}>
+		<Card className={cn("aspect-square w-full max-w-[14rem] gap-2 py-3", className)}>
 			<CardHeader className="px-4">
 				<CardTitle className="text-sm font-medium">Sleep</CardTitle>
 			</CardHeader>
