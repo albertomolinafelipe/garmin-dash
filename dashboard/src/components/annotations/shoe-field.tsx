@@ -74,6 +74,21 @@ export function ShoeField({
 			label="Shoe"
 			error={required && !selected ? "Pick the shoe you used." : undefined}
 		>
+			<div className="space-y-2">
+			{current ? (
+				<div className="flex aspect-square w-full items-center justify-center overflow-hidden rounded-lg border bg-white">
+					{current.image_url ? (
+						// biome-ignore lint/a11y/useAltText: decorative shoe preview
+						<img
+							src={current.image_url}
+							alt={current.name}
+							className="size-full object-contain p-2"
+						/>
+					) : (
+						<Footprints className="size-16 text-neutral-400" />
+					)}
+				</div>
+			) : null}
 			<Popover open={open} onOpenChange={setOpen}>
 				<PopoverTrigger asChild>
 					<Button
@@ -127,6 +142,7 @@ export function ShoeField({
 					</Command>
 				</PopoverContent>
 			</Popover>
+			</div>
 		</Field>
 	);
 }
