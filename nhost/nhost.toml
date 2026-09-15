@@ -45,7 +45,7 @@ version = '16.8-20250530-1'
 
 [postgres.resources]
 [postgres.resources.storage]
-capacity = 1
+capacity = 3
 
 [provider]
 
