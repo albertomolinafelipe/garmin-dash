@@ -664,9 +664,10 @@ export function ActivityDetail() {
 
 	return (
 		<div className="space-y-4 p-4">
-			<div className="grid gap-4 lg:grid-cols-3">
+			<div className="flex flex-col gap-4 lg:flex-row lg:items-stretch">
+				<div className="grid flex-1 gap-4 sm:grid-cols-3 lg:min-h-[13rem]">
 				<Card
-					className="justify-center gap-3 border-l-4 py-4 lg:col-span-1"
+					className="justify-center gap-3 border-l-4 py-4 sm:col-span-1"
 					style={{ borderLeftColor: categoryColor[category] }}
 				>
 					<CardHeader className="px-4">
@@ -702,13 +703,17 @@ export function ActivityDetail() {
 						)}
 					</CardContent>
 				</Card>
-				<Card className="justify-center py-4 lg:col-span-2">
+				<Card className="justify-center py-4 sm:col-span-2">
 					<CardContent className="flex items-center px-4">
 						<Metrics activity={activity} />
 					</CardContent>
 				</Card>
+				</div>
 				{activity.start_time && (
-					<DaySleepPanel date={dayKey(new Date(activity.start_time))} />
+					<DaySleepPanel
+						date={dayKey(new Date(activity.start_time))}
+						className="w-full max-w-[14rem] lg:h-full lg:w-auto lg:max-w-none"
+					/>
 				)}
 			</div>
 			{/* Map fills the left column, matching the height of the chart and notes

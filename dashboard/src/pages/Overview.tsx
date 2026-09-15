@@ -45,6 +45,7 @@ import {
 import { WeekStrip } from "@/components/calendar/week-strip";
 import { WeeklyHrZones } from "@/components/weekly-hr-zones";
 import { categoryColor, categoryOf } from "@/lib/activity-types";
+import { SLEEP_STAGE_COLORS } from "@/lib/sleep";
 import { dayKey, fmtDuration } from "@/lib/format";
 import {
 	type CalendarActivity,
@@ -187,10 +188,7 @@ const HRV_COLORS = {
 };
 
 const SLEEP_COLORS = {
-	awake: "#54546D",
-	light: "#7E9CD8",
-	rem: "#957FB8",
-	deep: "#658594",
+	...SLEEP_STAGE_COLORS,
 	score: "#DCA561",
 };
 
