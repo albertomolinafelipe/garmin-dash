@@ -96,13 +96,10 @@ export function ShoeField({
 						// biome-ignore lint/a11y/useSemanticElements: combobox trigger
 						role="combobox"
 						aria-expanded={open}
-						className="h-auto w-full justify-between py-1.5"
+						className="w-40 justify-between"
 					>
 						{current ? (
-							<span className="flex min-w-0 items-center gap-2">
-								<ShoeThumb shoe={current} className="size-8" />
-								<span className="truncate">{current.name}</span>
-							</span>
+							<span className="truncate">{current.name}</span>
 						) : (
 							<span className="text-muted-foreground">Choose a shoe</span>
 						)}
