@@ -14,6 +14,7 @@ from garminconnect import Garmin
 from . import db, normalize
 from .config import Settings
 from .fit import Sample, parse_samples
+from .hasura import Hasura
 
 log = logging.getLogger(__name__)
 
@@ -68,6 +69,7 @@ def start_location(samples: list[Sample]) -> tuple[float, float] | None:
 
 def sync_activities(
     conn: psycopg.Connection,
+    hasura: Hasura,
     client: GarminClient,
     settings: Settings,
     *,
@@ -77,10 +79,12 @@ def sync_activities(
 ) -> None:
     """Pull recent activities, skipping ones already stored unless forced.
 
-    Each activity commits on its own so an interrupted or rate-limited run keeps
-    everything it already finished.
+    The activity summary is upserted through Hasura and its samples are COPYed
+    to Postgres. These are separate transactions, so a sample failure leaves the
+    summary saved without samples -- recoverable, since `backfill` then picks it
+    up (start_lat set, samples_synced_at still null).
     """
-    known = set() if force else db.known_garmin_activity_ids(conn)
+    known = set() if force else hasura.known_garmin_activity_ids()
     try:
         page = cast(list[dict[str, Any]], client.get_activities(0, limit))
     except Exception as exc:  # noqa: BLE001 - third-party API exceptions vary
@@ -105,10 +109,10 @@ def sync_activities(
                 start_location=start_location(samples),
                 synced_at=datetime.now(timezone.utc),
             )
-            activity_id = db.upsert_activity(conn, row)
+            activity_id = hasura.upsert_activity(row)
             if samples:
                 report.samples += db.replace_samples(conn, activity_id, samples)
-            conn.commit()
+                conn.commit()
             report.activities += 1
             log.info(
                 "synced activity %s (%d samples)", garmin_activity_id, len(samples)
@@ -120,7 +124,7 @@ def sync_activities(
 
 
 def sync_daily(
-    conn: psycopg.Connection,
+    hasura: Hasura,
     client: GarminClient,
     settings: Settings,
     *,
@@ -137,11 +141,8 @@ def sync_daily(
             data = client.get_sleep_data(day)
             daily = (data or {}).get("dailySleepDTO") or {}
             if daily.get("sleepTimeSeconds") not in (None, 0):
-                report.sleep += db.upsert_rows(
-                    conn,
-                    "sleep",
-                    ("calendar_date",),
-                    [normalize.sleep_row(data, synced_at=stamp)],
+                report.sleep += hasura.upsert_rows(
+                    "sleep", [normalize.sleep_row(data, synced_at=stamp)]
                 )
         except Exception as exc:  # noqa: BLE001 - tolerate one bad day
             report.errors.append(f"sleep {day} failed: {exc}")
@@ -149,11 +150,8 @@ def sync_daily(
         try:
             data = client.get_hrv_data(day)
             if data:
-                report.hrv += db.upsert_rows(
-                    conn,
-                    "daily_hrv",
-                    ("calendar_date",),
-                    [normalize.hrv_row(data, synced_at=stamp)],
+                report.hrv += hasura.upsert_rows(
+                    "daily_hrv", [normalize.hrv_row(data, synced_at=stamp)]
                 )
         except Exception as exc:  # noqa: BLE001 - tolerate one bad day
             report.errors.append(f"hrv {day} failed: {exc}")
@@ -162,11 +160,8 @@ def sync_daily(
             rows = normalize.readiness_rows(
                 client.get_training_readiness(day), synced_at=stamp
             )
-            report.readiness += db.upsert_rows(
-                conn, "training_readiness", ("calendar_date", "timestamp"), rows
-            )
+            report.readiness += hasura.upsert_rows("training_readiness", rows)
         except Exception as exc:  # noqa: BLE001 - tolerate one bad day
             report.errors.append(f"readiness {day} failed: {exc}")
 
-        conn.commit()
         time.sleep(settings.request_delay_s)

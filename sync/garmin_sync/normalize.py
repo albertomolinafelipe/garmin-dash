@@ -6,9 +6,28 @@ units are preserved as-is; conversion is the dashboard's concern.
 
 from __future__ import annotations
 
-import json
 from datetime import date, datetime, timezone
 from typing import Any
+
+# Columns the sync owns on `activities`. Everything else on the table is
+# user-authored annotation (name, subtype, feeling, effort, notes, ...) and must
+# survive a re-sync untouched, so an upsert's update list is exactly these.
+# `name` and `subtype` are seeded on first insert only, so they sit outside it.
+ACTIVITY_SYNCED_COLUMNS = (
+    "activity_type",
+    "start_time",
+    "duration_s",
+    "distance_m",
+    "avg_hr",
+    "max_hr",
+    "elevation_gain_m",
+    "calories",
+    "avg_speed_mps",
+    "avg_power_w",
+    "start_lat",
+    "start_lng",
+    "synced_at",
+)
 
 
 def seed_subtype(activity_type: str | None) -> str | None:
@@ -101,7 +120,9 @@ def hrv_row(
         "feedback_phrase": _string(summary.get("feedbackPhrase")),
         "start_time": _utc(_parse_dt(response.get("sleepStartTimestampGMT"))),
         "end_time": _utc(_parse_dt(response.get("sleepEndTimestampGMT"))),
-        "readings": json.dumps(readings),
+        # A JSON array for the jsonb column: Hasura serialises it, so it stays a
+        # native list here rather than a pre-encoded string.
+        "readings": readings,
         "synced_at": synced_at or datetime.now(timezone.utc),
     }
 

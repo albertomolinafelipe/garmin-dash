@@ -12,7 +12,7 @@ Hasura), annotated and planned through a React dashboard.
 | Path                | What it is                                              |
 | ------------------- | ------------------------------------------------------- |
 | `dashboard/`        | React + Vite SPA, deployed as an Nhost Run service       |
-| `sync/`             | Garmin -> Postgres CLI (`make sync`, `make backfill`)    |
+| `sync/`             | Garmin -> Hasura/Postgres CLI (`make sync`, `make backfill`) |
 | `nhost/migrations/` | Postgres migrations (`nhost.toml` is the project config) |
 | `nhost/metadata/`   | Hasura table metadata and permissions                    |
 | `flake.nix`         | Dev shell pinning the Nhost CLI, Node and Docker client  |
@@ -111,9 +111,14 @@ lexicographically in chronological order, which the calendar relies on.
 
 ## Sync
 
-`sync/` is a small CLI. It talks to Postgres directly rather than through
-Hasura — sample volume makes `COPY` the only sensible transport, and it runs
-locally as a trusted tool. Configure it with the `sync` block in `.env`.
+`sync/` is a small CLI. Activities and the daily summaries (sleep, HRV,
+readiness) are written through Hasura's GraphQL API — one schema and permission
+contract, shared with the dashboard. The full-resolution samples are the sole
+exception: their volume makes `COPY` straight to Postgres the only sensible
+transport (see [Samples](#samples)). So `make sync` needs both
+`HASURA_GRAPHQL_URL` (with the admin secret) and `DB_CONNECTION_STRING`,
+pointing at the same project; `make backfill` writes samples only and needs the
+connection string alone. Configure it with the `sync` block in `.env`.
 
 ```sh
 make sync                      # recent activities + sleep/HRV/readiness
@@ -136,8 +141,9 @@ the pause between Garmin requests.
 `effort`, `notes`, `focus`, ...). Those exist nowhere else — Garmin has never
 seen them — so overwriting them is unrecoverable.
 
-Upserts therefore list only `db.ACTIVITY_SYNCED_COLUMNS` in `DO UPDATE`.
-`name` and `subtype` are seeded on first insert and never updated again.
+The activity upsert therefore names only `normalize.ACTIVITY_SYNCED_COLUMNS` in
+its `on_conflict` `update_columns`. `name` and `subtype` are seeded on first
+insert and never updated again.
 `test_upserts_never_overwrite_user_columns` guards this; if you add an
 annotation column, add it to `ANNOTATION_COLUMNS` in the test too.
 

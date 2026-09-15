@@ -1,6 +1,10 @@
 .PHONY: sync backfill backfill-dry sync-activities lint test
 
 PYTHON ?= .venv/bin/python
+
+# The CLI loads .env itself (garmin_sync.config.load_dotenv). Sourcing it here
+# instead would corrupt secrets containing $ or #, which make expands or treats
+# as a comment.
 SYNC := cd sync && ../$(PYTHON) -m garmin_sync.cli
 
 # Routine pull: recent activities (with full-resolution samples) plus the

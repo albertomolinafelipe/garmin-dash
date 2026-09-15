@@ -8,8 +8,9 @@ import sys
 import time
 
 from . import db
-from .config import ConfigError, Settings
+from .config import ConfigError, Settings, load_dotenv
 from .garmin import GarminAuthError, GarminRateLimitError, login
+from .hasura import Hasura
 from .pull import Report, download_samples, sync_activities, sync_daily
 
 log = logging.getLogger("garmin_sync")
@@ -58,6 +59,7 @@ def main(argv: list[str] | None = None) -> int:
         format="%(levelname)s %(message)s",
     )
 
+    load_dotenv()
     try:
         settings = Settings.from_env()
     except ConfigError as exc:
@@ -68,6 +70,9 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "sync":
             return _run_sync(settings, args)
         return _run_backfill(settings, args)
+    except ConfigError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
     except (GarminAuthError, GarminRateLimitError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
@@ -77,14 +82,26 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _run_sync(settings: Settings, args: argparse.Namespace) -> int:
+    hasura_url, hasura_secret = settings.require_hasura()
     client = login(settings)
     report = Report()
-    with db.connect(settings.database_url) as conn:
+    # Both transports stay open for the whole run: Hasura for the summaries,
+    # Postgres for the sample COPY the activities loop performs inline.
+    with (
+        Hasura(hasura_url, hasura_secret) as hasura,
+        db.connect(settings.database_url) as conn,
+    ):
         sync_activities(
-            conn, client, settings, limit=args.limit, force=args.force, report=report
+            conn,
+            hasura,
+            client,
+            settings,
+            limit=args.limit,
+            force=args.force,
+            report=report,
         )
         if not args.skip_daily:
-            sync_daily(conn, client, settings, days=args.days, report=report)
+            sync_daily(hasura, client, settings, days=args.days, report=report)
     return _finish(report)
 
 
