@@ -74,16 +74,16 @@ function TagsInput({
 			className={cn("flex flex-wrap items-center gap-2", className)}
 		>
 			{value.map((tag) => (
-				<Badge key={tag} variant="secondary">
+				<Badge key={tag} variant="secondary" className="gap-1">
 					{tag}
 					<button
 						type="button"
 						aria-label={`Remove ${tag}`}
-						className="rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+						className="text-muted-foreground hover:text-foreground -mr-0.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
 						disabled={disabled}
 						onClick={() => remove(tag)}
 					>
-						<X />
+						<X className="size-3" />
 					</button>
 				</Badge>
 			))}
