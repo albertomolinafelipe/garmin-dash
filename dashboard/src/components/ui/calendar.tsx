@@ -21,6 +21,7 @@ function Calendar({
 	showOutsideDays = true,
 	captionLayout = "label",
 	buttonVariant = "ghost",
+	weekStartsOn = 1,
 	formatters,
 	components,
 	...props
@@ -32,6 +33,7 @@ function Calendar({
 	return (
 		<DayPicker
 			showOutsideDays={showOutsideDays}
+			weekStartsOn={weekStartsOn}
 			className={cn(
 				"group/calendar bg-background p-3 [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
 				String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
@@ -110,10 +112,7 @@ function Calendar({
 						: "[&:first-child[data-selected=true]_button]:rounded-l-md",
 					defaultClassNames.day,
 				),
-				range_start: cn(
-					"rounded-l-md bg-accent",
-					defaultClassNames.range_start,
-				),
+				range_start: cn("rounded-l-md bg-accent", defaultClassNames.range_start),
 				range_middle: cn("rounded-none", defaultClassNames.range_middle),
 				range_end: cn("rounded-r-md bg-accent", defaultClassNames.range_end),
 				today: cn(
@@ -144,23 +143,16 @@ function Calendar({
 				},
 				Chevron: ({ className, orientation, ...props }) => {
 					if (orientation === "left") {
-						return (
-							<ChevronLeftIcon className={cn("size-4", className)} {...props} />
-						);
+						return <ChevronLeftIcon className={cn("size-4", className)} {...props} />;
 					}
 
 					if (orientation === "right") {
 						return (
-							<ChevronRightIcon
-								className={cn("size-4", className)}
-								{...props}
-							/>
+							<ChevronRightIcon className={cn("size-4", className)} {...props} />
 						);
 					}
 
-					return (
-						<ChevronDownIcon className={cn("size-4", className)} {...props} />
-					);
+					return <ChevronDownIcon className={cn("size-4", className)} {...props} />;
 				},
 				DayButton: CalendarDayButton,
 				WeekNumber: ({ children, ...props }) => {

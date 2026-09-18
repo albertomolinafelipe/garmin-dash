@@ -16,6 +16,7 @@ const fixtures: CalendarActivity[] = [
 		distance_m: 5000,
 		elevation_gain_m: 50,
 		start_lat: null,
+		start_lng: null,
 		feeling: null,
 		effort: null,
 		caffeine: null,
@@ -32,6 +33,7 @@ const fixtures: CalendarActivity[] = [
 		distance_m: null,
 		elevation_gain_m: null,
 		start_lat: null,
+		start_lng: null,
 		feeling: 4,
 		effort: 3,
 		caffeine: null,
@@ -48,6 +50,7 @@ const fixtures: CalendarActivity[] = [
 		distance_m: 7000,
 		elevation_gain_m: 80,
 		start_lat: null,
+		start_lng: null,
 		feeling: 5,
 		effort: 4,
 		caffeine: "no",
@@ -86,9 +89,7 @@ describe("needs-annotation surfaces", () => {
 
 		const expected = fixtures.filter(needsAnnotation);
 		expect(expected.map((activity) => activity.id)).toEqual(["2"]);
-		expect(screen.getAllByText("Needs annotation")).toHaveLength(
-			expected.length,
-		);
+		expect(screen.getAllByText("Needs annotation")).toHaveLength(expected.length);
 		expect(screen.getByText("Needs annotation")).toBeVisible();
 	});
 
@@ -106,9 +107,10 @@ describe("needs-annotation surfaces", () => {
 		const expected = fixtures.filter(needsAnnotation);
 		expect(screen.getByText("Needs annotation")).toBeInTheDocument();
 		expect(screen.getByText(String(expected.length))).toBeInTheDocument();
-		expect(
-			screen.getByRole("link", { name: /Unfocused climb/ }),
-		).toHaveAttribute("href", "/activities/2");
+		expect(screen.getByRole("link", { name: /Unfocused climb/ })).toHaveAttribute(
+			"href",
+			"/activities/2",
+		);
 		expect(
 			screen.queryByRole("link", { name: /Grandfathered run/ }),
 		).not.toBeInTheDocument();

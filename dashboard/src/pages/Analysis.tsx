@@ -38,6 +38,12 @@ import {
 	ChartTooltip,
 	ChartTooltipContent,
 } from "@/components/ui/chart";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
 import { DayPlanDndProvider } from "@/components/calendar/dnd";
 import {
 	addDays,
@@ -51,7 +57,7 @@ import {
 import { WeekStrip } from "@/components/calendar/week-strip";
 import { ReadinessSection } from "@/components/readiness-section";
 import { WeeklyHrZones } from "@/components/weekly-hr-zones";
-import { categoryColor, categoryOf } from "@/lib/activity-types";
+import { categoryColor, categoryOf, iconifyIcon } from "@/lib/activity-types";
 import { SLEEP_STAGE_COLORS } from "@/lib/sleep";
 import { dayKey, fmtDuration } from "@/lib/format";
 import {
@@ -65,6 +71,9 @@ import {
 import { useWeekObjectivesQuery } from "@/graphql/hooks";
 import { type Metric, METRIC_META, type Sport, toIsoWeek } from "@/lib/plans";
 import { cn } from "@/lib/utils";
+
+const ExpandIcon = iconifyIcon("mdi:arrow-expand");
+const CollapseIcon = iconifyIcon("mdi:arrow-collapse");
 
 const WINDOW_DAYS = 7; // trailing window each daily point aggregates
 const SPAN_DAYS = 30; // how many days to plot
@@ -165,6 +174,30 @@ function WindowNav() {
 	);
 }
 
+// Faint dotted separators on every Sunday, so week boundaries are readable in
+// any daily chart. Returns an array because recharts only recognises its own
+// element types as chart children, not wrapper components.
+function weekLines(end: Date, yAxisId?: string | number) {
+	const lines = [];
+	for (let i = SPAN_DAYS - 1; i >= 0; i--) {
+		const day = new Date(end);
+		day.setDate(end.getDate() - i);
+		if (day.getDay() !== 0) continue;
+		const x = dayKey(day).slice(5);
+		lines.push(
+			<ReferenceLine
+				key={x}
+				yAxisId={yAxisId}
+				x={x}
+				stroke="currentColor"
+				strokeOpacity={0.15}
+				strokeDasharray="2 4"
+			/>,
+		);
+	}
+	return lines;
+}
+
 function inWindow(dateKey: string, w: WindowNav): boolean {
 	return dateKey >= w.startKey && dateKey <= w.endKey;
 }
@@ -253,19 +286,77 @@ function Panel({
 	className?: string;
 	children: ReactNode;
 }) {
+	const [expanded, setExpanded] = useState(false);
+	const header = (open: boolean) => (
+		<CardHeader className="px-4">
+			<CardTitle className="text-sm font-medium">{title}</CardTitle>
+			<CardAction>
+				<div className="flex items-center gap-3">
+					{action}
+					{showNav && <WindowNav />}
+					<Button
+						variant="ghost"
+						size="icon"
+						className="text-muted-foreground size-6"
+						aria-label={`${open ? "Collapse" : "Expand"} ${title}`}
+						onClick={() => setExpanded(!open)}
+					>
+						{open ? <CollapseIcon size={16} /> : <ExpandIcon size={16} />}
+					</Button>
+				</div>
+			</CardAction>
+		</CardHeader>
+	);
 	return (
-		<Card className={cn("min-h-0 gap-2 py-3", className)}>
-			<CardHeader className="px-4">
-				<CardTitle className="text-sm font-medium">{title}</CardTitle>
-				<CardAction>
-					<div className="flex items-center gap-3">
-						{action}
-						{showNav && <WindowNav />}
-					</div>
-				</CardAction>
-			</CardHeader>
-			<CardContent className="min-h-0 flex-1 px-4 pb-1">{children}</CardContent>
-		</Card>
+		<>
+			<Card className={cn("min-h-0 gap-2 py-3", className)}>
+				{header(false)}
+				<CardContent className="min-h-0 flex-1 px-4 pb-1">{children}</CardContent>
+			</Card>
+			{expanded ? (
+				<ExpandedPanel title={title} onClose={() => setExpanded(false)}>
+					{header(true)}
+					<CardContent className="min-h-0 flex-1 px-4 pb-1">
+						{children}
+					</CardContent>
+				</ExpandedPanel>
+			) : null}
+		</>
+	);
+}
+
+// Full-screen view of a single panel. h/l and the arrow keys scrub the shared
+// window while it is open; Escape or the close button dismisses it.
+function ExpandedPanel({
+	title,
+	onClose,
+	children,
+}: {
+	title: string;
+	onClose: () => void;
+	children: ReactNode;
+}) {
+	const { back, forward } = useWindowNav();
+	useEffect(() => {
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === "h" || e.key === "ArrowLeft") back();
+			else if (e.key === "l" || e.key === "ArrowRight") forward();
+		};
+		window.addEventListener("keydown", onKey);
+		return () => window.removeEventListener("keydown", onKey);
+	}, [back, forward]);
+	return (
+		<Dialog open onOpenChange={(open) => !open && onClose()}>
+			<DialogContent
+				showCloseButton={false}
+				className="flex h-[40svh] w-[calc(100vw-4rem)] max-w-none flex-col gap-2 p-0 py-3 sm:max-w-none"
+			>
+				<DialogHeader className="sr-only">
+					<DialogTitle>{title}</DialogTitle>
+				</DialogHeader>
+				{children}
+			</DialogContent>
+		</Dialog>
 	);
 }
 
@@ -326,6 +417,8 @@ interface LoadSeries {
 	unit: string;
 	color: string;
 	axis: "left" | "right";
+	// Pins the axis top so the plot keeps a stable scale across windows.
+	axisMax?: number;
 	contribution: (a: CalendarActivity) => number | null;
 	// When set, the panel can overlay this series' weekly plan target.
 	objective?: { metric: Metric; sport: Sport };
@@ -415,18 +508,9 @@ function LoadPanel({
 		[series, objectiveSeries],
 	);
 
-	// Sundays: the last day of each week, where its objective dot sits.
-	const weekStarts = useMemo(() => {
-		const out: string[] = [];
-		for (let i = SPAN_DAYS - 1; i >= 0; i--) {
-			const day = new Date(end);
-			day.setDate(end.getDate() - i);
-			if (day.getDay() === 0) out.push(dayKey(day).slice(5));
-		}
-		return out;
-	}, [end]);
-
 	const usesRight = series.some((s) => s.axis === "right");
+	const axisMax = (axis: "left" | "right") =>
+		series.find((s) => s.axis === axis)?.axisMax;
 	const hasData = rows.some((r) => series.some((s) => Number(r[s.key]) > 0));
 	const animate = useInitialAnimation(hasData);
 	const current = (s: LoadSeries) =>
@@ -488,16 +572,7 @@ function LoadPanel({
 							))}
 						</defs>
 						<CartesianGrid strokeDasharray="3 3" vertical={false} />
-						{weekStarts.map((x) => (
-							<ReferenceLine
-								key={x}
-								yAxisId="left"
-								x={x}
-								stroke="currentColor"
-								strokeOpacity={0.15}
-								strokeDasharray="2 4"
-							/>
-						))}
+						{weekLines(end, "left")}
 						<XAxis
 							dataKey="date"
 							interval={4}
@@ -505,7 +580,13 @@ function LoadPanel({
 							axisLine={false}
 							tickMargin={6}
 						/>
-						<YAxis yAxisId="left" width={32} tickLine={false} axisLine={false} />
+						<YAxis
+							yAxisId="left"
+							width={32}
+							tickLine={false}
+							axisLine={false}
+							domain={[0, axisMax("left") ?? "auto"]}
+						/>
 						{usesRight && (
 							<YAxis
 								yAxisId="right"
@@ -513,6 +594,7 @@ function LoadPanel({
 								width={38}
 								tickLine={false}
 								axisLine={false}
+								domain={[0, axisMax("right") ?? "auto"]}
 							/>
 						)}
 						<ChartTooltip content={<ChartTooltipContent />} />
@@ -574,6 +656,7 @@ const RUNNING_SERIES: LoadSeries[] = [
 		unit: "km",
 		color: categoryColor.running,
 		axis: "left",
+		axisMax: 80,
 		contribution: (a) =>
 			a.activity_type?.includes("running") && num(a.distance_m)
 				? num(a.distance_m) / 1000
@@ -586,6 +669,7 @@ const RUNNING_SERIES: LoadSeries[] = [
 		unit: "m",
 		color: "#D27E99",
 		axis: "right",
+		axisMax: 3000,
 		contribution: (a) =>
 			a.activity_type?.includes("running") && num(a.elevation_gain_m)
 				? num(a.elevation_gain_m)
@@ -711,6 +795,7 @@ function SleepPanel() {
 							))}
 						</defs>
 						<CartesianGrid strokeDasharray="3 3" vertical={false} />
+						{weekLines(win.end, "hours")}
 						<XAxis
 							dataKey="date"
 							interval={2}
@@ -850,6 +935,7 @@ function HrvPanel() {
 							</linearGradient>
 						</defs>
 						<CartesianGrid strokeDasharray="3 3" vertical={false} />
+						{weekLines(win.end)}
 						<XAxis
 							dataKey="date"
 							interval={2}
@@ -990,6 +1076,7 @@ function ReadinessPanel() {
 				>
 					<ComposedChart data={rows} margin={{ top: 6, right: 0, left: 0 }}>
 						<CartesianGrid strokeDasharray="3 3" vertical={false} />
+						{weekLines(win.end, "pct")}
 						<XAxis
 							dataKey="date"
 							interval={2}

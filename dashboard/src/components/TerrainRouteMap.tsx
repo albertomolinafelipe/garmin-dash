@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 import * as maptilersdk from "@maptiler/sdk";
 import "@maptiler/sdk/dist/maptiler-sdk.css";
 
+import { routeColor } from "@/lib/map-tiles";
+
 const ROUTE_SOURCE = "route";
 const ROUTE_LAYER = "route-line";
 
@@ -57,7 +59,7 @@ export function TerrainRouteMap({
 				source: ROUTE_SOURCE,
 				layout: { "line-cap": "round", "line-join": "round" },
 				paint: {
-					"line-color": "#0066ff",
+					"line-color": routeColor(),
 					"line-width": 4,
 					"line-opacity": 1,
 				},
@@ -82,8 +84,7 @@ export function TerrainRouteMap({
 		}
 		if (!markerRef.current) {
 			const element = document.createElement("div");
-			element.style.cssText =
-				"width:12px;height:12px;border-radius:9999px;background:#E46876;border:2px solid #fff;";
+			element.style.cssText = `width:12px;height:12px;border-radius:9999px;background:${routeColor()};border:2px solid #fff;`;
 			markerRef.current = new maptilersdk.Marker({ element });
 		}
 		markerRef.current.setLngLat([marker.lng, marker.lat]).addTo(map);

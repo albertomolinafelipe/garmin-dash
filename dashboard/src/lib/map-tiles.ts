@@ -24,3 +24,16 @@ export const STADIA_MAX_ZOOM = 20;
 
 export const STADIA_ATTRIBUTION =
 	'&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+
+// Route stroke colour, themeable via the `--route` custom property. Leaflet and
+// MapTiler both want a concrete colour string, so resolve it from the document
+// instead of handing them a var() reference.
+export function routeColor(): string {
+	if (typeof document === "undefined") return ROUTE_COLOR_FALLBACK;
+	const value = getComputedStyle(document.documentElement)
+		.getPropertyValue("--route")
+		.trim();
+	return value || ROUTE_COLOR_FALLBACK;
+}
+
+const ROUTE_COLOR_FALLBACK = "#2F7DF6";

@@ -1,12 +1,28 @@
 import type { LatLngBoundsExpression, LatLngExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { MapContainer, Polyline, TileLayer } from "react-leaflet";
+import { useEffect } from "react";
+import { MapContainer, Polyline, TileLayer, useMap } from "react-leaflet";
 
 import { cn } from "@/lib/utils";
-import { STADIA_DARK_TILE_URL, STADIA_MAX_ZOOM } from "@/lib/map-tiles";
+import {
+	routeColor,
+	STADIA_DARK_TILE_URL,
+	STADIA_MAX_ZOOM,
+} from "@/lib/map-tiles";
 
 // A static, non-interactive route thumbnail. Deliberately dumber than the
 // detail page's RouteMap: no 2D/3D toggle, no hover marker, no zoom controls.
+// A thumbnail often mounts before its grid cell has been laid out, and Leaflet
+// measures the container once: without this the tiles never fill the box.
+function Resize({ positions }: { positions: LatLngExpression[] }) {
+	const map = useMap();
+	useEffect(() => {
+		map.invalidateSize();
+		map.fitBounds(positions as LatLngBoundsExpression, { padding: [12, 12] });
+	}, [map, positions]);
+	return null;
+}
+
 export function RoutePreviewMap({
 	track,
 	className,
@@ -32,9 +48,10 @@ export function RoutePreviewMap({
 					detectRetina
 					maxNativeZoom={STADIA_MAX_ZOOM}
 				/>
+				<Resize positions={positions} />
 				<Polyline
 					positions={positions}
-					pathOptions={{ color: "#E46876", weight: 3, opacity: 0.95 }}
+					pathOptions={{ color: routeColor(), weight: 3, opacity: 0.95 }}
 				/>
 			</MapContainer>
 		</div>

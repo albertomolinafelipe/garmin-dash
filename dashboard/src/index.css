@@ -37,6 +37,7 @@
 	--destructive: oklch(0.577 0.245 27.325); /* errors / delete */
 	--plan: oklch(0.59 0.24 328); /* plans: workouts & requirements accent */
 	--race: oklch(0.72 0.13 85); /* races: gold accent */
+	--route: oklch(0.55 0.15 263); /* gps tracks drawn on maps */
 
 	/* borders & focus */
 	--border: oklch(0.922 0 0);
@@ -73,6 +74,7 @@
 	--destructive: oklch(0.704 0.191 22.216);
 	--plan: oklch(0.72 0.19 328);
 	--race: oklch(0.8 0.13 85);
+	--route: oklch(0.68 0.11 263);
 
 	--border: oklch(1 0 0 / 10%);
 	--input: oklch(1 0 0 / 15%);
@@ -115,6 +117,7 @@
 	--color-destructive: var(--destructive);
 	--color-plan: var(--plan);
 	--color-race: var(--race);
+	--color-route: var(--route);
 	--color-border: var(--border);
 	--color-input: var(--input);
 	--color-ring: var(--ring);

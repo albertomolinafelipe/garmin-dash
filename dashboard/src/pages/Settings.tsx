@@ -1,8 +1,8 @@
-import { type FocusEvent, useEffect, useState } from "react";
+import { type FocusEvent, lazy, Suspense, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
-import { Footprints, Plus, Trash2 } from "lucide-react";
+import { Footprints, Map as MapIcon, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -60,6 +60,11 @@ import {
 	useUpdateExerciseMutation,
 } from "@/graphql/hooks";
 import { raceIcon as RaceIcon } from "@/lib/plans";
+
+// Leaflet ships its own CSS bundle, so keep it out of the settings chunk.
+const RacesMap = lazy(() =>
+	import("@/components/races-map").then((m) => ({ default: m.RacesMap })),
+);
 
 // --- Exercises ----------------------------------------------------------------
 
@@ -383,6 +388,7 @@ function RacesCard() {
 	const activities = useActivities();
 	const remove = useDeleteRaceMutation();
 	const [createOpen, setCreateOpen] = useState(false);
+	const [mapOpen, setMapOpen] = useState(false);
 	const today = new Date().toISOString().slice(0, 10);
 
 	const list = [...(races.data ?? [])].sort((a, b) =>
@@ -402,6 +408,13 @@ function RacesCard() {
 		return ids && ids.length === 1 ? ids[0] : null;
 	};
 
+	const raceRoutes = list.flatMap((race) => {
+		const activityId = activityForRace(String(race.date));
+		return activityId
+			? [{ id: String(race.id), name: race.name, activityId }]
+			: [];
+	});
+
 	const deleteRace = async (id: unknown) => {
 		try {
 			await remove.mutateAsync({ id });
@@ -419,10 +432,16 @@ function RacesCard() {
 					Races show on the calendar on their date, past ones flagged.
 				</CardDescription>
 				<CardAction>
-					<Button size="sm" onClick={() => setCreateOpen(true)}>
-						<Plus className="size-4" />
-						New race
-					</Button>
+					<div className="flex items-center gap-2">
+						<Button size="sm" variant="outline" onClick={() => setMapOpen(true)}>
+							<MapIcon className="size-4" />
+							Map
+						</Button>
+						<Button size="sm" onClick={() => setCreateOpen(true)}>
+							<Plus className="size-4" />
+							New race
+						</Button>
+					</div>
 				</CardAction>
 			</CardHeader>
 			<CardContent>
@@ -499,6 +518,23 @@ function RacesCard() {
 					}}
 				/>
 				<RaceDialog open={createOpen} onOpenChange={setCreateOpen} />
+				<Dialog open={mapOpen} onOpenChange={setMapOpen}>
+					<DialogContent className="flex h-[70svh] w-[calc(100vw-4rem)] max-w-none flex-col sm:max-w-none">
+						<DialogHeader>
+							<DialogTitle>Race routes</DialogTitle>
+							<DialogDescription>
+								Every past race that matched a recorded activity.
+							</DialogDescription>
+						</DialogHeader>
+						<div className="isolate min-h-0 flex-1 overflow-hidden rounded-lg border">
+							{mapOpen ? (
+								<Suspense fallback={null}>
+									<RacesMap races={raceRoutes} />
+								</Suspense>
+							) : null}
+						</div>
+					</DialogContent>
+				</Dialog>
 			</CardContent>
 		</Card>
 	);

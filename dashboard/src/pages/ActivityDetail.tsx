@@ -60,6 +60,7 @@ import { dayKey, fmtDate, fmtDistance, fmtDuration } from "@/lib/format";
 import {
 	STADIA_ATTRIBUTION,
 	STADIA_MAX_ZOOM,
+	routeColor,
 	STADIA_SATELLITE_TILE_URL,
 } from "@/lib/map-tiles";
 import { cn } from "@/lib/utils";
@@ -225,7 +226,7 @@ function RouteMap({
 							/>
 							<Polyline
 								positions={positions}
-								pathOptions={{ color: "#E46876", weight: 4, opacity: 0.95 }}
+								pathOptions={{ color: routeColor(), weight: 4, opacity: 0.95 }}
 							/>
 							{marker && (
 								<CircleMarker
@@ -234,7 +235,7 @@ function RouteMap({
 									pathOptions={{
 										color: "#fff",
 										weight: 2,
-										fillColor: "#E46876",
+										fillColor: routeColor(),
 										fillOpacity: 1,
 									}}
 								/>
