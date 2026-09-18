@@ -43,7 +43,7 @@ import { fmtDay } from "@/lib/format";
 import { useActivities } from "@/lib/queries";
 
 const NAV = [
-	{ to: "/overview", label: "Overview", icon: LayoutDashboard },
+	{ to: "/analysis", label: "Analysis", icon: LayoutDashboard },
 	{ to: "/calendar", label: "Calendar", icon: CalendarDays },
 	{ to: "/activities", label: "Activities", icon: Activity },
 	{ to: "/settings", label: "Settings", icon: Settings },
@@ -80,19 +80,13 @@ function NeedsAnnotationGroup({ onNavigate }: { onNavigate: () => void }) {
 							<SidebarMenuSub>
 								{incomplete.map((activity) => (
 									<SidebarMenuSubItem key={activity.id}>
-										<NavLink
-											to={`/activities/${activity.id}`}
-											onClick={onNavigate}
-										>
+										<NavLink to={`/activities/${activity.id}`} onClick={onNavigate}>
 											{({ isActive }) => (
 												<SidebarMenuSubButton asChild isActive={isActive}>
 													<span>
 														<span className="min-w-0 truncate">
 															{activity.name ??
-																typeLabel(
-																	activity.activity_type,
-																	activity.subtype,
-																)}
+																typeLabel(activity.activity_type, activity.subtype)}
 														</span>
 														<span className="text-muted-foreground ml-auto shrink-0 text-xs">
 															{fmtDay(activity.start_time)}

@@ -43,6 +43,7 @@ import { useActivities } from "@/lib/queries";
 import { dayKey } from "@/lib/format";
 import {
 	type Shoe,
+	lifetimeHours,
 	lifetimeKm,
 	useDeleteShoe,
 	useInsertShoe,
@@ -363,7 +364,10 @@ function RaceDialog({
 					</div>
 				</div>
 				<DialogFooter>
-					<Button disabled={!valid || insert.isPending} onClick={() => void create()}>
+					<Button
+						disabled={!valid || insert.isPending}
+						onClick={() => void create()}
+					>
 						{insert.isPending ? "Creating…" : "Create race"}
 					</Button>
 				</DialogFooter>
@@ -447,9 +451,7 @@ function RacesCard() {
 								<button
 									type="button"
 									disabled={activityId == null}
-									onClick={() =>
-										activityId && navigate(`/activities/${activityId}`)
-									}
+									onClick={() => activityId && navigate(`/activities/${activityId}`)}
 									className={cn(
 										"min-w-0 flex-1 p-2 text-left",
 										activityId != null && "cursor-pointer",
@@ -462,10 +464,7 @@ function RacesCard() {
 										<span className="truncate">{race.name}</span>
 									</span>
 									<span className="text-muted-foreground block truncate text-xs">
-										{format(
-											new Date(`${String(race.date)}T00:00:00`),
-											"d MMM yyyy",
-										)}
+										{format(new Date(`${String(race.date)}T00:00:00`), "d MMM yyyy")}
 										{meta ? ` · ${meta}` : ""}
 									</span>
 								</button>
@@ -582,7 +581,10 @@ function ShoeDialog({
 					</div>
 				</div>
 				<DialogFooter>
-					<Button disabled={!valid || insert.isPending} onClick={() => void create()}>
+					<Button
+						disabled={!valid || insert.isPending}
+						onClick={() => void create()}
+					>
 						{insert.isPending ? "Adding…" : "Add shoe"}
 					</Button>
 				</DialogFooter>
@@ -595,7 +597,13 @@ function ShoeRow({ shoe }: { shoe: Shoe }) {
 	const queryClient = useQueryClient();
 	const remove = useDeleteShoe();
 	const km = lifetimeKm(shoe);
+	const hours = lifetimeHours(shoe);
 	const count = shoe.activities_aggregate.aggregate?.count ?? 0;
+	const stats = [
+		...(km > 0 ? [`${km.toFixed(0)} km`] : []),
+		`${hours.toFixed(0)} h`,
+		`${count} ${count === 1 ? "activity" : "activities"}`,
+	];
 
 	const deleteShoe = async () => {
 		try {
@@ -623,7 +631,7 @@ function ShoeRow({ shoe }: { shoe: Shoe }) {
 			<div className="min-w-0 flex-1">
 				<div className="truncate text-sm font-medium">{shoe.name}</div>
 				<div className="text-muted-foreground text-xs tabular-nums">
-					{km.toFixed(0)} km · {count} {count === 1 ? "activity" : "activities"}
+					{stats.join(" · ")}
 				</div>
 			</div>
 			<AlertDialog>

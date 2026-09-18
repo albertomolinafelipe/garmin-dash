@@ -6,7 +6,7 @@ import { AppShell } from "@/components/app-shell";
 import { Activities } from "@/pages/Activities";
 import { ActivityDetail } from "@/pages/ActivityDetail";
 import { Calendar } from "@/pages/Calendar";
-import { Overview } from "@/pages/Overview";
+import { Analysis } from "@/pages/Analysis";
 import { Settings } from "@/pages/Settings";
 import { queryClient } from "@/queryClient";
 
@@ -42,13 +42,13 @@ export default function App() {
 	return (
 		<AppShell authenticated={session !== null} onSignOut={signOut}>
 			<Routes>
-				<Route path="/" element={<Navigate to="/overview" replace />} />
-				<Route path="/overview" element={<Overview />} />
+				<Route path="/" element={<Navigate to="/analysis" replace />} />
+				<Route path="/analysis" element={<Analysis />} />
 				<Route path="/calendar" element={<Calendar />} />
 				<Route path="/activities" element={<Activities />} />
 				<Route path="/activities/:id" element={<ActivityDetail />} />
 				<Route path="/settings" element={<Settings />} />
-				<Route path="*" element={<Navigate to="/overview" replace />} />
+				<Route path="*" element={<Navigate to="/analysis" replace />} />
 			</Routes>
 		</AppShell>
 	);

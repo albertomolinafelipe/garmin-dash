@@ -157,9 +157,7 @@ function Metrics({ activity }: { activity: Activity }) {
 						<metric.icon className="size-5" style={{ color }} />
 					</div>
 					<div className="min-w-0">
-						<div className="truncate font-semibold tabular-nums">
-							{metric.value}
-						</div>
+						<div className="truncate font-semibold tabular-nums">{metric.value}</div>
 						<div className="text-muted-foreground truncate text-xs">
 							{metric.label}
 						</div>
@@ -288,10 +286,7 @@ function StreamChart({
 				</CardTitle>
 			</CardHeader>
 			<CardContent className="h-[296px] px-4 pb-1">
-				<ChartContainer
-					config={streamConfig}
-					className="aspect-auto h-full w-full"
-				>
+				<ChartContainer config={streamConfig} className="aspect-auto h-full w-full">
 					<ComposedChart
 						data={rows}
 						margin={{ top: 5, right: 2, left: 0 }}
@@ -302,13 +297,7 @@ function StreamChart({
 						onMouseLeave={() => onHover?.(null)}
 					>
 						<defs>
-							<linearGradient
-								id="activity-elevation"
-								x1="0"
-								y1="0"
-								x2="0"
-								y2="1"
-							>
+							<linearGradient id="activity-elevation" x1="0" y1="0" x2="0" y2="1">
 								<stop offset="0%" stopColor={ELEVATION} stopOpacity={0.35} />
 								<stop offset="100%" stopColor={ELEVATION} stopOpacity={0.03} />
 							</linearGradient>
@@ -345,8 +334,7 @@ function StreamChart({
 								<ChartTooltipContent
 									hideLabel
 									formatter={(value, name) => {
-										if (value == null || Number.isNaN(Number(value)))
-											return null;
+										if (value == null || Number.isNaN(Number(value))) return null;
 										const isHr = name === "hr" || name === "Heart rate";
 										return (
 											<div className="flex w-full items-center justify-between gap-4">
@@ -480,8 +468,7 @@ function SampleChart({
 										return d == null ? "" : `${Number(d).toFixed(2)} km`;
 									}}
 									formatter={(value, name) => {
-										if (value == null || Number.isNaN(Number(value)))
-											return null;
+										if (value == null || Number.isNaN(Number(value))) return null;
 										const isHr = name === "hr" || name === "Heart rate";
 										return (
 											<div className="flex w-full items-center justify-between gap-4">
@@ -667,62 +654,56 @@ export function ActivityDetail() {
 		<div className="space-y-4 p-4">
 			<div className="flex flex-col gap-4 lg:flex-row lg:items-stretch">
 				<div className="grid flex-1 gap-4 sm:grid-cols-3 lg:min-h-[13rem]">
-				<Card
-					className="justify-center gap-3 border-l-4 py-4 sm:col-span-1"
-					style={{ borderLeftColor: categoryColor[category] }}
-				>
-					<CardHeader className="px-4">
-						<CardTitle>
-							<EditableName
-								key={String(activity.id)}
-								activity={activity}
-								onSave={save}
-							/>
-						</CardTitle>
-					</CardHeader>
-					<CardContent className="flex flex-wrap items-center gap-2 px-4">
-						<span className="text-foreground text-base font-medium">
-							{fmtDate(activity.start_time)}
-						</span>
-						{(() => {
-							const Icon = categoryIcon[category];
-							const sub = effectiveSubtype(
-								activity.activity_type,
-								activity.subtype,
-							);
-							return (
-								<span className="flex items-center gap-1.5">
-									<Icon size={30} style={{ color: categoryColor[category] }} />
-									{sub && (
-										<span className="text-muted-foreground text-xs tracking-wide uppercase">
-											{sub}
-										</span>
-									)}
-								</span>
-							);
-						})()}
-						{(() => {
-							const race = raceForStartTime(racesByDay, activity.start_time);
-							return race ? (
-								<Badge
-									variant="outline"
-									className="text-race border-race gap-1"
-								>
-									<RaceIcon className="size-3.5" />
-									{race.name}
-								</Badge>
-							) : null;
-						})()}
-						{needsAnnotation(activity) && (
-							<Badge variant="secondary">needs annotation</Badge>
-						)}
-					</CardContent>
-				</Card>
-				<Card className="justify-center py-4 sm:col-span-2">
-					<CardContent className="flex items-center px-4">
-						<Metrics activity={activity} />
-					</CardContent>
-				</Card>
+					<Card
+						className="justify-center gap-3 border-l-4 py-4 sm:col-span-1"
+						style={{ borderLeftColor: categoryColor[category] }}
+					>
+						<CardHeader className="px-4">
+							<CardTitle>
+								<EditableName
+									key={String(activity.id)}
+									activity={activity}
+									onSave={save}
+								/>
+							</CardTitle>
+						</CardHeader>
+						<CardContent className="flex flex-wrap items-center gap-2 px-4">
+							<span className="text-foreground text-base font-medium">
+								{fmtDate(activity.start_time)}
+							</span>
+							{(() => {
+								const Icon = categoryIcon[category];
+								const sub = effectiveSubtype(activity.activity_type, activity.subtype);
+								return (
+									<span className="flex items-center gap-1.5">
+										<Icon size={30} style={{ color: categoryColor[category] }} />
+										{sub && (
+											<span className="text-muted-foreground text-xs tracking-wide uppercase">
+												{sub}
+											</span>
+										)}
+									</span>
+								);
+							})()}
+							{(() => {
+								const race = raceForStartTime(racesByDay, activity.start_time);
+								return race ? (
+									<Badge variant="outline" className="text-race border-race gap-1">
+										<RaceIcon className="size-3.5" />
+										{race.name}
+									</Badge>
+								) : null;
+							})()}
+							{needsAnnotation(activity) && (
+								<Badge variant="secondary">needs annotation</Badge>
+							)}
+						</CardContent>
+					</Card>
+					<Card className="justify-center py-4 sm:col-span-2">
+						<CardContent className="flex items-center px-4">
+							<Metrics activity={activity} />
+						</CardContent>
+					</Card>
 				</div>
 				{activity.start_time && (
 					<DaySleepPanel
@@ -765,16 +746,14 @@ export function ActivityDetail() {
 								const shoeSport =
 									category === "running" ||
 									category === "hiking" ||
-									category === "skiing";
+									category === "skiing" ||
+									category === "climbing";
 								const shoeRequired =
 									shoeSport &&
+									category !== "climbing" &&
 									(activity.start_time?.slice(0, 10) ?? "") >= SHOE_CUTOFF;
 								const shoe = shoeSport ? (
-									<ShoeField
-										activity={activity}
-										onSave={save}
-										required={shoeRequired}
-									/>
+									<ShoeField activity={activity} onSave={save} required={shoeRequired} />
 								) : null;
 
 								if (category === "running") {
@@ -791,13 +770,14 @@ export function ActivityDetail() {
 								}
 								if (category === "climbing") {
 									return (
-										<ClimbingAnnotation activity={activity} onSave={save} />
+										<div className="space-y-3">
+											<ClimbingAnnotation activity={activity} onSave={save} />
+											{shoe}
+										</div>
 									);
 								}
 								if (category === "strength") {
-									return (
-										<StrengthAnnotation activity={activity} onSave={save} />
-									);
+									return <StrengthAnnotation activity={activity} onSave={save} />;
 								}
 								if (shoe) return shoe;
 								return (

@@ -1,10 +1,14 @@
-import { useMutation, useQuery, type UseQueryResult } from "@tanstack/react-query";
+import {
+	useMutation,
+	useQuery,
+	type UseQueryResult,
+} from "@tanstack/react-query";
 
 import { graphQLClient } from "@/graphql/client";
 
 // Raw requests, hand-typed, so the generated types stay untouched. Lifetime
-// mileage rides the shoes -> activities relationship: starting_km plus the
-// summed distance of every activity logged in the shoe.
+// usage rides the shoes -> activities relationship: starting_km plus the
+// summed distance and duration of every activity logged in the shoe.
 export interface Shoe {
 	id: string | number;
 	name: string;
@@ -13,7 +17,10 @@ export interface Shoe {
 	activities_aggregate: {
 		aggregate: {
 			count: number;
-			sum: { distance_m: number | string | null } | null;
+			sum: {
+				distance_m: number | string | null;
+				duration_s: number | string | null;
+			} | null;
 		} | null;
 	};
 }
@@ -36,6 +43,7 @@ const SHOES = `
 					count
 					sum {
 						distance_m
+						duration_s
 					}
 				}
 			}
@@ -97,6 +105,17 @@ export function useDeleteShoe() {
 // starting_km plus summed activity distance, in km.
 export function lifetimeKm(shoe: Shoe): number {
 	const start = Number(shoe.starting_km ?? 0);
-	const summed = Number(shoe.activities_aggregate.aggregate?.sum?.distance_m ?? 0);
+	const summed = Number(
+		shoe.activities_aggregate.aggregate?.sum?.distance_m ?? 0,
+	);
 	return start + summed / 1000;
+}
+
+// Summed activity duration, in hours. Climbing sessions carry no distance, so
+// time is the only wear signal for those shoes.
+export function lifetimeHours(shoe: Shoe): number {
+	const summed = Number(
+		shoe.activities_aggregate.aggregate?.sum?.duration_s ?? 0,
+	);
+	return summed / 3600;
 }

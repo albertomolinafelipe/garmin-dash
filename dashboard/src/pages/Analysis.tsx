@@ -6,13 +6,19 @@ import {
 	useMemo,
 	useState,
 } from "react";
-import { ChevronLeft, ChevronRight, ChevronsRight, Target } from "lucide-react";
+import {
+	ChevronLeft,
+	ChevronRight,
+	ChevronsRight,
+	ClipboardList,
+} from "lucide-react";
 import {
 	Area,
 	Bar,
 	CartesianGrid,
 	ComposedChart,
 	Line,
+	ReferenceLine,
 	XAxis,
 	YAxis,
 } from "recharts";
@@ -43,6 +49,7 @@ import {
 	useCalendarData,
 } from "@/components/calendar/use-calendar-data";
 import { WeekStrip } from "@/components/calendar/week-strip";
+import { ReadinessSection } from "@/components/readiness-section";
 import { WeeklyHrZones } from "@/components/weekly-hr-zones";
 import { categoryColor, categoryOf } from "@/lib/activity-types";
 import { SLEEP_STAGE_COLORS } from "@/lib/sleep";
@@ -324,10 +331,9 @@ interface LoadSeries {
 	objective?: { metric: Metric; sport: Sport };
 }
 
-// Per-day plan target for a series, flat across each ISO week (Mon–Sun) so it
-// reads as a level line to compare the rolling total against. Objectives for
-// the series' sport and "all sports" ones both count; days in weeks without an
-// objective are null so the line breaks instead of sloping to zero.
+// Weekly plan target for a series, placed on the Sunday that closes each ISO
+// week so it renders as a single dot beside that week's boundary line. Other
+// days are null. Objectives for the series' sport and "all sports" both count.
 function objectiveByDay(
 	objectives: WeekObjective[],
 	objective: { metric: Metric; sport: Sport },
@@ -344,7 +350,7 @@ function objectiveByDay(
 	for (let i = SPAN_DAYS - 1; i >= 0; i--) {
 		const day = new Date(end);
 		day.setDate(end.getDate() - i);
-		const target = perWeek.get(toIsoWeek(day));
+		const target = day.getDay() === 0 ? perWeek.get(toIsoWeek(day)) : undefined;
 		out.push(target === undefined ? null : +fromBase(target).toFixed(1));
 	}
 	return out;
@@ -409,6 +415,17 @@ function LoadPanel({
 		[series, objectiveSeries],
 	);
 
+	// Sundays: the last day of each week, where its objective dot sits.
+	const weekStarts = useMemo(() => {
+		const out: string[] = [];
+		for (let i = SPAN_DAYS - 1; i >= 0; i--) {
+			const day = new Date(end);
+			day.setDate(end.getDate() - i);
+			if (day.getDay() === 0) out.push(dayKey(day).slice(5));
+		}
+		return out;
+	}, [end]);
+
 	const usesRight = series.some((s) => s.axis === "right");
 	const hasData = rows.some((r) => series.some((s) => Number(r[s.key]) > 0));
 	const animate = useInitialAnimation(hasData);
@@ -426,7 +443,7 @@ function LoadPanel({
 					aria-pressed={showObjectives}
 					onClick={() => setShowObjectives((shown) => !shown)}
 				>
-					<Target
+					<ClipboardList
 						className={cn(
 							"size-4",
 							showObjectives ? "text-foreground" : "text-muted-foreground",
@@ -471,6 +488,16 @@ function LoadPanel({
 							))}
 						</defs>
 						<CartesianGrid strokeDasharray="3 3" vertical={false} />
+						{weekStarts.map((x) => (
+							<ReferenceLine
+								key={x}
+								yAxisId="left"
+								x={x}
+								stroke="currentColor"
+								strokeOpacity={0.15}
+								strokeDasharray="2 4"
+							/>
+						))}
 						<XAxis
 							dataKey="date"
 							interval={4}
@@ -520,15 +547,15 @@ function LoadPanel({
 									<Line
 										key={`${s.key}-objective`}
 										yAxisId={s.axis}
-										type="stepAfter"
 										dataKey={`${s.key}-objective`}
+										type="monotone"
+										tooltipType="none"
 										stroke={s.color}
-										strokeWidth={2}
-										strokeOpacity={0.4}
-										strokeDasharray="4 4"
-										dot={false}
+										strokeWidth={1.5}
+										strokeOpacity={0.35}
+										dot={{ r: 3, stroke: s.color, strokeOpacity: 1 }}
 										activeDot={false}
-										connectNulls={false}
+										connectNulls
 										isAnimationActive={animate}
 									/>
 								))
@@ -602,6 +629,16 @@ const sleepConfig = {
 
 // Stages stacked bottom → top as filled bands; score overlaid on its own axis.
 const STAGE_ORDER = ["deep", "light", "awake", "rem"] as const;
+
+// Tooltip rows follow the visual stack read top → bottom (reverse of the paint
+// order), with the score line last.
+const SLEEP_TOOLTIP_ORDER: Record<string, number> = {
+	rem: 0,
+	awake: 1,
+	light: 2,
+	deep: 3,
+	score: 4,
+};
 
 function SleepPanel() {
 	const { data, isPending } = useSleep(HISTORY_DAYS);
@@ -690,6 +727,9 @@ function SleepPanel() {
 						/>
 						<YAxis yAxisId="score" hide domain={[0, 100]} />
 						<ChartTooltip
+							// Match the visual stack (top→bottom) and legend, which run the
+							// reverse of STAGE_ORDER's bottom→top paint order.
+							itemSorter={(item) => SLEEP_TOOLTIP_ORDER[String(item.dataKey)] ?? 99}
 							content={
 								<ChartTooltipContent
 									formatter={(value, name) => {
@@ -1078,15 +1118,15 @@ function WeekPanel({ className }: { className?: string }) {
 // window-proportional height and the page simply scrolls as rows are added.
 const ROW = "md:h-[calc((100svh-4rem)/3)] md:min-h-[260px]";
 
-export function Overview() {
+export function Analysis() {
 	return (
 		<WindowNavProvider>
-			<OverviewPanels />
+			<AnalysisPanels />
 		</WindowNavProvider>
 	);
 }
 
-function OverviewPanels() {
+function AnalysisPanels() {
 	return (
 		<div className="flex flex-col gap-4 p-4">
 			<div className="flex flex-col gap-4 md:h-[calc((100svh-4rem)/4)] md:min-h-[200px] md:flex-row">
@@ -1112,6 +1152,7 @@ function OverviewPanels() {
 				<ReadinessPanel />
 				<WeeklyHrZones className="aspect-square h-[280px] md:h-full md:shrink-0" />
 			</div>
+			<ReadinessSection />
 		</div>
 	);
 }

@@ -1,28 +1,45 @@
 import { useQuery } from "@tanstack/react-query";
 import { Cell, Pie, PieChart } from "recharts";
 
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
-import {
-	type ChartConfig,
-	ChartContainer,
-	ChartTooltip,
-	ChartTooltipContent,
-} from "@/components/ui/chart";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { type ChartConfig, ChartContainer } from "@/components/ui/chart";
 import { graphQLClient } from "@/graphql/client";
-import { fmtDuration } from "@/lib/format";
 import { SLEEP_STAGE_COLORS } from "@/lib/sleep";
 import { cn } from "@/lib/utils";
 
+// Total sleep as h:mm (e.g. 7:40) rather than the "7h 40m" used elsewhere.
+function hhmm(seconds: number | null): string {
+	if (!seconds) return "—";
+	const h = Math.floor(seconds / 3600);
+	const m = Math.floor((seconds % 3600) / 60);
+	return `${h}:${String(m).padStart(2, "0")}`;
+}
+
 const STAGES = [
-	{ key: "deep", label: "Deep", field: "deep_sleep_s", color: SLEEP_STAGE_COLORS.deep },
-	{ key: "light", label: "Light", field: "light_sleep_s", color: SLEEP_STAGE_COLORS.light },
-	{ key: "rem", label: "REM", field: "rem_sleep_s", color: SLEEP_STAGE_COLORS.rem },
-	{ key: "awake", label: "Awake", field: "awake_s", color: SLEEP_STAGE_COLORS.awake },
+	{
+		key: "deep",
+		label: "Deep",
+		field: "deep_sleep_s",
+		color: SLEEP_STAGE_COLORS.deep,
+	},
+	{
+		key: "light",
+		label: "Light",
+		field: "light_sleep_s",
+		color: SLEEP_STAGE_COLORS.light,
+	},
+	{
+		key: "rem",
+		label: "REM",
+		field: "rem_sleep_s",
+		color: SLEEP_STAGE_COLORS.rem,
+	},
+	{
+		key: "awake",
+		label: "Awake",
+		field: "awake_s",
+		color: SLEEP_STAGE_COLORS.awake,
+	},
 ] as const;
 
 interface Night {
@@ -51,7 +68,8 @@ const chartConfig = Object.fromEntries(
 	STAGES.map((s) => [s.key, { label: s.label, color: s.color }]),
 ) satisfies ChartConfig;
 
-const num = (v: number | string | null | undefined) => (v == null ? 0 : Number(v));
+const num = (v: number | string | null | undefined) =>
+	v == null ? 0 : Number(v);
 
 export function DaySleepPanel({
 	date,
@@ -62,8 +80,7 @@ export function DaySleepPanel({
 }) {
 	const { data, isPending } = useQuery({
 		queryKey: ["day-sleep", date],
-		queryFn: () =>
-			graphQLClient.request<{ sleep: Night[] }>(QUERY, { date }),
+		queryFn: () => graphQLClient.request<{ sleep: Night[] }>(QUERY, { date }),
 	});
 	const night = data?.sleep[0];
 	const rows = night
@@ -74,7 +91,8 @@ export function DaySleepPanel({
 				seconds: num(night[s.field]),
 			})).filter((r) => r.seconds > 0)
 		: [];
-	const score = night?.sleep_score == null ? null : Math.round(num(night.sleep_score));
+	const score =
+		night?.sleep_score == null ? null : Math.round(num(night.sleep_score));
 	const total = num(night?.total_sleep_s);
 
 	return (
@@ -91,35 +109,24 @@ export function DaySleepPanel({
 					<>
 						<ChartContainer config={chartConfig} className="h-full w-full">
 							<PieChart>
-								<ChartTooltip
-									content={
-										<ChartTooltipContent
-											hideLabel
-											formatter={(value, name) => (
-												<span className="flex w-full items-center justify-between gap-3">
-													<span className="text-muted-foreground capitalize">
-														{String(name)}
-													</span>
-													<span className="text-foreground font-mono tabular-nums">
-														{fmtDuration(Number(value))}
-													</span>
-												</span>
-											)}
-										/>
-									}
-								/>
 								<Pie
 									data={rows}
 									dataKey="seconds"
 									nameKey="label"
 									innerRadius="62%"
 									outerRadius="90%"
-									paddingAngle={2}
-									strokeWidth={0}
+									paddingAngle={8}
 									isAnimationActive={false}
 								>
+									{/* Coloured border with a faded fill, matching the area plots. */}
 									{rows.map((r) => (
-										<Cell key={r.stage} fill={r.color} />
+										<Cell
+											key={r.stage}
+											fill={r.color}
+											fillOpacity={0.25}
+											stroke={r.color}
+											strokeWidth={1.5}
+										/>
 									))}
 								</Pie>
 							</PieChart>
@@ -131,11 +138,8 @@ export function DaySleepPanel({
 									{score}
 								</span>
 							)}
-							<span className="text-muted-foreground text-xs">
-								{score != null ? "score" : ""}
-							</span>
-							<span className="mt-1 text-sm font-medium tabular-nums">
-								{fmtDuration(total)}
+							<span className="text-muted-foreground mt-1 text-sm font-medium tabular-nums">
+								{hhmm(total)}
 							</span>
 						</div>
 					</>

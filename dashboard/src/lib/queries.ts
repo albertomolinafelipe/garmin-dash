@@ -147,13 +147,23 @@ export interface ReadinessDay {
 	timestamp: string;
 	score: number | string | null;
 	level: string | null;
+	// Minutes until fully recovered, from this snapshot.
+	recovery_time: number | string | null;
+	recovery_time_change_phrase: string | null;
+	feedback_short: string | null;
 	acute_load: number | string | null;
 	acwr_factor_percent: number | string | null;
+	acwr_factor_feedback: string | null;
 	stress_history_factor_percent: number | string | null;
+	stress_history_factor_feedback: string | null;
 	hrv_factor_percent: number | string | null;
+	hrv_factor_feedback: string | null;
 	sleep_score_factor_percent: number | string | null;
+	sleep_score_factor_feedback: string | null;
 	recovery_time_factor_percent: number | string | null;
+	recovery_time_factor_feedback: string | null;
 	sleep_history_factor_percent: number | string | null;
+	sleep_history_factor_feedback: string | null;
 }
 
 // The morning (AFTER_WAKEUP_RESET) snapshot is the headline readiness value.
@@ -168,13 +178,22 @@ const READINESS_DAYS = /* GraphQL */ `
 			timestamp
 			score
 			level
+			recovery_time
+			recovery_time_change_phrase
+			feedback_short
 			acute_load
 			acwr_factor_percent
+			acwr_factor_feedback
 			stress_history_factor_percent
+			stress_history_factor_feedback
 			hrv_factor_percent
+			hrv_factor_feedback
 			sleep_score_factor_percent
+			sleep_score_factor_feedback
 			recovery_time_factor_percent
+			recovery_time_factor_feedback
 			sleep_history_factor_percent
+			sleep_history_factor_feedback
 		}
 	}
 `;

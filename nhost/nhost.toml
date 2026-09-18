@@ -44,6 +44,8 @@ enabled = true
 version = '16.8-20250530-1'
 
 [postgres.resources]
+enablePublicAccess = true
+
 [postgres.resources.storage]
 capacity = 3
 

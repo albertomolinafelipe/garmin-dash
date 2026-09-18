@@ -62,21 +62,22 @@ export function WeekTotalsBlock({ totals }: { totals?: WeekTotals }) {
 						{(totals?.runKm ?? 0).toFixed(1)} km
 					</div>
 					<div className="text-muted-foreground text-[11px]">
-						{(totals?.runH ?? 0).toFixed(1)} h ·{" "}
-						{Math.round(totals?.runVert ?? 0)} m
+						{(totals?.runH ?? 0).toFixed(1)} h · {Math.round(totals?.runVert ?? 0)} m
 					</div>
 				</div>
 			</div>
-			<TotalRow
-				category="climbing"
-				value={`${(totals?.climbH ?? 0).toFixed(1)} h`}
-				zero={!totals?.climbH}
-			/>
-			<TotalRow
-				category="strength"
-				value={`${(totals?.weightsH ?? 0).toFixed(1)} h`}
-				zero={!totals?.weightsH}
-			/>
+			<div className="flex items-center gap-3">
+				<TotalRow
+					category="climbing"
+					value={`${(totals?.climbH ?? 0).toFixed(1)} h`}
+					zero={!totals?.climbH}
+				/>
+				<TotalRow
+					category="strength"
+					value={`${(totals?.weightsH ?? 0).toFixed(1)} h`}
+					zero={!totals?.weightsH}
+				/>
+			</div>
 		</div>
 	);
 }
@@ -163,12 +164,8 @@ export function WeekObjectives({
 						/>
 						<span className="text-muted-foreground flex w-24 shrink-0 items-center gap-1 text-xs tabular-nums">
 							<SportIcon size={13} className="shrink-0" />
-							{MetricIcon ? (
-								<MetricIcon size={13} className="shrink-0" />
-							) : null}
-							<span className="truncate">
-								{meta ? meta.format(target) : ""}
-							</span>
+							{MetricIcon ? <MetricIcon size={13} className="shrink-0" /> : null}
+							<span className="truncate">{meta ? meta.format(target) : ""}</span>
 						</span>
 					</button>
 				);
