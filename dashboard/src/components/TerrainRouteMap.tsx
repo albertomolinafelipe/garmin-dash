@@ -6,6 +6,7 @@ import { routeColor } from "@/lib/map-tiles";
 
 const ROUTE_SOURCE = "route";
 const ROUTE_LAYER = "route-line";
+const MAP_STYLE = "outdoor-v4";
 
 const apiKey = import.meta.env.VITE_MAPTILER_KEY as string | undefined;
 
@@ -32,7 +33,7 @@ export function TerrainRouteMap({
 
 		const map = new maptilersdk.Map({
 			container: container.current,
-			style: maptilersdk.MapStyle.OUTDOOR,
+			style: MAP_STYLE,
 			terrain: true,
 			terrainExaggeration: 1,
 			pitch: 70,
@@ -41,7 +42,8 @@ export function TerrainRouteMap({
 		});
 		mapRef.current = map;
 
-		map.on("load", () => {
+		const addRoute = () => {
+			if (map.getSource(ROUTE_SOURCE)) return;
 			map.addSource(ROUTE_SOURCE, {
 				type: "geojson",
 				data: {
@@ -64,7 +66,12 @@ export function TerrainRouteMap({
 					"line-opacity": 1,
 				},
 			});
-		});
+		};
+
+		// The style can already be loaded by the time we subscribe, in which case
+		// "load" never fires and the route would never be added.
+		if (map.isStyleLoaded()) addRoute();
+		else map.on("load", addRoute);
 
 		return () => {
 			markerRef.current?.remove();

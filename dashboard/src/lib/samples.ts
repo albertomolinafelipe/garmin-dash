@@ -2,6 +2,7 @@ import type { ActivitySample } from "@/lib/queries";
 
 export interface SamplePoint {
 	d: number; // cumulative distance, km
+	t: number; // elapsed time, seconds
 	hr: number | null;
 	elevation: number | null;
 	lat?: number;
@@ -30,6 +31,7 @@ export function buildSamplePoints(samples: ActivitySample[]): {
 		if (elevation != null) hasElevation = true;
 		points.push({
 			d: Number(s.distance_m ?? 0) / 1000,
+			t: Number(s.elapsed_s ?? 0),
 			hr: s.hr ?? null,
 			elevation,
 			lat: coords ? coords[1] : undefined,

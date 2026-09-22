@@ -465,8 +465,16 @@ function SampleChart({
 							content={
 								<ChartTooltipContent
 									labelFormatter={(_, payload) => {
-										const d = payload?.[0]?.payload?.d;
-										return d == null ? "" : `${Number(d).toFixed(2)} km`;
+										const point = payload?.[0]?.payload;
+										const d = point?.d;
+										const t = point?.t;
+										const parts = [];
+										if (d != null) parts.push(`${Number(d).toFixed(2)} km`);
+										// fmtDuration renders a falsy 0 as an em dash, but the
+										// first sample is legitimately at 0s.
+										if (t != null)
+											parts.push(Number(t) === 0 ? "0s" : fmtDuration(Number(t)));
+										return parts.join(" · ");
 									}}
 									formatter={(value, name) => {
 										if (value == null || Number.isNaN(Number(value))) return null;
