@@ -1170,6 +1170,8 @@ function WeekPanel({ className }: { className?: string }) {
 		objectivesByWeek,
 		noteByWeek,
 		racesByDay,
+		journalByDay,
+		journalKinds,
 		totalsByWeekStart,
 	} = useCalendarData();
 	const weekStart = useMemo(() => startOfWeek(new Date()), []);
@@ -1192,6 +1194,8 @@ function WeekPanel({ className }: { className?: string }) {
 					byDay={byDay}
 					dayPlansByDay={dayPlansByDay}
 					racesByDay={racesByDay}
+					journalByDay={journalByDay}
+					journalKinds={journalKinds}
 					totals={totalsByWeekStart.get(dayKey(weekStart))}
 					objectives={objectivesByWeek.get(week) ?? []}
 					weekNote={noteByWeek.get(week)}

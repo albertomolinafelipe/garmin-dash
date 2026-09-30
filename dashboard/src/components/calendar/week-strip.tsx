@@ -5,13 +5,17 @@ import { toIsoWeek } from "@/lib/plans";
 import type { CalendarActivity } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 import { SelectableCell } from "./cell";
+import { DayJournal } from "./day-journal";
 import { DayPlanDialog, type DayPlanTarget } from "./day-plan-dialog";
 import { DayPlans } from "./day-plans";
 import { dayDropProps, useDayPlanDnd } from "./dnd";
 import { DayEvent, DayRaces } from "./events";
+import { JournalDialog, type JournalTarget } from "./journal-dialog";
 import {
 	addDays,
 	type DayPlan,
+	type JournalEntry,
+	type JournalKind,
 	type Race,
 	WEEKDAYS,
 	type WeekObjective,
@@ -33,6 +37,8 @@ export function WeekStrip({
 	byDay,
 	dayPlansByDay,
 	racesByDay,
+	journalByDay,
+	journalKinds,
 	totals,
 	objectives,
 	weekNote,
@@ -41,6 +47,8 @@ export function WeekStrip({
 	byDay: Map<string, CalendarActivity[]>;
 	dayPlansByDay?: Map<string, DayPlan[]>;
 	racesByDay?: Map<string, Race[]>;
+	journalByDay?: Map<string, JournalEntry[]>;
+	journalKinds?: JournalKind[];
 	totals?: WeekTotals;
 	objectives?: WeekObjective[];
 	weekNote?: string;
@@ -52,6 +60,7 @@ export function WeekStrip({
 	const [objectiveTarget, setObjectiveTarget] =
 		useState<ObjectiveTarget | null>(null);
 	const [noteWeek, setNoteWeek] = useState<string | null>(null);
+	const [journalTarget, setJournalTarget] = useState<JournalTarget | null>(null);
 	const showTotals = totals !== undefined || objectives !== undefined;
 	const weekActivities = showTotals ? Array.from(byDay.values()).flat() : [];
 
@@ -69,6 +78,10 @@ export function WeekStrip({
 				week={noteWeek}
 				note={weekNote}
 				onClose={() => setNoteWeek(null)}
+			/>
+			<JournalDialog
+				target={journalTarget}
+				onClose={() => setJournalTarget(null)}
 			/>
 			<div className="grid min-w-0 flex-1 grid-cols-7">
 				{Array.from({ length: 7 }, (_, i) => i).map((i) => {
@@ -104,6 +117,14 @@ export function WeekStrip({
 								</span>
 							</div>
 							<div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-1 pt-2">
+								{journalByDay ? (
+									<DayJournal
+										day={day}
+										byDay={journalByDay}
+										kinds={journalKinds}
+										onEdit={(entry) => setJournalTarget({ day, entry })}
+									/>
+								) : null}
 								<DayRaces day={day} byDay={racesByDay} activitiesByDay={byDay} />
 								{events.map((a) => (
 									<DayEvent

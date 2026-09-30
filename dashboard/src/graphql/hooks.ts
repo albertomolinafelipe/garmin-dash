@@ -29,6 +29,14 @@ import {
 	type GeneratedUpdateDayPlanMutationVariables,
 	DeleteDayPlanDocument,
 	type GeneratedDeleteDayPlanMutationVariables,
+	JournalKindsDocument,
+	JournalEntriesDocument,
+	InsertJournalEntryDocument,
+	type GeneratedInsertJournalEntryMutationVariables,
+	UpdateJournalEntryDocument,
+	type GeneratedUpdateJournalEntryMutationVariables,
+	DeleteJournalEntryDocument,
+	type GeneratedDeleteJournalEntryMutationVariables,
 	UpsertWeekNoteDocument,
 	type GeneratedUpsertWeekNoteMutationVariables,
 	DeleteWeekNoteDocument,
@@ -205,6 +213,46 @@ export function useDeleteWeekNoteMutation() {
 	return useMutation({
 		mutationFn: (variables: GeneratedDeleteWeekNoteMutationVariables) =>
 			graphQLClient.request(DeleteWeekNoteDocument, variables),
+	});
+}
+
+// The kind vocabulary only changes when a migration adds a row, so it is held
+// indefinitely rather than refetched on every calendar mount.
+export function useJournalKindsQuery() {
+	return useQuery({
+		queryKey: ["journal-kinds"],
+		staleTime: Infinity,
+		queryFn: () => graphQLClient.request(JournalKindsDocument),
+		select: (data) => data.journal_kinds,
+	});
+}
+
+export function useJournalEntriesQuery() {
+	return useQuery({
+		queryKey: ["journal-entries"],
+		queryFn: () => graphQLClient.request(JournalEntriesDocument),
+		select: (data) => data.journal_entries,
+	});
+}
+
+export function useInsertJournalEntryMutation() {
+	return useMutation({
+		mutationFn: (variables: GeneratedInsertJournalEntryMutationVariables) =>
+			graphQLClient.request(InsertJournalEntryDocument, variables),
+	});
+}
+
+export function useUpdateJournalEntryMutation() {
+	return useMutation({
+		mutationFn: (variables: GeneratedUpdateJournalEntryMutationVariables) =>
+			graphQLClient.request(UpdateJournalEntryDocument, variables),
+	});
+}
+
+export function useDeleteJournalEntryMutation() {
+	return useMutation({
+		mutationFn: (variables: GeneratedDeleteJournalEntryMutationVariables) =>
+			graphQLClient.request(DeleteJournalEntryDocument, variables),
 	});
 }
 

@@ -2,6 +2,8 @@ import { useMemo } from "react";
 
 import {
 	useDayPlansQuery,
+	useJournalEntriesQuery,
+	useJournalKindsQuery,
 	useRacesQuery,
 	useWeekNotesQuery,
 	useWeekObjectivesQuery,
@@ -13,9 +15,12 @@ import {
 	computeWeekTotals,
 	type DayPlan,
 	indexDayPlans,
+	indexJournalEntries,
 	indexObjectives,
 	indexRaces,
 	indexWeekNotes,
+	type JournalEntry,
+	type JournalKind,
 	type Race,
 	type WeekNote,
 	type WeekObjective,
@@ -30,6 +35,8 @@ export function useCalendarData() {
 	const { data: objectives } = useWeekObjectivesQuery();
 	const { data: weekNotes } = useWeekNotesQuery();
 	const { data: races } = useRacesQuery();
+	const { data: journalEntries } = useJournalEntriesQuery();
+	const { data: journalKinds } = useJournalKindsQuery();
 
 	const activities = useMemo(() => data?.activities ?? [], [data]);
 
@@ -48,6 +55,12 @@ export function useCalendarData() {
 	const racesByDay = useMemo(
 		() => indexRaces((races ?? []) as Race[]),
 		[races],
+	);
+	// Ranges are expanded to one bucket per covered day here, so day cells look
+	// journal entries up exactly like plans and races.
+	const journalByDay = useMemo(
+		() => indexJournalEntries((journalEntries ?? []) as JournalEntry[]),
+		[journalEntries],
 	);
 	const totalsByWeekStart = useMemo(
 		() => computeWeekTotals(activities),
@@ -70,6 +83,8 @@ export function useCalendarData() {
 		objectivesByWeek,
 		noteByWeek,
 		racesByDay,
+		journalByDay,
+		journalKinds: journalKinds as JournalKind[] | undefined,
 		totalsByWeekStart,
 		activitiesByWeek,
 	};

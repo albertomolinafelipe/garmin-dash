@@ -211,6 +211,46 @@ mutation DeleteWeekNote($week: String!) {
   }
 }
 
+query JournalKinds {
+  journal_kinds(order_by: {sort_order: asc}) {
+    value
+    label
+    icon
+    color
+    has_severity
+  }
+}
+
+query JournalEntries {
+  journal_entries(order_by: {start_date: asc}) {
+    id
+    kind
+    start_date
+    end_date
+    title
+    note
+    severity
+  }
+}
+
+mutation InsertJournalEntry($object: journal_entries_insert_input!) {
+  insert_journal_entries_one(object: $object) {
+    id
+  }
+}
+
+mutation UpdateJournalEntry($id: bigint!, $set: journal_entries_set_input!) {
+  update_journal_entries_by_pk(pk_columns: {id: $id}, _set: $set) {
+    id
+  }
+}
+
+mutation DeleteJournalEntry($id: bigint!) {
+  delete_journal_entries_by_pk(id: $id) {
+    id
+  }
+}
+
 query WeekObjectives {
   week_objectives(order_by: {week: asc}) {
     id

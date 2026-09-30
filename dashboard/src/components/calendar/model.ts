@@ -59,6 +59,28 @@ export interface Race {
 	elevation_gain_m: number | string | null;
 }
 
+// Rendering metadata for a journal kind. Icon and colour come from the DB (see
+// the phase 12 migration) so a kind added by INSERT renders without a deploy.
+export interface JournalKind {
+	value: string;
+	label: string;
+	icon: string;
+	color: string;
+	has_severity: boolean;
+}
+
+// A trip, illness, injury or plain remark covering one or more days.
+// end_date null means it is still running.
+export interface JournalEntry {
+	id: unknown;
+	kind: string;
+	start_date: string;
+	end_date: string | null;
+	title: string;
+	note: string | null;
+	severity: number | null;
+}
+
 // Group rows into a lookup keyed by one of their own fields, so per-day and
 // per-week rendering is O(1) instead of a filter per cell.
 function groupBy<T>(rows: T[], key: (row: T) => string): Map<string, T[]> {
@@ -78,6 +100,53 @@ export const indexRaces = (races: Race[]) => groupBy(races, (r) => r.date);
 
 export function indexWeekNotes(notes: WeekNote[]): Map<string, string> {
 	return new Map(notes.map((n) => [n.week, n.note]));
+}
+
+// 'YYYY-MM-DD' -> local midnight. Built from parts rather than new Date(key),
+// which the spec parses as UTC and so lands on the previous day west of
+// Greenwich -- the same drift dayKey() exists to avoid.
+function parseDayKey(key: string): Date | null {
+	const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(key);
+	if (!m) return null;
+	return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+}
+
+// Ceiling on the days one entry may paint. A years-long open injury would
+// otherwise add a bucket per day for every day since it started.
+const MAX_ENTRY_DAYS = 400;
+
+// Expand every entry's date range into one bucket per covered day, so a day
+// cell looks journal entries up the same O(1) way it looks up plans and races.
+//
+// An entry with no end_date is still running, and covers from its start up to
+// today -- not indefinitely into the future, which would paint every month you
+// ever scroll forward to. A future-dated entry with no end covers its start day
+// alone until that day arrives.
+export function indexJournalEntries(
+	entries: JournalEntry[],
+	today: Date = new Date(),
+): Map<string, JournalEntry[]> {
+	const map = new Map<string, JournalEntry[]>();
+	const todayKey = dayKey(today);
+	for (const entry of entries) {
+		const start = parseDayKey(entry.start_date);
+		if (!start) continue;
+		const endKey =
+			entry.end_date ??
+			(entry.start_date > todayKey ? entry.start_date : todayKey);
+		// An end that is unparseable or before the start still shows the entry on
+		// its start day. journal_entries_date_order rules this out in the DB, but
+		// silently dropping a row here would be the worst way to find that out.
+		const parsedEnd = parseDayKey(endKey);
+		const end = parsedEnd && parsedEnd >= start ? parsedEnd : start;
+		let cursor = start;
+		for (let i = 0; i < MAX_ENTRY_DAYS && cursor <= end; i++) {
+			const key = dayKey(cursor);
+			(map.get(key) ?? map.set(key, []).get(key))?.push(entry);
+			cursor = addDays(cursor, 1);
+		}
+	}
+	return map;
 }
 
 export interface WeekTotals {

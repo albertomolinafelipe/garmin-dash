@@ -20,10 +20,16 @@ import {
 	DayPlanDndProvider,
 	useDayPlanDnd,
 } from "@/components/calendar/dnd";
+import { DayJournal } from "@/components/calendar/day-journal";
 import { DayEvent, DayRaces } from "@/components/calendar/events";
+import {
+	JournalDialog,
+	type JournalTarget,
+} from "@/components/calendar/journal-dialog";
 import {
 	addDays,
 	type DayPlan,
+	type JournalEntry,
 	startOfWeek,
 	WEEKDAYS,
 } from "@/components/calendar/model";
@@ -50,6 +56,7 @@ import {
 	categoryColor,
 	categoryIcon,
 	categoryOf,
+	iconifyIcon,
 } from "@/lib/activity-types";
 import { dayKey, fmtDuration } from "@/lib/format";
 import { useWeekZ2, type WeekRuns } from "@/components/calendar/use-week-z2";
@@ -68,6 +75,8 @@ export function Calendar() {
 function monthToken(date: Date): string {
 	return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
+const JournalIcon = iconifyIcon("mdi:notebook-outline");
+
 function parseMonthToken(token: string | null): Date | null {
 	if (!token) return null;
 	const match = /^(\d{4})-(\d{2})$/.exec(token);
@@ -143,6 +152,8 @@ function CalendarInner() {
 		objectivesByWeek,
 		noteByWeek,
 		racesByDay,
+		journalByDay,
+		journalKinds,
 		totalsByWeekStart,
 		activitiesByWeek,
 	} = useCalendarData();
@@ -150,6 +161,7 @@ function CalendarInner() {
 	const [objectiveTarget, setObjectiveTarget] =
 		useState<ObjectiveTarget | null>(null);
 	const [noteWeek, setNoteWeek] = useState<string | null>(null);
+	const [journalTarget, setJournalTarget] = useState<JournalTarget | null>(null);
 
 	const byDay = useMemo(
 		() =>
@@ -208,6 +220,10 @@ function CalendarInner() {
 				note={noteWeek ? noteByWeek.get(noteWeek) : undefined}
 				onClose={() => setNoteWeek(null)}
 			/>
+			<JournalDialog
+				target={journalTarget}
+				onClose={() => setJournalTarget(null)}
+			/>
 			{/* Toolbar */}
 			<div className="relative flex flex-wrap items-center justify-between gap-3">
 				<div className="flex flex-wrap items-center gap-4">
@@ -246,6 +262,19 @@ function CalendarInner() {
 						</Button>
 					</div>
 					<div className="text-sm font-semibold sm:hidden">{month}</div>
+					<Separator orientation="vertical" className="hidden h-6 sm:block" />
+					{/* Day cells open the plan dialog, so recording a trip or an illness
+					    needs its own entry point. It opens on today; the dialog's range
+					    picker covers any other stretch of days. */}
+					<Button
+						variant="outline"
+						size="icon"
+						aria-label="Add journal entry"
+						title="Add journal entry — trip, illness, injury, how you felt"
+						onClick={() => setJournalTarget({ day: new Date() })}
+					>
+						<JournalIcon />
+					</Button>
 					<Separator orientation="vertical" className="hidden h-6 sm:block" />
 					<div className="flex items-center gap-1">
 						{presentCats.map((c) => {
@@ -320,8 +349,16 @@ function CalendarInner() {
 												>
 													{day.getDate()}
 												</div>
-												<div className="flex min-h-0 flex-1 flex-col p-1 pt-0">
-													<div className="mt-2 flex flex-col gap-1">
+										<div className="flex min-h-0 flex-1 flex-col p-1 pt-0">
+											<DayJournal
+												day={day}
+												byDay={journalByDay}
+												kinds={journalKinds}
+												onEdit={(entry: JournalEntry) =>
+													setJournalTarget({ day, entry })
+												}
+											/>
+											<div className="mt-2 flex flex-col gap-1">
 														<DayRaces
 															day={day}
 															byDay={racesByDay}

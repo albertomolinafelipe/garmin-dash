@@ -1,0 +1,17 @@
+table:
+  name: journal_kinds
+  schema: public
+array_relationships:
+  - name: entries
+    using:
+      foreign_key_constraint_on:
+        column: kind
+        table:
+          name: journal_entries
+          schema: public
+select_permissions:
+  - role: user
+    permission:
+      columns: "*"
+      filter: {}
+      allow_aggregations: true

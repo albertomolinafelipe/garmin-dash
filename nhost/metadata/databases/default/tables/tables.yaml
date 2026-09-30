@@ -5,6 +5,8 @@
 - "!include public_day_plans.yaml"
 - "!include public_exercises.yaml"
 - "!include public_food_options.yaml"
+- "!include public_journal_entries.yaml"
+- "!include public_journal_kinds.yaml"
 - "!include public_races.yaml"
 - "!include public_shoes.yaml"
 - "!include public_sleep.yaml"
