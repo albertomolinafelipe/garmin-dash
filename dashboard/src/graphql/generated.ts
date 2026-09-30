@@ -7216,6 +7216,706 @@ export type Geometry_Comparison_Exp = {
   _st_within?: InputMaybe<Scalars['geometry']['input']>;
 };
 
+/** columns and relationships of "journal_entries" */
+export type Journal_Entries = {
+  __typename?: 'journal_entries';
+  data?: Maybe<Scalars['jsonb']['output']>;
+  end_date?: Maybe<Scalars['date']['output']>;
+  id: Scalars['bigint']['output'];
+  /** An object relationship */
+  journalKindByKind: Journal_Kinds;
+  kind: Scalars['String']['output'];
+  note?: Maybe<Scalars['String']['output']>;
+  severity?: Maybe<Scalars['smallint']['output']>;
+  start_date: Scalars['date']['output'];
+  title: Scalars['String']['output'];
+};
+
+
+/** columns and relationships of "journal_entries" */
+export type Journal_EntriesDataArgs = {
+  path?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** aggregated selection of "journal_entries" */
+export type Journal_Entries_Aggregate = {
+  __typename?: 'journal_entries_aggregate';
+  aggregate?: Maybe<Journal_Entries_Aggregate_Fields>;
+  nodes: Array<Journal_Entries>;
+};
+
+export type Journal_Entries_Aggregate_Bool_Exp = {
+  count?: InputMaybe<Journal_Entries_Aggregate_Bool_Exp_Count>;
+};
+
+export type Journal_Entries_Aggregate_Bool_Exp_Count = {
+  arguments?: InputMaybe<Array<Journal_Entries_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+  filter?: InputMaybe<Journal_Entries_Bool_Exp>;
+  predicate: Int_Comparison_Exp;
+};
+
+/** aggregate fields of "journal_entries" */
+export type Journal_Entries_Aggregate_Fields = {
+  __typename?: 'journal_entries_aggregate_fields';
+  avg?: Maybe<Journal_Entries_Avg_Fields>;
+  count: Scalars['Int']['output'];
+  max?: Maybe<Journal_Entries_Max_Fields>;
+  min?: Maybe<Journal_Entries_Min_Fields>;
+  stddev?: Maybe<Journal_Entries_Stddev_Fields>;
+  stddev_pop?: Maybe<Journal_Entries_Stddev_Pop_Fields>;
+  stddev_samp?: Maybe<Journal_Entries_Stddev_Samp_Fields>;
+  sum?: Maybe<Journal_Entries_Sum_Fields>;
+  var_pop?: Maybe<Journal_Entries_Var_Pop_Fields>;
+  var_samp?: Maybe<Journal_Entries_Var_Samp_Fields>;
+  variance?: Maybe<Journal_Entries_Variance_Fields>;
+};
+
+
+/** aggregate fields of "journal_entries" */
+export type Journal_Entries_Aggregate_FieldsCountArgs = {
+  columns?: InputMaybe<Array<Journal_Entries_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+/** order by aggregate values of table "journal_entries" */
+export type Journal_Entries_Aggregate_Order_By = {
+  avg?: InputMaybe<Journal_Entries_Avg_Order_By>;
+  count?: InputMaybe<Order_By>;
+  max?: InputMaybe<Journal_Entries_Max_Order_By>;
+  min?: InputMaybe<Journal_Entries_Min_Order_By>;
+  stddev?: InputMaybe<Journal_Entries_Stddev_Order_By>;
+  stddev_pop?: InputMaybe<Journal_Entries_Stddev_Pop_Order_By>;
+  stddev_samp?: InputMaybe<Journal_Entries_Stddev_Samp_Order_By>;
+  sum?: InputMaybe<Journal_Entries_Sum_Order_By>;
+  var_pop?: InputMaybe<Journal_Entries_Var_Pop_Order_By>;
+  var_samp?: InputMaybe<Journal_Entries_Var_Samp_Order_By>;
+  variance?: InputMaybe<Journal_Entries_Variance_Order_By>;
+};
+
+/** append existing jsonb value of filtered columns with new jsonb value */
+export type Journal_Entries_Append_Input = {
+  data?: InputMaybe<Scalars['jsonb']['input']>;
+};
+
+/** input type for inserting array relation for remote table "journal_entries" */
+export type Journal_Entries_Arr_Rel_Insert_Input = {
+  data: Array<Journal_Entries_Insert_Input>;
+  /** upsert condition */
+  on_conflict?: InputMaybe<Journal_Entries_On_Conflict>;
+};
+
+/** aggregate avg on columns */
+export type Journal_Entries_Avg_Fields = {
+  __typename?: 'journal_entries_avg_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+  severity?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by avg() on columns of table "journal_entries" */
+export type Journal_Entries_Avg_Order_By = {
+  id?: InputMaybe<Order_By>;
+  severity?: InputMaybe<Order_By>;
+};
+
+/** Boolean expression to filter rows from the table "journal_entries". All fields are combined with a logical 'AND'. */
+export type Journal_Entries_Bool_Exp = {
+  _and?: InputMaybe<Array<Journal_Entries_Bool_Exp>>;
+  _not?: InputMaybe<Journal_Entries_Bool_Exp>;
+  _or?: InputMaybe<Array<Journal_Entries_Bool_Exp>>;
+  data?: InputMaybe<Jsonb_Comparison_Exp>;
+  end_date?: InputMaybe<Date_Comparison_Exp>;
+  id?: InputMaybe<Bigint_Comparison_Exp>;
+  journalKindByKind?: InputMaybe<Journal_Kinds_Bool_Exp>;
+  kind?: InputMaybe<String_Comparison_Exp>;
+  note?: InputMaybe<String_Comparison_Exp>;
+  severity?: InputMaybe<Smallint_Comparison_Exp>;
+  start_date?: InputMaybe<Date_Comparison_Exp>;
+  title?: InputMaybe<String_Comparison_Exp>;
+};
+
+/** unique or primary key constraints on table "journal_entries" */
+export enum Journal_Entries_Constraint {
+  /** unique or primary key constraint on columns "id" */
+  JournalEntriesPkey = 'journal_entries_pkey'
+}
+
+/** delete the field or element with specified path (for JSON arrays, negative integers count from the end) */
+export type Journal_Entries_Delete_At_Path_Input = {
+  data?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+/** delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array */
+export type Journal_Entries_Delete_Elem_Input = {
+  data?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** delete key/value pair or string element. key/value pairs are matched based on their key value */
+export type Journal_Entries_Delete_Key_Input = {
+  data?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** input type for incrementing numeric columns in table "journal_entries" */
+export type Journal_Entries_Inc_Input = {
+  severity?: InputMaybe<Scalars['smallint']['input']>;
+};
+
+/** input type for inserting data into table "journal_entries" */
+export type Journal_Entries_Insert_Input = {
+  data?: InputMaybe<Scalars['jsonb']['input']>;
+  end_date?: InputMaybe<Scalars['date']['input']>;
+  journalKindByKind?: InputMaybe<Journal_Kinds_Obj_Rel_Insert_Input>;
+  kind?: InputMaybe<Scalars['String']['input']>;
+  note?: InputMaybe<Scalars['String']['input']>;
+  severity?: InputMaybe<Scalars['smallint']['input']>;
+  start_date?: InputMaybe<Scalars['date']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** aggregate max on columns */
+export type Journal_Entries_Max_Fields = {
+  __typename?: 'journal_entries_max_fields';
+  end_date?: Maybe<Scalars['date']['output']>;
+  id?: Maybe<Scalars['bigint']['output']>;
+  kind?: Maybe<Scalars['String']['output']>;
+  note?: Maybe<Scalars['String']['output']>;
+  severity?: Maybe<Scalars['smallint']['output']>;
+  start_date?: Maybe<Scalars['date']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+};
+
+/** order by max() on columns of table "journal_entries" */
+export type Journal_Entries_Max_Order_By = {
+  end_date?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  kind?: InputMaybe<Order_By>;
+  note?: InputMaybe<Order_By>;
+  severity?: InputMaybe<Order_By>;
+  start_date?: InputMaybe<Order_By>;
+  title?: InputMaybe<Order_By>;
+};
+
+/** aggregate min on columns */
+export type Journal_Entries_Min_Fields = {
+  __typename?: 'journal_entries_min_fields';
+  end_date?: Maybe<Scalars['date']['output']>;
+  id?: Maybe<Scalars['bigint']['output']>;
+  kind?: Maybe<Scalars['String']['output']>;
+  note?: Maybe<Scalars['String']['output']>;
+  severity?: Maybe<Scalars['smallint']['output']>;
+  start_date?: Maybe<Scalars['date']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+};
+
+/** order by min() on columns of table "journal_entries" */
+export type Journal_Entries_Min_Order_By = {
+  end_date?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  kind?: InputMaybe<Order_By>;
+  note?: InputMaybe<Order_By>;
+  severity?: InputMaybe<Order_By>;
+  start_date?: InputMaybe<Order_By>;
+  title?: InputMaybe<Order_By>;
+};
+
+/** response of any mutation on the table "journal_entries" */
+export type Journal_Entries_Mutation_Response = {
+  __typename?: 'journal_entries_mutation_response';
+  /** number of rows affected by the mutation */
+  affected_rows: Scalars['Int']['output'];
+  /** data from the rows affected by the mutation */
+  returning: Array<Journal_Entries>;
+};
+
+/** on_conflict condition type for table "journal_entries" */
+export type Journal_Entries_On_Conflict = {
+  constraint: Journal_Entries_Constraint;
+  update_columns?: Array<Journal_Entries_Update_Column>;
+  where?: InputMaybe<Journal_Entries_Bool_Exp>;
+};
+
+/** Ordering options when selecting data from "journal_entries". */
+export type Journal_Entries_Order_By = {
+  data?: InputMaybe<Order_By>;
+  end_date?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  journalKindByKind?: InputMaybe<Journal_Kinds_Order_By>;
+  kind?: InputMaybe<Order_By>;
+  note?: InputMaybe<Order_By>;
+  severity?: InputMaybe<Order_By>;
+  start_date?: InputMaybe<Order_By>;
+  title?: InputMaybe<Order_By>;
+};
+
+/** primary key columns input for table: journal_entries */
+export type Journal_Entries_Pk_Columns_Input = {
+  id: Scalars['bigint']['input'];
+};
+
+/** prepend existing jsonb value of filtered columns with new jsonb value */
+export type Journal_Entries_Prepend_Input = {
+  data?: InputMaybe<Scalars['jsonb']['input']>;
+};
+
+/** select columns of table "journal_entries" */
+export enum Journal_Entries_Select_Column {
+  /** column name */
+  Data = 'data',
+  /** column name */
+  EndDate = 'end_date',
+  /** column name */
+  Id = 'id',
+  /** column name */
+  Kind = 'kind',
+  /** column name */
+  Note = 'note',
+  /** column name */
+  Severity = 'severity',
+  /** column name */
+  StartDate = 'start_date',
+  /** column name */
+  Title = 'title'
+}
+
+/** input type for updating data in table "journal_entries" */
+export type Journal_Entries_Set_Input = {
+  data?: InputMaybe<Scalars['jsonb']['input']>;
+  end_date?: InputMaybe<Scalars['date']['input']>;
+  kind?: InputMaybe<Scalars['String']['input']>;
+  note?: InputMaybe<Scalars['String']['input']>;
+  severity?: InputMaybe<Scalars['smallint']['input']>;
+  start_date?: InputMaybe<Scalars['date']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** aggregate stddev on columns */
+export type Journal_Entries_Stddev_Fields = {
+  __typename?: 'journal_entries_stddev_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+  severity?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by stddev() on columns of table "journal_entries" */
+export type Journal_Entries_Stddev_Order_By = {
+  id?: InputMaybe<Order_By>;
+  severity?: InputMaybe<Order_By>;
+};
+
+/** aggregate stddev_pop on columns */
+export type Journal_Entries_Stddev_Pop_Fields = {
+  __typename?: 'journal_entries_stddev_pop_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+  severity?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by stddev_pop() on columns of table "journal_entries" */
+export type Journal_Entries_Stddev_Pop_Order_By = {
+  id?: InputMaybe<Order_By>;
+  severity?: InputMaybe<Order_By>;
+};
+
+/** aggregate stddev_samp on columns */
+export type Journal_Entries_Stddev_Samp_Fields = {
+  __typename?: 'journal_entries_stddev_samp_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+  severity?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by stddev_samp() on columns of table "journal_entries" */
+export type Journal_Entries_Stddev_Samp_Order_By = {
+  id?: InputMaybe<Order_By>;
+  severity?: InputMaybe<Order_By>;
+};
+
+/** Streaming cursor of the table "journal_entries" */
+export type Journal_Entries_Stream_Cursor_Input = {
+  /** Stream column input with initial value */
+  initial_value: Journal_Entries_Stream_Cursor_Value_Input;
+  /** cursor ordering */
+  ordering?: InputMaybe<Cursor_Ordering>;
+};
+
+/** Initial value of the column from where the streaming should start */
+export type Journal_Entries_Stream_Cursor_Value_Input = {
+  data?: InputMaybe<Scalars['jsonb']['input']>;
+  end_date?: InputMaybe<Scalars['date']['input']>;
+  id?: InputMaybe<Scalars['bigint']['input']>;
+  kind?: InputMaybe<Scalars['String']['input']>;
+  note?: InputMaybe<Scalars['String']['input']>;
+  severity?: InputMaybe<Scalars['smallint']['input']>;
+  start_date?: InputMaybe<Scalars['date']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** aggregate sum on columns */
+export type Journal_Entries_Sum_Fields = {
+  __typename?: 'journal_entries_sum_fields';
+  id?: Maybe<Scalars['bigint']['output']>;
+  severity?: Maybe<Scalars['smallint']['output']>;
+};
+
+/** order by sum() on columns of table "journal_entries" */
+export type Journal_Entries_Sum_Order_By = {
+  id?: InputMaybe<Order_By>;
+  severity?: InputMaybe<Order_By>;
+};
+
+/** update columns of table "journal_entries" */
+export enum Journal_Entries_Update_Column {
+  /** column name */
+  Data = 'data',
+  /** column name */
+  EndDate = 'end_date',
+  /** column name */
+  Kind = 'kind',
+  /** column name */
+  Note = 'note',
+  /** column name */
+  Severity = 'severity',
+  /** column name */
+  StartDate = 'start_date',
+  /** column name */
+  Title = 'title'
+}
+
+export type Journal_Entries_Updates = {
+  /** append existing jsonb value of filtered columns with new jsonb value */
+  _append?: InputMaybe<Journal_Entries_Append_Input>;
+  /** delete the field or element with specified path (for JSON arrays, negative integers count from the end) */
+  _delete_at_path?: InputMaybe<Journal_Entries_Delete_At_Path_Input>;
+  /** delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array */
+  _delete_elem?: InputMaybe<Journal_Entries_Delete_Elem_Input>;
+  /** delete key/value pair or string element. key/value pairs are matched based on their key value */
+  _delete_key?: InputMaybe<Journal_Entries_Delete_Key_Input>;
+  /** increments the numeric columns with given value of the filtered values */
+  _inc?: InputMaybe<Journal_Entries_Inc_Input>;
+  /** prepend existing jsonb value of filtered columns with new jsonb value */
+  _prepend?: InputMaybe<Journal_Entries_Prepend_Input>;
+  /** sets the columns of the filtered rows to the given values */
+  _set?: InputMaybe<Journal_Entries_Set_Input>;
+  /** filter the rows which have to be updated */
+  where: Journal_Entries_Bool_Exp;
+};
+
+/** aggregate var_pop on columns */
+export type Journal_Entries_Var_Pop_Fields = {
+  __typename?: 'journal_entries_var_pop_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+  severity?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by var_pop() on columns of table "journal_entries" */
+export type Journal_Entries_Var_Pop_Order_By = {
+  id?: InputMaybe<Order_By>;
+  severity?: InputMaybe<Order_By>;
+};
+
+/** aggregate var_samp on columns */
+export type Journal_Entries_Var_Samp_Fields = {
+  __typename?: 'journal_entries_var_samp_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+  severity?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by var_samp() on columns of table "journal_entries" */
+export type Journal_Entries_Var_Samp_Order_By = {
+  id?: InputMaybe<Order_By>;
+  severity?: InputMaybe<Order_By>;
+};
+
+/** aggregate variance on columns */
+export type Journal_Entries_Variance_Fields = {
+  __typename?: 'journal_entries_variance_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+  severity?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by variance() on columns of table "journal_entries" */
+export type Journal_Entries_Variance_Order_By = {
+  id?: InputMaybe<Order_By>;
+  severity?: InputMaybe<Order_By>;
+};
+
+/** columns and relationships of "journal_kinds" */
+export type Journal_Kinds = {
+  __typename?: 'journal_kinds';
+  color: Scalars['String']['output'];
+  /** An array relationship */
+  entries: Array<Journal_Entries>;
+  /** An aggregate relationship */
+  entries_aggregate: Journal_Entries_Aggregate;
+  has_severity: Scalars['Boolean']['output'];
+  icon: Scalars['String']['output'];
+  label: Scalars['String']['output'];
+  sort_order: Scalars['Int']['output'];
+  value: Scalars['String']['output'];
+};
+
+
+/** columns and relationships of "journal_kinds" */
+export type Journal_KindsEntriesArgs = {
+  distinct_on?: InputMaybe<Array<Journal_Entries_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Journal_Entries_Order_By>>;
+  where?: InputMaybe<Journal_Entries_Bool_Exp>;
+};
+
+
+/** columns and relationships of "journal_kinds" */
+export type Journal_KindsEntries_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Journal_Entries_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Journal_Entries_Order_By>>;
+  where?: InputMaybe<Journal_Entries_Bool_Exp>;
+};
+
+/** aggregated selection of "journal_kinds" */
+export type Journal_Kinds_Aggregate = {
+  __typename?: 'journal_kinds_aggregate';
+  aggregate?: Maybe<Journal_Kinds_Aggregate_Fields>;
+  nodes: Array<Journal_Kinds>;
+};
+
+/** aggregate fields of "journal_kinds" */
+export type Journal_Kinds_Aggregate_Fields = {
+  __typename?: 'journal_kinds_aggregate_fields';
+  avg?: Maybe<Journal_Kinds_Avg_Fields>;
+  count: Scalars['Int']['output'];
+  max?: Maybe<Journal_Kinds_Max_Fields>;
+  min?: Maybe<Journal_Kinds_Min_Fields>;
+  stddev?: Maybe<Journal_Kinds_Stddev_Fields>;
+  stddev_pop?: Maybe<Journal_Kinds_Stddev_Pop_Fields>;
+  stddev_samp?: Maybe<Journal_Kinds_Stddev_Samp_Fields>;
+  sum?: Maybe<Journal_Kinds_Sum_Fields>;
+  var_pop?: Maybe<Journal_Kinds_Var_Pop_Fields>;
+  var_samp?: Maybe<Journal_Kinds_Var_Samp_Fields>;
+  variance?: Maybe<Journal_Kinds_Variance_Fields>;
+};
+
+
+/** aggregate fields of "journal_kinds" */
+export type Journal_Kinds_Aggregate_FieldsCountArgs = {
+  columns?: InputMaybe<Array<Journal_Kinds_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+/** aggregate avg on columns */
+export type Journal_Kinds_Avg_Fields = {
+  __typename?: 'journal_kinds_avg_fields';
+  sort_order?: Maybe<Scalars['Float']['output']>;
+};
+
+/** Boolean expression to filter rows from the table "journal_kinds". All fields are combined with a logical 'AND'. */
+export type Journal_Kinds_Bool_Exp = {
+  _and?: InputMaybe<Array<Journal_Kinds_Bool_Exp>>;
+  _not?: InputMaybe<Journal_Kinds_Bool_Exp>;
+  _or?: InputMaybe<Array<Journal_Kinds_Bool_Exp>>;
+  color?: InputMaybe<String_Comparison_Exp>;
+  entries?: InputMaybe<Journal_Entries_Bool_Exp>;
+  entries_aggregate?: InputMaybe<Journal_Entries_Aggregate_Bool_Exp>;
+  has_severity?: InputMaybe<Boolean_Comparison_Exp>;
+  icon?: InputMaybe<String_Comparison_Exp>;
+  label?: InputMaybe<String_Comparison_Exp>;
+  sort_order?: InputMaybe<Int_Comparison_Exp>;
+  value?: InputMaybe<String_Comparison_Exp>;
+};
+
+/** unique or primary key constraints on table "journal_kinds" */
+export enum Journal_Kinds_Constraint {
+  /** unique or primary key constraint on columns "value" */
+  JournalKindsPkey = 'journal_kinds_pkey',
+  /** unique or primary key constraint on columns "sort_order" */
+  JournalKindsSortOrderKey = 'journal_kinds_sort_order_key'
+}
+
+/** input type for incrementing numeric columns in table "journal_kinds" */
+export type Journal_Kinds_Inc_Input = {
+  sort_order?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** input type for inserting data into table "journal_kinds" */
+export type Journal_Kinds_Insert_Input = {
+  color?: InputMaybe<Scalars['String']['input']>;
+  entries?: InputMaybe<Journal_Entries_Arr_Rel_Insert_Input>;
+  has_severity?: InputMaybe<Scalars['Boolean']['input']>;
+  icon?: InputMaybe<Scalars['String']['input']>;
+  label?: InputMaybe<Scalars['String']['input']>;
+  sort_order?: InputMaybe<Scalars['Int']['input']>;
+  value?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** aggregate max on columns */
+export type Journal_Kinds_Max_Fields = {
+  __typename?: 'journal_kinds_max_fields';
+  color?: Maybe<Scalars['String']['output']>;
+  icon?: Maybe<Scalars['String']['output']>;
+  label?: Maybe<Scalars['String']['output']>;
+  sort_order?: Maybe<Scalars['Int']['output']>;
+  value?: Maybe<Scalars['String']['output']>;
+};
+
+/** aggregate min on columns */
+export type Journal_Kinds_Min_Fields = {
+  __typename?: 'journal_kinds_min_fields';
+  color?: Maybe<Scalars['String']['output']>;
+  icon?: Maybe<Scalars['String']['output']>;
+  label?: Maybe<Scalars['String']['output']>;
+  sort_order?: Maybe<Scalars['Int']['output']>;
+  value?: Maybe<Scalars['String']['output']>;
+};
+
+/** response of any mutation on the table "journal_kinds" */
+export type Journal_Kinds_Mutation_Response = {
+  __typename?: 'journal_kinds_mutation_response';
+  /** number of rows affected by the mutation */
+  affected_rows: Scalars['Int']['output'];
+  /** data from the rows affected by the mutation */
+  returning: Array<Journal_Kinds>;
+};
+
+/** input type for inserting object relation for remote table "journal_kinds" */
+export type Journal_Kinds_Obj_Rel_Insert_Input = {
+  data: Journal_Kinds_Insert_Input;
+  /** upsert condition */
+  on_conflict?: InputMaybe<Journal_Kinds_On_Conflict>;
+};
+
+/** on_conflict condition type for table "journal_kinds" */
+export type Journal_Kinds_On_Conflict = {
+  constraint: Journal_Kinds_Constraint;
+  update_columns?: Array<Journal_Kinds_Update_Column>;
+  where?: InputMaybe<Journal_Kinds_Bool_Exp>;
+};
+
+/** Ordering options when selecting data from "journal_kinds". */
+export type Journal_Kinds_Order_By = {
+  color?: InputMaybe<Order_By>;
+  entries_aggregate?: InputMaybe<Journal_Entries_Aggregate_Order_By>;
+  has_severity?: InputMaybe<Order_By>;
+  icon?: InputMaybe<Order_By>;
+  label?: InputMaybe<Order_By>;
+  sort_order?: InputMaybe<Order_By>;
+  value?: InputMaybe<Order_By>;
+};
+
+/** primary key columns input for table: journal_kinds */
+export type Journal_Kinds_Pk_Columns_Input = {
+  value: Scalars['String']['input'];
+};
+
+/** select columns of table "journal_kinds" */
+export enum Journal_Kinds_Select_Column {
+  /** column name */
+  Color = 'color',
+  /** column name */
+  HasSeverity = 'has_severity',
+  /** column name */
+  Icon = 'icon',
+  /** column name */
+  Label = 'label',
+  /** column name */
+  SortOrder = 'sort_order',
+  /** column name */
+  Value = 'value'
+}
+
+/** input type for updating data in table "journal_kinds" */
+export type Journal_Kinds_Set_Input = {
+  color?: InputMaybe<Scalars['String']['input']>;
+  has_severity?: InputMaybe<Scalars['Boolean']['input']>;
+  icon?: InputMaybe<Scalars['String']['input']>;
+  label?: InputMaybe<Scalars['String']['input']>;
+  sort_order?: InputMaybe<Scalars['Int']['input']>;
+  value?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** aggregate stddev on columns */
+export type Journal_Kinds_Stddev_Fields = {
+  __typename?: 'journal_kinds_stddev_fields';
+  sort_order?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate stddev_pop on columns */
+export type Journal_Kinds_Stddev_Pop_Fields = {
+  __typename?: 'journal_kinds_stddev_pop_fields';
+  sort_order?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate stddev_samp on columns */
+export type Journal_Kinds_Stddev_Samp_Fields = {
+  __typename?: 'journal_kinds_stddev_samp_fields';
+  sort_order?: Maybe<Scalars['Float']['output']>;
+};
+
+/** Streaming cursor of the table "journal_kinds" */
+export type Journal_Kinds_Stream_Cursor_Input = {
+  /** Stream column input with initial value */
+  initial_value: Journal_Kinds_Stream_Cursor_Value_Input;
+  /** cursor ordering */
+  ordering?: InputMaybe<Cursor_Ordering>;
+};
+
+/** Initial value of the column from where the streaming should start */
+export type Journal_Kinds_Stream_Cursor_Value_Input = {
+  color?: InputMaybe<Scalars['String']['input']>;
+  has_severity?: InputMaybe<Scalars['Boolean']['input']>;
+  icon?: InputMaybe<Scalars['String']['input']>;
+  label?: InputMaybe<Scalars['String']['input']>;
+  sort_order?: InputMaybe<Scalars['Int']['input']>;
+  value?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** aggregate sum on columns */
+export type Journal_Kinds_Sum_Fields = {
+  __typename?: 'journal_kinds_sum_fields';
+  sort_order?: Maybe<Scalars['Int']['output']>;
+};
+
+/** update columns of table "journal_kinds" */
+export enum Journal_Kinds_Update_Column {
+  /** column name */
+  Color = 'color',
+  /** column name */
+  HasSeverity = 'has_severity',
+  /** column name */
+  Icon = 'icon',
+  /** column name */
+  Label = 'label',
+  /** column name */
+  SortOrder = 'sort_order',
+  /** column name */
+  Value = 'value'
+}
+
+export type Journal_Kinds_Updates = {
+  /** increments the numeric columns with given value of the filtered values */
+  _inc?: InputMaybe<Journal_Kinds_Inc_Input>;
+  /** sets the columns of the filtered rows to the given values */
+  _set?: InputMaybe<Journal_Kinds_Set_Input>;
+  /** filter the rows which have to be updated */
+  where: Journal_Kinds_Bool_Exp;
+};
+
+/** aggregate var_pop on columns */
+export type Journal_Kinds_Var_Pop_Fields = {
+  __typename?: 'journal_kinds_var_pop_fields';
+  sort_order?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate var_samp on columns */
+export type Journal_Kinds_Var_Samp_Fields = {
+  __typename?: 'journal_kinds_var_samp_fields';
+  sort_order?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate variance on columns */
+export type Journal_Kinds_Variance_Fields = {
+  __typename?: 'journal_kinds_variance_fields';
+  sort_order?: Maybe<Scalars['Float']['output']>;
+};
+
 export type Jsonb_Cast_Exp = {
   String?: InputMaybe<String_Comparison_Exp>;
 };
@@ -7339,6 +8039,14 @@ export type Mutation_Root = {
   delete_exercises?: Maybe<Exercises_Mutation_Response>;
   /** delete single row from the table: "exercises" */
   delete_exercises_by_pk?: Maybe<Exercises>;
+  /** delete data from the table: "journal_entries" */
+  delete_journal_entries?: Maybe<Journal_Entries_Mutation_Response>;
+  /** delete single row from the table: "journal_entries" */
+  delete_journal_entries_by_pk?: Maybe<Journal_Entries>;
+  /** delete data from the table: "journal_kinds" */
+  delete_journal_kinds?: Maybe<Journal_Kinds_Mutation_Response>;
+  /** delete single row from the table: "journal_kinds" */
+  delete_journal_kinds_by_pk?: Maybe<Journal_Kinds>;
   /** delete data from the table: "races" */
   delete_races?: Maybe<Races_Mutation_Response>;
   /** delete single row from the table: "races" */
@@ -7459,6 +8167,14 @@ export type Mutation_Root = {
   insert_exercises?: Maybe<Exercises_Mutation_Response>;
   /** insert a single row into the table: "exercises" */
   insert_exercises_one?: Maybe<Exercises>;
+  /** insert data into the table: "journal_entries" */
+  insert_journal_entries?: Maybe<Journal_Entries_Mutation_Response>;
+  /** insert a single row into the table: "journal_entries" */
+  insert_journal_entries_one?: Maybe<Journal_Entries>;
+  /** insert data into the table: "journal_kinds" */
+  insert_journal_kinds?: Maybe<Journal_Kinds_Mutation_Response>;
+  /** insert a single row into the table: "journal_kinds" */
+  insert_journal_kinds_one?: Maybe<Journal_Kinds>;
   /** insert data into the table: "races" */
   insert_races?: Maybe<Races_Mutation_Response>;
   /** insert a single row into the table: "races" */
@@ -7621,6 +8337,18 @@ export type Mutation_Root = {
   update_exercises_many?: Maybe<Array<Maybe<Exercises_Mutation_Response>>>;
   /** update multiples rows of table: "storage.files" */
   update_files_many?: Maybe<Array<Maybe<Files_Mutation_Response>>>;
+  /** update data of the table: "journal_entries" */
+  update_journal_entries?: Maybe<Journal_Entries_Mutation_Response>;
+  /** update single row of the table: "journal_entries" */
+  update_journal_entries_by_pk?: Maybe<Journal_Entries>;
+  /** update multiples rows of table: "journal_entries" */
+  update_journal_entries_many?: Maybe<Array<Maybe<Journal_Entries_Mutation_Response>>>;
+  /** update data of the table: "journal_kinds" */
+  update_journal_kinds?: Maybe<Journal_Kinds_Mutation_Response>;
+  /** update single row of the table: "journal_kinds" */
+  update_journal_kinds_by_pk?: Maybe<Journal_Kinds>;
+  /** update multiples rows of table: "journal_kinds" */
+  update_journal_kinds_many?: Maybe<Array<Maybe<Journal_Kinds_Mutation_Response>>>;
   /** update data of the table: "races" */
   update_races?: Maybe<Races_Mutation_Response>;
   /** update single row of the table: "races" */
@@ -7944,6 +8672,30 @@ export type Mutation_RootDelete_ExercisesArgs = {
 /** mutation root */
 export type Mutation_RootDelete_Exercises_By_PkArgs = {
   id: Scalars['bigint']['input'];
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_Journal_EntriesArgs = {
+  where: Journal_Entries_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_Journal_Entries_By_PkArgs = {
+  id: Scalars['bigint']['input'];
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_Journal_KindsArgs = {
+  where: Journal_Kinds_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_Journal_Kinds_By_PkArgs = {
+  value: Scalars['String']['input'];
 };
 
 
@@ -8350,6 +9102,34 @@ export type Mutation_RootInsert_ExercisesArgs = {
 export type Mutation_RootInsert_Exercises_OneArgs = {
   object: Exercises_Insert_Input;
   on_conflict?: InputMaybe<Exercises_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_Journal_EntriesArgs = {
+  objects: Array<Journal_Entries_Insert_Input>;
+  on_conflict?: InputMaybe<Journal_Entries_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_Journal_Entries_OneArgs = {
+  object: Journal_Entries_Insert_Input;
+  on_conflict?: InputMaybe<Journal_Entries_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_Journal_KindsArgs = {
+  objects: Array<Journal_Kinds_Insert_Input>;
+  on_conflict?: InputMaybe<Journal_Kinds_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_Journal_Kinds_OneArgs = {
+  object: Journal_Kinds_Insert_Input;
+  on_conflict?: InputMaybe<Journal_Kinds_On_Conflict>;
 };
 
 
@@ -9004,6 +9784,60 @@ export type Mutation_RootUpdate_Files_ManyArgs = {
 
 
 /** mutation root */
+export type Mutation_RootUpdate_Journal_EntriesArgs = {
+  _append?: InputMaybe<Journal_Entries_Append_Input>;
+  _delete_at_path?: InputMaybe<Journal_Entries_Delete_At_Path_Input>;
+  _delete_elem?: InputMaybe<Journal_Entries_Delete_Elem_Input>;
+  _delete_key?: InputMaybe<Journal_Entries_Delete_Key_Input>;
+  _inc?: InputMaybe<Journal_Entries_Inc_Input>;
+  _prepend?: InputMaybe<Journal_Entries_Prepend_Input>;
+  _set?: InputMaybe<Journal_Entries_Set_Input>;
+  where: Journal_Entries_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Journal_Entries_By_PkArgs = {
+  _append?: InputMaybe<Journal_Entries_Append_Input>;
+  _delete_at_path?: InputMaybe<Journal_Entries_Delete_At_Path_Input>;
+  _delete_elem?: InputMaybe<Journal_Entries_Delete_Elem_Input>;
+  _delete_key?: InputMaybe<Journal_Entries_Delete_Key_Input>;
+  _inc?: InputMaybe<Journal_Entries_Inc_Input>;
+  _prepend?: InputMaybe<Journal_Entries_Prepend_Input>;
+  _set?: InputMaybe<Journal_Entries_Set_Input>;
+  pk_columns: Journal_Entries_Pk_Columns_Input;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Journal_Entries_ManyArgs = {
+  updates: Array<Journal_Entries_Updates>;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Journal_KindsArgs = {
+  _inc?: InputMaybe<Journal_Kinds_Inc_Input>;
+  _set?: InputMaybe<Journal_Kinds_Set_Input>;
+  where: Journal_Kinds_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Journal_Kinds_By_PkArgs = {
+  _inc?: InputMaybe<Journal_Kinds_Inc_Input>;
+  _set?: InputMaybe<Journal_Kinds_Set_Input>;
+  pk_columns: Journal_Kinds_Pk_Columns_Input;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Journal_Kinds_ManyArgs = {
+  updates: Array<Journal_Kinds_Updates>;
+};
+
+
+/** mutation root */
 export type Mutation_RootUpdate_RacesArgs = {
   _inc?: InputMaybe<Races_Inc_Input>;
   _set?: InputMaybe<Races_Set_Input>;
@@ -9327,6 +10161,18 @@ export type Query_Root = {
   food_options: Array<Food_Options>;
   /** fetch aggregated fields from the table: "food_options" */
   food_options_aggregate: Food_Options_Aggregate;
+  /** fetch data from the table: "journal_entries" */
+  journal_entries: Array<Journal_Entries>;
+  /** fetch aggregated fields from the table: "journal_entries" */
+  journal_entries_aggregate: Journal_Entries_Aggregate;
+  /** fetch data from the table: "journal_entries" using primary key columns */
+  journal_entries_by_pk?: Maybe<Journal_Entries>;
+  /** fetch data from the table: "journal_kinds" */
+  journal_kinds: Array<Journal_Kinds>;
+  /** fetch aggregated fields from the table: "journal_kinds" */
+  journal_kinds_aggregate: Journal_Kinds_Aggregate;
+  /** fetch data from the table: "journal_kinds" using primary key columns */
+  journal_kinds_by_pk?: Maybe<Journal_Kinds>;
   /** fetch data from the table: "races" */
   races: Array<Races>;
   /** fetch aggregated fields from the table: "races" */
@@ -9883,6 +10729,52 @@ export type Query_RootFood_Options_AggregateArgs = {
   offset?: InputMaybe<Scalars['Int']['input']>;
   order_by?: InputMaybe<Array<Food_Options_Order_By>>;
   where?: InputMaybe<Food_Options_Bool_Exp>;
+};
+
+
+export type Query_RootJournal_EntriesArgs = {
+  distinct_on?: InputMaybe<Array<Journal_Entries_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Journal_Entries_Order_By>>;
+  where?: InputMaybe<Journal_Entries_Bool_Exp>;
+};
+
+
+export type Query_RootJournal_Entries_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Journal_Entries_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Journal_Entries_Order_By>>;
+  where?: InputMaybe<Journal_Entries_Bool_Exp>;
+};
+
+
+export type Query_RootJournal_Entries_By_PkArgs = {
+  id: Scalars['bigint']['input'];
+};
+
+
+export type Query_RootJournal_KindsArgs = {
+  distinct_on?: InputMaybe<Array<Journal_Kinds_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Journal_Kinds_Order_By>>;
+  where?: InputMaybe<Journal_Kinds_Bool_Exp>;
+};
+
+
+export type Query_RootJournal_Kinds_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Journal_Kinds_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Journal_Kinds_Order_By>>;
+  where?: InputMaybe<Journal_Kinds_Bool_Exp>;
+};
+
+
+export type Query_RootJournal_Kinds_By_PkArgs = {
+  value: Scalars['String']['input'];
 };
 
 
@@ -11470,6 +12362,22 @@ export type Subscription_Root = {
   food_options_aggregate: Food_Options_Aggregate;
   /** fetch data from the table in a streaming manner: "food_options" */
   food_options_stream: Array<Food_Options>;
+  /** fetch data from the table: "journal_entries" */
+  journal_entries: Array<Journal_Entries>;
+  /** fetch aggregated fields from the table: "journal_entries" */
+  journal_entries_aggregate: Journal_Entries_Aggregate;
+  /** fetch data from the table: "journal_entries" using primary key columns */
+  journal_entries_by_pk?: Maybe<Journal_Entries>;
+  /** fetch data from the table in a streaming manner: "journal_entries" */
+  journal_entries_stream: Array<Journal_Entries>;
+  /** fetch data from the table: "journal_kinds" */
+  journal_kinds: Array<Journal_Kinds>;
+  /** fetch aggregated fields from the table: "journal_kinds" */
+  journal_kinds_aggregate: Journal_Kinds_Aggregate;
+  /** fetch data from the table: "journal_kinds" using primary key columns */
+  journal_kinds_by_pk?: Maybe<Journal_Kinds>;
+  /** fetch data from the table in a streaming manner: "journal_kinds" */
+  journal_kinds_stream: Array<Journal_Kinds>;
   /** fetch data from the table: "races" */
   races: Array<Races>;
   /** fetch aggregated fields from the table: "races" */
@@ -12198,6 +13106,66 @@ export type Subscription_RootFood_Options_StreamArgs = {
   batch_size: Scalars['Int']['input'];
   cursor: Array<InputMaybe<Food_Options_Stream_Cursor_Input>>;
   where?: InputMaybe<Food_Options_Bool_Exp>;
+};
+
+
+export type Subscription_RootJournal_EntriesArgs = {
+  distinct_on?: InputMaybe<Array<Journal_Entries_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Journal_Entries_Order_By>>;
+  where?: InputMaybe<Journal_Entries_Bool_Exp>;
+};
+
+
+export type Subscription_RootJournal_Entries_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Journal_Entries_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Journal_Entries_Order_By>>;
+  where?: InputMaybe<Journal_Entries_Bool_Exp>;
+};
+
+
+export type Subscription_RootJournal_Entries_By_PkArgs = {
+  id: Scalars['bigint']['input'];
+};
+
+
+export type Subscription_RootJournal_Entries_StreamArgs = {
+  batch_size: Scalars['Int']['input'];
+  cursor: Array<InputMaybe<Journal_Entries_Stream_Cursor_Input>>;
+  where?: InputMaybe<Journal_Entries_Bool_Exp>;
+};
+
+
+export type Subscription_RootJournal_KindsArgs = {
+  distinct_on?: InputMaybe<Array<Journal_Kinds_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Journal_Kinds_Order_By>>;
+  where?: InputMaybe<Journal_Kinds_Bool_Exp>;
+};
+
+
+export type Subscription_RootJournal_Kinds_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Journal_Kinds_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Journal_Kinds_Order_By>>;
+  where?: InputMaybe<Journal_Kinds_Bool_Exp>;
+};
+
+
+export type Subscription_RootJournal_Kinds_By_PkArgs = {
+  value: Scalars['String']['input'];
+};
+
+
+export type Subscription_RootJournal_Kinds_StreamArgs = {
+  batch_size: Scalars['Int']['input'];
+  cursor: Array<InputMaybe<Journal_Kinds_Stream_Cursor_Input>>;
+  where?: InputMaybe<Journal_Kinds_Bool_Exp>;
 };
 
 
@@ -14573,6 +15541,19 @@ export type Week_Objectives_Variance_Order_By = {
   target?: InputMaybe<Order_By>;
 };
 
+/** Boolean expression to compare columns of type "Boolean". All fields are combined with logical 'AND'. */
+export type GeneratedBoolean_Comparison_Exp = {
+  _eq?: boolean | null | undefined;
+  _gt?: boolean | null | undefined;
+  _gte?: boolean | null | undefined;
+  _in?: Array<boolean> | null | undefined;
+  _is_null?: boolean | null | undefined;
+  _lt?: boolean | null | undefined;
+  _lte?: boolean | null | undefined;
+  _neq?: boolean | null | undefined;
+  _nin?: Array<boolean> | null | undefined;
+};
+
 /** Boolean expression to compare columns of type "Int". All fields are combined with logical 'AND'. */
 export type GeneratedInt_Comparison_Exp = {
   _eq?: number | null | undefined;
@@ -14760,6 +15741,201 @@ export type GeneratedExercises_Set_Input = {
   name?: string | null | undefined;
 };
 
+export type GeneratedJournal_Entries_Aggregate_Bool_Exp = {
+  count?: GeneratedJournal_Entries_Aggregate_Bool_Exp_Count | null | undefined;
+};
+
+export type GeneratedJournal_Entries_Aggregate_Bool_Exp_Count = {
+  arguments?: Array<GeneratedJournal_Entries_Select_Column> | null | undefined;
+  distinct?: boolean | null | undefined;
+  filter?: GeneratedJournal_Entries_Bool_Exp | null | undefined;
+  predicate: GeneratedInt_Comparison_Exp;
+};
+
+/** input type for inserting array relation for remote table "journal_entries" */
+export type GeneratedJournal_Entries_Arr_Rel_Insert_Input = {
+  data: Array<GeneratedJournal_Entries_Insert_Input>;
+  /** upsert condition */
+  on_conflict?: GeneratedJournal_Entries_On_Conflict | null | undefined;
+};
+
+/** Boolean expression to filter rows from the table "journal_entries". All fields are combined with a logical 'AND'. */
+export type GeneratedJournal_Entries_Bool_Exp = {
+  _and?: Array<GeneratedJournal_Entries_Bool_Exp> | null | undefined;
+  _not?: GeneratedJournal_Entries_Bool_Exp | null | undefined;
+  _or?: Array<GeneratedJournal_Entries_Bool_Exp> | null | undefined;
+  data?: GeneratedJsonb_Comparison_Exp | null | undefined;
+  end_date?: GeneratedDate_Comparison_Exp | null | undefined;
+  id?: GeneratedBigint_Comparison_Exp | null | undefined;
+  journalKindByKind?: GeneratedJournal_Kinds_Bool_Exp | null | undefined;
+  kind?: GeneratedString_Comparison_Exp | null | undefined;
+  note?: GeneratedString_Comparison_Exp | null | undefined;
+  severity?: GeneratedSmallint_Comparison_Exp | null | undefined;
+  start_date?: GeneratedDate_Comparison_Exp | null | undefined;
+  title?: GeneratedString_Comparison_Exp | null | undefined;
+};
+
+/** unique or primary key constraints on table "journal_entries" */
+export type GeneratedJournal_Entries_Constraint =
+  /** unique or primary key constraint on columns "id" */
+  | 'journal_entries_pkey';
+
+/** input type for inserting data into table "journal_entries" */
+export type GeneratedJournal_Entries_Insert_Input = {
+  data?: unknown;
+  end_date?: unknown;
+  journalKindByKind?: GeneratedJournal_Kinds_Obj_Rel_Insert_Input | null | undefined;
+  kind?: string | null | undefined;
+  note?: string | null | undefined;
+  severity?: unknown;
+  start_date?: unknown;
+  title?: string | null | undefined;
+};
+
+/** on_conflict condition type for table "journal_entries" */
+export type GeneratedJournal_Entries_On_Conflict = {
+  constraint: GeneratedJournal_Entries_Constraint;
+  update_columns?: Array<GeneratedJournal_Entries_Update_Column>;
+  where?: GeneratedJournal_Entries_Bool_Exp | null | undefined;
+};
+
+/** select columns of table "journal_entries" */
+export type GeneratedJournal_Entries_Select_Column =
+  /** column name */
+  | 'data'
+  /** column name */
+  | 'end_date'
+  /** column name */
+  | 'id'
+  /** column name */
+  | 'kind'
+  /** column name */
+  | 'note'
+  /** column name */
+  | 'severity'
+  /** column name */
+  | 'start_date'
+  /** column name */
+  | 'title';
+
+/** input type for updating data in table "journal_entries" */
+export type GeneratedJournal_Entries_Set_Input = {
+  data?: unknown;
+  end_date?: unknown;
+  kind?: string | null | undefined;
+  note?: string | null | undefined;
+  severity?: unknown;
+  start_date?: unknown;
+  title?: string | null | undefined;
+};
+
+/** update columns of table "journal_entries" */
+export type GeneratedJournal_Entries_Update_Column =
+  /** column name */
+  | 'data'
+  /** column name */
+  | 'end_date'
+  /** column name */
+  | 'kind'
+  /** column name */
+  | 'note'
+  /** column name */
+  | 'severity'
+  /** column name */
+  | 'start_date'
+  /** column name */
+  | 'title';
+
+/** Boolean expression to filter rows from the table "journal_kinds". All fields are combined with a logical 'AND'. */
+export type GeneratedJournal_Kinds_Bool_Exp = {
+  _and?: Array<GeneratedJournal_Kinds_Bool_Exp> | null | undefined;
+  _not?: GeneratedJournal_Kinds_Bool_Exp | null | undefined;
+  _or?: Array<GeneratedJournal_Kinds_Bool_Exp> | null | undefined;
+  color?: GeneratedString_Comparison_Exp | null | undefined;
+  entries?: GeneratedJournal_Entries_Bool_Exp | null | undefined;
+  entries_aggregate?: GeneratedJournal_Entries_Aggregate_Bool_Exp | null | undefined;
+  has_severity?: GeneratedBoolean_Comparison_Exp | null | undefined;
+  icon?: GeneratedString_Comparison_Exp | null | undefined;
+  label?: GeneratedString_Comparison_Exp | null | undefined;
+  sort_order?: GeneratedInt_Comparison_Exp | null | undefined;
+  value?: GeneratedString_Comparison_Exp | null | undefined;
+};
+
+/** unique or primary key constraints on table "journal_kinds" */
+export type GeneratedJournal_Kinds_Constraint =
+  /** unique or primary key constraint on columns "value" */
+  | 'journal_kinds_pkey'
+  /** unique or primary key constraint on columns "sort_order" */
+  | 'journal_kinds_sort_order_key';
+
+/** input type for inserting data into table "journal_kinds" */
+export type GeneratedJournal_Kinds_Insert_Input = {
+  color?: string | null | undefined;
+  entries?: GeneratedJournal_Entries_Arr_Rel_Insert_Input | null | undefined;
+  has_severity?: boolean | null | undefined;
+  icon?: string | null | undefined;
+  label?: string | null | undefined;
+  sort_order?: number | null | undefined;
+  value?: string | null | undefined;
+};
+
+/** input type for inserting object relation for remote table "journal_kinds" */
+export type GeneratedJournal_Kinds_Obj_Rel_Insert_Input = {
+  data: GeneratedJournal_Kinds_Insert_Input;
+  /** upsert condition */
+  on_conflict?: GeneratedJournal_Kinds_On_Conflict | null | undefined;
+};
+
+/** on_conflict condition type for table "journal_kinds" */
+export type GeneratedJournal_Kinds_On_Conflict = {
+  constraint: GeneratedJournal_Kinds_Constraint;
+  update_columns?: Array<GeneratedJournal_Kinds_Update_Column>;
+  where?: GeneratedJournal_Kinds_Bool_Exp | null | undefined;
+};
+
+/** update columns of table "journal_kinds" */
+export type GeneratedJournal_Kinds_Update_Column =
+  /** column name */
+  | 'color'
+  /** column name */
+  | 'has_severity'
+  /** column name */
+  | 'icon'
+  /** column name */
+  | 'label'
+  /** column name */
+  | 'sort_order'
+  /** column name */
+  | 'value';
+
+export type GeneratedJsonb_Cast_Exp = {
+  String?: GeneratedString_Comparison_Exp | null | undefined;
+};
+
+/** Boolean expression to compare columns of type "jsonb". All fields are combined with logical 'AND'. */
+export type GeneratedJsonb_Comparison_Exp = {
+  _cast?: GeneratedJsonb_Cast_Exp | null | undefined;
+  /** is the column contained in the given json value */
+  _contained_in?: unknown;
+  /** does the column contain the given json value at the top level */
+  _contains?: unknown;
+  _eq?: unknown;
+  _gt?: unknown;
+  _gte?: unknown;
+  /** does the string exist as a top-level key in the column */
+  _has_key?: string | null | undefined;
+  /** do all of these strings exist as top-level keys in the column */
+  _has_keys_all?: Array<string> | null | undefined;
+  /** do any of these strings exist as top-level keys in the column */
+  _has_keys_any?: Array<string> | null | undefined;
+  _in?: Array<unknown> | null | undefined;
+  _is_null?: boolean | null | undefined;
+  _lt?: unknown;
+  _lte?: unknown;
+  _neq?: unknown;
+  _nin?: Array<unknown> | null | undefined;
+};
+
 /** Boolean expression to compare columns of type "numeric". All fields are combined with logical 'AND'. */
 export type GeneratedNumeric_Comparison_Exp = {
   _eq?: unknown;
@@ -14787,6 +15963,19 @@ export type GeneratedRaces_Set_Input = {
   distance_m?: unknown;
   elevation_gain_m?: unknown;
   name?: string | null | undefined;
+};
+
+/** Boolean expression to compare columns of type "smallint". All fields are combined with logical 'AND'. */
+export type GeneratedSmallint_Comparison_Exp = {
+  _eq?: unknown;
+  _gt?: unknown;
+  _gte?: unknown;
+  _in?: Array<unknown> | null | undefined;
+  _is_null?: boolean | null | undefined;
+  _lt?: unknown;
+  _lte?: unknown;
+  _neq?: unknown;
+  _nin?: Array<unknown> | null | undefined;
 };
 
 /** Boolean expression to filter rows from the table "sports". All fields are combined with a logical 'AND'. */
@@ -14947,7 +16136,7 @@ export type GeneratedActivitiesSmokeQuery = { activities: Array<{ id: unknown, g
 export type GeneratedCalendarActivitiesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GeneratedCalendarActivitiesQuery = { activities: Array<{ id: unknown, name: string | null, activity_type: string | null, subtype: string | null, start_time: unknown, duration_s: unknown, distance_m: unknown, elevation_gain_m: unknown, start_lat: unknown, feeling: number | null, effort: number | null, caffeine: string | null, focus: string | null, shoe_id: unknown }> };
+export type GeneratedCalendarActivitiesQuery = { activities: Array<{ id: unknown, name: string | null, activity_type: string | null, subtype: string | null, start_time: unknown, duration_s: unknown, distance_m: unknown, elevation_gain_m: unknown, start_lat: unknown, start_lng: unknown, feeling: number | null, effort: number | null, caffeine: string | null, focus: string | null, shoe_id: unknown }> };
 
 export type GeneratedActivityDetailQueryVariables = Exact<{
   id: unknown;
@@ -15075,6 +16264,38 @@ export type GeneratedDeleteWeekNoteMutationVariables = Exact<{
 
 export type GeneratedDeleteWeekNoteMutation = { delete_week_notes_by_pk: { week: string } | null };
 
+export type GeneratedJournalKindsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GeneratedJournalKindsQuery = { journal_kinds: Array<{ value: string, label: string, icon: string, color: string, has_severity: boolean }> };
+
+export type GeneratedJournalEntriesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GeneratedJournalEntriesQuery = { journal_entries: Array<{ id: unknown, kind: string, start_date: unknown, end_date: unknown, title: string, note: string | null, severity: unknown }> };
+
+export type GeneratedInsertJournalEntryMutationVariables = Exact<{
+  object: GeneratedJournal_Entries_Insert_Input;
+}>;
+
+
+export type GeneratedInsertJournalEntryMutation = { insert_journal_entries_one: { id: unknown } | null };
+
+export type GeneratedUpdateJournalEntryMutationVariables = Exact<{
+  id: unknown;
+  set: GeneratedJournal_Entries_Set_Input;
+}>;
+
+
+export type GeneratedUpdateJournalEntryMutation = { update_journal_entries_by_pk: { id: unknown } | null };
+
+export type GeneratedDeleteJournalEntryMutationVariables = Exact<{
+  id: unknown;
+}>;
+
+
+export type GeneratedDeleteJournalEntryMutation = { delete_journal_entries_by_pk: { id: unknown } | null };
+
 export type GeneratedWeekObjectivesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -15104,7 +16325,7 @@ export type GeneratedDeleteWeekObjectiveMutation = { delete_week_objectives_by_p
 
 
 export const ActivitiesSmokeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ActivitiesSmoke"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"activities"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"start_time"},"value":{"kind":"EnumValue","value":"desc_nulls_last"}}]}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"25"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"garmin_activity_id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"activity_type"}},{"kind":"Field","name":{"kind":"Name","value":"subtype"}},{"kind":"Field","name":{"kind":"Name","value":"start_time"}},{"kind":"Field","name":{"kind":"Name","value":"duration_s"}},{"kind":"Field","name":{"kind":"Name","value":"distance_m"}}]}}]}}]} as unknown as DocumentNode<GeneratedActivitiesSmokeQuery, GeneratedActivitiesSmokeQueryVariables>;
-export const CalendarActivitiesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CalendarActivities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"activities"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"start_time"},"value":{"kind":"EnumValue","value":"desc_nulls_last"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"activity_type"}},{"kind":"Field","name":{"kind":"Name","value":"subtype"}},{"kind":"Field","name":{"kind":"Name","value":"start_time"}},{"kind":"Field","name":{"kind":"Name","value":"duration_s"}},{"kind":"Field","name":{"kind":"Name","value":"distance_m"}},{"kind":"Field","name":{"kind":"Name","value":"elevation_gain_m"}},{"kind":"Field","name":{"kind":"Name","value":"start_lat"}},{"kind":"Field","name":{"kind":"Name","value":"feeling"}},{"kind":"Field","name":{"kind":"Name","value":"effort"}},{"kind":"Field","name":{"kind":"Name","value":"caffeine"}},{"kind":"Field","name":{"kind":"Name","value":"focus"}},{"kind":"Field","name":{"kind":"Name","value":"shoe_id"}}]}}]}}]} as unknown as DocumentNode<GeneratedCalendarActivitiesQuery, GeneratedCalendarActivitiesQueryVariables>;
+export const CalendarActivitiesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CalendarActivities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"activities"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"start_time"},"value":{"kind":"EnumValue","value":"desc_nulls_last"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"activity_type"}},{"kind":"Field","name":{"kind":"Name","value":"subtype"}},{"kind":"Field","name":{"kind":"Name","value":"start_time"}},{"kind":"Field","name":{"kind":"Name","value":"duration_s"}},{"kind":"Field","name":{"kind":"Name","value":"distance_m"}},{"kind":"Field","name":{"kind":"Name","value":"elevation_gain_m"}},{"kind":"Field","name":{"kind":"Name","value":"start_lat"}},{"kind":"Field","name":{"kind":"Name","value":"start_lng"}},{"kind":"Field","name":{"kind":"Name","value":"feeling"}},{"kind":"Field","name":{"kind":"Name","value":"effort"}},{"kind":"Field","name":{"kind":"Name","value":"caffeine"}},{"kind":"Field","name":{"kind":"Name","value":"focus"}},{"kind":"Field","name":{"kind":"Name","value":"shoe_id"}}]}}]}}]} as unknown as DocumentNode<GeneratedCalendarActivitiesQuery, GeneratedCalendarActivitiesQueryVariables>;
 export const ActivityDetailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ActivityDetail"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"activities_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"garmin_activity_id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"activity_type"}},{"kind":"Field","name":{"kind":"Name","value":"subtype"}},{"kind":"Field","name":{"kind":"Name","value":"start_time"}},{"kind":"Field","name":{"kind":"Name","value":"duration_s"}},{"kind":"Field","name":{"kind":"Name","value":"distance_m"}},{"kind":"Field","name":{"kind":"Name","value":"elevation_gain_m"}},{"kind":"Field","name":{"kind":"Name","value":"avg_hr"}},{"kind":"Field","name":{"kind":"Name","value":"max_hr"}},{"kind":"Field","name":{"kind":"Name","value":"calories"}},{"kind":"Field","name":{"kind":"Name","value":"avg_speed_mps"}},{"kind":"Field","name":{"kind":"Name","value":"avg_power_w"}},{"kind":"Field","name":{"kind":"Name","value":"feeling"}},{"kind":"Field","name":{"kind":"Name","value":"effort"}},{"kind":"Field","name":{"kind":"Name","value":"food_during"}},{"kind":"Field","name":{"kind":"Name","value":"food_after"}},{"kind":"Field","name":{"kind":"Name","value":"caffeine"}},{"kind":"Field","name":{"kind":"Name","value":"weather"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}},{"kind":"Field","name":{"kind":"Name","value":"focus"}},{"kind":"Field","name":{"kind":"Name","value":"hard_tries"}},{"kind":"Field","name":{"kind":"Name","value":"strength_exercises"}},{"kind":"Field","name":{"kind":"Name","value":"shoe_id"}},{"kind":"Field","name":{"kind":"Name","value":"shoe"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"activity_streams"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"payload"}}]}}]}}]}}]} as unknown as DocumentNode<GeneratedActivityDetailQuery, GeneratedActivityDetailQueryVariables>;
 export const UpdateActivityDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateActivity"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"set"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"activities_set_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"update_activities_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"pk_columns"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}},{"kind":"Argument","name":{"kind":"Name","value":"_set"},"value":{"kind":"Variable","name":{"kind":"Name","value":"set"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"subtype"}},{"kind":"Field","name":{"kind":"Name","value":"feeling"}},{"kind":"Field","name":{"kind":"Name","value":"effort"}},{"kind":"Field","name":{"kind":"Name","value":"food_during"}},{"kind":"Field","name":{"kind":"Name","value":"food_after"}},{"kind":"Field","name":{"kind":"Name","value":"caffeine"}},{"kind":"Field","name":{"kind":"Name","value":"weather"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}},{"kind":"Field","name":{"kind":"Name","value":"focus"}},{"kind":"Field","name":{"kind":"Name","value":"hard_tries"}},{"kind":"Field","name":{"kind":"Name","value":"strength_exercises"}},{"kind":"Field","name":{"kind":"Name","value":"shoe_id"}},{"kind":"Field","name":{"kind":"Name","value":"shoe"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GeneratedUpdateActivityMutation, GeneratedUpdateActivityMutationVariables>;
 export const FoodOptionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"FoodOptions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"food_options"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"value"},"value":{"kind":"EnumValue","value":"asc"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}}]} as unknown as DocumentNode<GeneratedFoodOptionsQuery, GeneratedFoodOptionsQueryVariables>;
@@ -15124,6 +16345,11 @@ export const DeleteDayPlanDocument = {"kind":"Document","definitions":[{"kind":"
 export const WeekNotesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"WeekNotes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"week_notes"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"week"},"value":{"kind":"EnumValue","value":"asc"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"week"}},{"kind":"Field","name":{"kind":"Name","value":"note"}}]}}]}}]} as unknown as DocumentNode<GeneratedWeekNotesQuery, GeneratedWeekNotesQueryVariables>;
 export const UpsertWeekNoteDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpsertWeekNote"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"object"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"week_notes_insert_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"insert_week_notes_one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"object"},"value":{"kind":"Variable","name":{"kind":"Name","value":"object"}}},{"kind":"Argument","name":{"kind":"Name","value":"on_conflict"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"constraint"},"value":{"kind":"EnumValue","value":"week_notes_pkey"}},{"kind":"ObjectField","name":{"kind":"Name","value":"update_columns"},"value":{"kind":"ListValue","values":[{"kind":"EnumValue","value":"note"}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"week"}}]}}]}}]} as unknown as DocumentNode<GeneratedUpsertWeekNoteMutation, GeneratedUpsertWeekNoteMutationVariables>;
 export const DeleteWeekNoteDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteWeekNote"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"week"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"delete_week_notes_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"week"},"value":{"kind":"Variable","name":{"kind":"Name","value":"week"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"week"}}]}}]}}]} as unknown as DocumentNode<GeneratedDeleteWeekNoteMutation, GeneratedDeleteWeekNoteMutationVariables>;
+export const JournalKindsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"JournalKinds"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"journal_kinds"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"sort_order"},"value":{"kind":"EnumValue","value":"asc"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"label"}},{"kind":"Field","name":{"kind":"Name","value":"icon"}},{"kind":"Field","name":{"kind":"Name","value":"color"}},{"kind":"Field","name":{"kind":"Name","value":"has_severity"}}]}}]}}]} as unknown as DocumentNode<GeneratedJournalKindsQuery, GeneratedJournalKindsQueryVariables>;
+export const JournalEntriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"JournalEntries"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"journal_entries"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"start_date"},"value":{"kind":"EnumValue","value":"asc"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"start_date"}},{"kind":"Field","name":{"kind":"Name","value":"end_date"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"note"}},{"kind":"Field","name":{"kind":"Name","value":"severity"}}]}}]}}]} as unknown as DocumentNode<GeneratedJournalEntriesQuery, GeneratedJournalEntriesQueryVariables>;
+export const InsertJournalEntryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"InsertJournalEntry"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"object"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"journal_entries_insert_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"insert_journal_entries_one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"object"},"value":{"kind":"Variable","name":{"kind":"Name","value":"object"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedInsertJournalEntryMutation, GeneratedInsertJournalEntryMutationVariables>;
+export const UpdateJournalEntryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateJournalEntry"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"set"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"journal_entries_set_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"update_journal_entries_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"pk_columns"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}},{"kind":"Argument","name":{"kind":"Name","value":"_set"},"value":{"kind":"Variable","name":{"kind":"Name","value":"set"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedUpdateJournalEntryMutation, GeneratedUpdateJournalEntryMutationVariables>;
+export const DeleteJournalEntryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteJournalEntry"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"delete_journal_entries_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedDeleteJournalEntryMutation, GeneratedDeleteJournalEntryMutationVariables>;
 export const WeekObjectivesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"WeekObjectives"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"week_objectives"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"week"},"value":{"kind":"EnumValue","value":"asc"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"week"}},{"kind":"Field","name":{"kind":"Name","value":"sport"}},{"kind":"Field","name":{"kind":"Name","value":"metric"}},{"kind":"Field","name":{"kind":"Name","value":"target"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}}]}}]}}]} as unknown as DocumentNode<GeneratedWeekObjectivesQuery, GeneratedWeekObjectivesQueryVariables>;
 export const InsertWeekObjectiveDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"InsertWeekObjective"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"object"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"week_objectives_insert_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"insert_week_objectives_one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"object"},"value":{"kind":"Variable","name":{"kind":"Name","value":"object"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedInsertWeekObjectiveMutation, GeneratedInsertWeekObjectiveMutationVariables>;
 export const UpdateWeekObjectiveDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateWeekObjective"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"set"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"week_objectives_set_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"update_week_objectives_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"pk_columns"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}},{"kind":"Argument","name":{"kind":"Name","value":"_set"},"value":{"kind":"Variable","name":{"kind":"Name","value":"set"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GeneratedUpdateWeekObjectiveMutation, GeneratedUpdateWeekObjectiveMutationVariables>;
