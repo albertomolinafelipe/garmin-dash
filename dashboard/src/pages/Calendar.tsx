@@ -7,7 +7,7 @@ import {
 	useState,
 } from "react";
 import { useSearchParams } from "react-router-dom";
-import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
+import { CalendarDays, ChevronDown, ChevronUp } from "lucide-react";
 
 import { SelectableCell } from "@/components/calendar/cell";
 import {
@@ -41,6 +41,8 @@ import {
 	indexActivitiesByDay,
 	useCalendarData,
 } from "@/components/calendar/use-calendar-data";
+import { useDayRangeDrag } from "@/components/calendar/use-day-range-drag";
+import { useMonthKeys } from "@/components/calendar/use-month-keys";
 import {
 	TotalRow,
 	WeekNotePreview,
@@ -143,6 +145,11 @@ function CalendarInner() {
 			},
 			{ replace: true },
 		);
+	// Shared by the toolbar chevrons and the j/k keys. `replace` above keeps
+	// holding a key down from stacking up one history entry per month.
+	const stepMonth = (direction: 1 | -1) =>
+		setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + direction, 1));
+	useMonthKeys(stepMonth);
 	const [filter, setFilter] = useState<Category | null>(null);
 	const dnd = useDayPlanDnd();
 	const {
@@ -162,6 +169,10 @@ function CalendarInner() {
 		useState<ObjectiveTarget | null>(null);
 	const [noteWeek, setNoteWeek] = useState<string | null>(null);
 	const [journalTarget, setJournalTarget] = useState<JournalTarget | null>(null);
+	// Dragging across day cells opens the journal dialog on that range.
+	const rangeDrag = useDayRangeDrag((from, to) =>
+		setJournalTarget({ day: new Date(), range: { from, to } }),
+	);
 
 	const byDay = useMemo(
 		() =>
@@ -240,37 +251,29 @@ function CalendarInner() {
 							variant="outline"
 							size="icon"
 							aria-label="Previous month"
-							onClick={() =>
-								setCursor(
-									new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1),
-								)
-							}
+							title="Previous month (k)"
+							onClick={() => stepMonth(-1)}
 						>
-							<ChevronLeft />
+							<ChevronUp />
 						</Button>
 						<Button
 							variant="outline"
 							size="icon"
 							aria-label="Next month"
-							onClick={() =>
-								setCursor(
-									new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1),
-								)
-							}
+							title="Next month (j)"
+							onClick={() => stepMonth(1)}
 						>
-							<ChevronRight />
+							<ChevronDown />
 						</Button>
 					</div>
 					<div className="text-sm font-semibold sm:hidden">{month}</div>
 					<Separator orientation="vertical" className="hidden h-6 sm:block" />
-					{/* Day cells open the plan dialog, so recording a trip or an illness
-					    needs its own entry point. It opens on today; the dialog's range
-					    picker covers any other stretch of days. */}
+					{/* Day cells open the plan dialog, so journal entries need their own
+					    entry point. Opens on today; the range picker covers the rest. */}
 					<Button
 						variant="outline"
 						size="icon"
 						aria-label="Add journal entry"
-						title="Add journal entry — trip, illness, injury, how you felt"
 						onClick={() => setJournalTarget({ day: new Date() })}
 					>
 						<JournalIcon />
@@ -306,7 +309,13 @@ function CalendarInner() {
 			</div>
 
 			{/* Month grid + week-totals column */}
-			<div className="bg-card flex min-h-0 flex-1 overflow-hidden rounded-xl border">
+			<div
+				className={cn(
+					"bg-card flex min-h-0 flex-1 overflow-hidden rounded-xl border",
+					// Without this a drag across cells selects the day numbers as text.
+					rangeDrag.dragging && "select-none",
+				)}
+			>
 				{/* Days */}
 				<div className="flex min-w-0 flex-1 flex-col">
 					<div className="grid grid-cols-7 border-b">
@@ -328,17 +337,23 @@ function CalendarInner() {
 								{Array.from({ length: 7 }, (_, i) => addDays(w, i)).map(
 									(day) => {
 										const offMonth = day.getMonth() !== cursor.getMonth();
-										const events = byDay.get(dayKey(day)) ?? [];
+										const key = dayKey(day);
+										const events = byDay.get(key) ?? [];
 										return (
 											<ScrollableDayCell
-												key={dayKey(day)}
+												key={key}
 												{...dayDropProps(dnd, day)}
+												{...rangeDrag.dayProps(key)}
 												label={`Add plan on ${day.toLocaleDateString()}`}
-												onSelect={() => setPlanTarget({ day })}
+												onSelect={() => {
+													if (rangeDrag.shouldIgnoreClick()) return;
+													setPlanTarget({ day });
+												}}
 												className={cn(
 													"border-r last:border-r-0",
 													offMonth &&
 														"bg-[color-mix(in_oklab,var(--muted)_30%,var(--card))]",
+													rangeDrag.inRange(key) && "bg-primary/10",
 												)}
 											>
 												<div

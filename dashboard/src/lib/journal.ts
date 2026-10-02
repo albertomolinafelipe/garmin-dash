@@ -35,17 +35,8 @@ export function kindOf(
 	return kinds?.find((k) => k.value === value) ?? FALLBACK_KIND;
 }
 
-// 1 (mild) to 5 (severe). Labels keep the scale legible in the form; the
-// calendar only ever shows the number of filled dots.
 export const SEVERITY_MIN = 1;
 export const SEVERITY_MAX = 5;
-export const SEVERITY_LABEL: Record<number, string> = {
-	1: "Barely noticeable",
-	2: "Mild",
-	3: "Moderate",
-	4: "Bad",
-	5: "Severe",
-};
 
 const MONTH_DAY: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
 
@@ -85,12 +76,7 @@ export function entryTooltip(entry: JournalEntry, kind: JournalKind): string {
 		formatRange(entry) + (days && days > 1 ? ` (${days} days)` : ""),
 	];
 	if (entry.severity) {
-		parts.push(
-			`Severity ${entry.severity}/${SEVERITY_MAX}` +
-				(SEVERITY_LABEL[entry.severity]
-					? ` – ${SEVERITY_LABEL[entry.severity]}`
-					: ""),
-		);
+		parts.push(`Severity ${entry.severity}/${SEVERITY_MAX}`);
 	}
 	if (entry.note) parts.push(entry.note);
 	return parts.join("\n");

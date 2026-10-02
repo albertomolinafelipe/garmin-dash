@@ -7,7 +7,6 @@ import { DateRangePicker } from "@/components/ui/date-range-picker";
 import {
 	Dialog,
 	DialogContent,
-	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
@@ -29,19 +28,15 @@ import {
 	useUpdateJournalEntryMutation,
 } from "@/graphql/hooks";
 import { dayKey } from "@/lib/format";
-import {
-	journalIcon,
-	kindOf,
-	SEVERITY_LABEL,
-	SEVERITY_MAX,
-	SEVERITY_MIN,
-} from "@/lib/journal";
+import { journalIcon, kindOf, SEVERITY_MAX, SEVERITY_MIN } from "@/lib/journal";
 import type { JournalEntry, JournalKind } from "./model";
 
 // Open on a day to record something new, or on an existing entry to edit it.
+// `range` pre-fills the dates from a drag across the calendar.
 export interface JournalTarget {
 	day: Date;
 	entry?: JournalEntry;
+	range?: { from: string; to: string };
 }
 
 const DEFAULT_KIND = "feeling";
@@ -70,15 +65,15 @@ export function JournalDialog({
 	const [severity, setSeverity] = useState("");
 
 	// Seed the form whenever the dialog opens on a different target. A new entry
-	// starts as a single day -- the day that was clicked -- which the range
-	// picker can then be dragged out from.
+	// starts as the dragged range, or as the single day that was clicked, which
+	// the range picker can then be adjusted from.
 	useEffect(() => {
 		if (!target) return;
 		const entry = target.entry;
 		const day = dayKey(target.day);
 		setKind(entry?.kind ?? DEFAULT_KIND);
-		setFrom(entry?.start_date ?? day);
-		setTo(entry?.end_date ?? (entry ? "" : day));
+		setFrom(entry?.start_date ?? target.range?.from ?? day);
+		setTo(entry?.end_date ?? target.range?.to ?? (entry ? "" : day));
 		setTitle(entry?.title ?? "");
 		setNote(entry?.note ?? "");
 		setSeverity(entry?.severity ? String(entry.severity) : "");
@@ -133,12 +128,11 @@ export function JournalDialog({
 
 	return (
 		<Dialog open={target !== null} onOpenChange={(open) => !open && onClose()}>
-			<DialogContent className="sm:max-w-lg">
+			{/* No DialogDescription: Radix warns when one is absent unless the
+			    description is explicitly opted out of. */}
+			<DialogContent className="sm:max-w-lg" aria-describedby={undefined}>
 				<DialogHeader>
 					<DialogTitle>{editing ? "Edit entry" : "Add entry"}</DialogTitle>
-					<DialogDescription>
-						Trips, illness, injuries, or how a stretch of days felt.
-					</DialogDescription>
 				</DialogHeader>
 
 				<div className="flex flex-col gap-4">
@@ -179,11 +173,6 @@ export function JournalDialog({
 								setTo(range.to);
 							}}
 						/>
-						<p className="text-muted-foreground text-xs">
-							{from && !to
-								? "No end date — treated as still ongoing."
-								: "Pick one day, or drag to cover a range. Leave the end open if it is still ongoing."}
-						</p>
 					</div>
 
 					<div className="flex flex-col gap-2">
@@ -193,7 +182,6 @@ export function JournalDialog({
 							autoFocus
 							value={title}
 							onChange={(event) => setTitle(event.target.value)}
-							placeholder="Chamonix, head cold, left ankle…"
 						/>
 					</div>
 
@@ -213,18 +201,12 @@ export function JournalDialog({
 									<ToggleGroupItem
 										key={value}
 										value={value}
-										aria-label={SEVERITY_LABEL[Number(value)]}
-										title={SEVERITY_LABEL[Number(value)]}
+										aria-label={`Severity ${value}`}
 									>
 										{value}
 									</ToggleGroupItem>
 								))}
 							</ToggleGroup>
-							<p className="text-muted-foreground text-xs">
-								{severity
-									? SEVERITY_LABEL[Number(severity)]
-									: "Optional — 1 is barely noticeable, 5 is severe."}
-							</p>
 						</div>
 					) : null}
 
@@ -235,7 +217,6 @@ export function JournalDialog({
 							rows={3}
 							value={note}
 							onChange={(event) => setNote(event.target.value)}
-							placeholder="Anything worth remembering when looking back at this stretch"
 						/>
 					</div>
 				</div>

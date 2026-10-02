@@ -31,6 +31,9 @@ export function SelectableCell({
 			<button
 				type="button"
 				aria-label={label}
+				// Marks the empty-space hit layer so a range drag can tell it apart
+				// from the chips and buttons sitting above it.
+				data-cell-hit=""
 				onClick={onSelect}
 				className="focus-visible:ring-ring group-hover/cell:ring-muted-foreground/25 absolute inset-0 z-0 cursor-pointer rounded-sm ring-1 ring-transparent ring-inset transition-[box-shadow] duration-300 ease-out group-hover/cell:ring-2 focus-visible:ring-2 focus-visible:outline-none"
 			/>
