@@ -37,8 +37,15 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 // Hover body for a calendar activity: its route when the activity has GPS,
 // plus the headline numbers. Mounted only while the card is open, so the detail
-// query and the map bundle are both deferred until hover.
-export function ActivityPreview({ id }: { id: string }) {
+// query and the map bundle are both deferred until hover. `showProfile` trims it
+// to the route and the numbers, for surfaces that only want the card itself.
+export function ActivityPreview({
+	id,
+	showProfile = true,
+}: {
+	id: string;
+	showProfile?: boolean;
+}) {
 	const { data: activity, isPending } = useActivity(id);
 	const { data: samplesData } = useActivitySamples(id);
 	const sample = useMemo(
@@ -119,7 +126,7 @@ export function ActivityPreview({ id }: { id: string }) {
 			</div>
 			{/* Flush to the card's side and bottom edges: the rounded corners come
 			    from the popover, which clips it. */}
-			{profile.length > 1 ? (
+			{showProfile && profile.length > 1 ? (
 				<Suspense fallback={<div className={PROFILE_HEIGHT} />}>
 					<ElevationSparkline
 						points={profile}

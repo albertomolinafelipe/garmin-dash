@@ -6,12 +6,7 @@ import {
 	useMemo,
 	useState,
 } from "react";
-import {
-	ChevronLeft,
-	ChevronRight,
-	ChevronsRight,
-	ClipboardList,
-} from "lucide-react";
+import { ClipboardList } from "lucide-react";
 import {
 	Area,
 	Bar,
@@ -55,6 +50,8 @@ import {
 	useCalendarData,
 } from "@/components/calendar/use-calendar-data";
 import { WeekStrip } from "@/components/calendar/week-strip";
+import { MonthMini } from "@/components/month-mini";
+import { PanelNav } from "@/components/panel-nav";
 import { ReadinessSection } from "@/components/readiness-section";
 import { WeeklyHrZones } from "@/components/weekly-hr-zones";
 import { categoryColor, categoryOf, iconifyIcon } from "@/lib/activity-types";
@@ -76,23 +73,28 @@ const ExpandIcon = iconifyIcon("mdi:arrow-expand");
 const CollapseIcon = iconifyIcon("mdi:arrow-collapse");
 
 const WINDOW_DAYS = 7; // trailing window each daily point aggregates
-const SPAN_DAYS = 30; // how many days to plot
+const SPAN_DAYS = 30; // how many days a collapsed panel plots
+const EXPANDED_SPAN_DAYS = 90; // how many days an expanded panel plots
 const HISTORY_DAYS = 400; // rows fetched per daily domain so the window can scrub back
 const STEP_DAYS = 1; // one back/forward click moves the window this far
 
-// Shared, page-wide window navigation: every panel plots the same SPAN_DAYS
-// window ending `end`, and the WindowNav control shifts `end` back/forward.
+// Shared, page-wide window navigation: every panel plots a window ending
+// `end`, and the WindowNav control shifts `end` back/forward.
 interface WindowNav {
 	end: Date;
 	startKey: string;
 	endKey: string;
+	offsetDays: number;
 	canForward: boolean;
 	back: () => void;
 	forward: () => void;
 	latest: () => void;
 }
 
-function computeWindow(offsetDays: number): {
+function computeWindow(
+	offsetDays: number,
+	spanDays: number,
+): {
 	end: Date;
 	startKey: string;
 	endKey: string;
@@ -101,13 +103,14 @@ function computeWindow(offsetDays: number): {
 	end.setHours(0, 0, 0, 0);
 	end.setDate(end.getDate() - offsetDays);
 	const start = new Date(end);
-	start.setDate(end.getDate() - (SPAN_DAYS - 1));
+	start.setDate(end.getDate() - (spanDays - 1));
 	return { end, startKey: dayKey(start), endKey: dayKey(end) };
 }
 
-const defaultWindow = computeWindow(0);
+const defaultWindow = computeWindow(0, SPAN_DAYS);
 const WindowNavContext = createContext<WindowNav>({
 	...defaultWindow,
+	offsetDays: 0,
 	canForward: false,
 	back: () => {},
 	forward: () => {},
@@ -122,7 +125,8 @@ function WindowNavProvider({ children }: { children: ReactNode }) {
 	const [offsetDays, setOffsetDays] = useState(0);
 	const value = useMemo<WindowNav>(
 		() => ({
-			...computeWindow(offsetDays),
+			...computeWindow(offsetDays, SPAN_DAYS),
+			offsetDays,
 			canForward: offsetDays > 0,
 			back: () => setOffsetDays((o) => o + STEP_DAYS),
 			forward: () => setOffsetDays((o) => Math.max(0, o - STEP_DAYS)),
@@ -137,49 +141,54 @@ function WindowNavProvider({ children }: { children: ReactNode }) {
 	);
 }
 
+// Per-panel view of the shared window: expanding a panel widens the plotted
+// span rather than only enlarging the panel.
+interface PanelWindow extends WindowNav {
+	spanDays: number;
+	expanded: boolean;
+	setExpanded: (value: boolean) => void;
+}
+
+function usePanelWindow(): PanelWindow {
+	const win = useWindowNav();
+	const [expanded, setExpanded] = useState(false);
+	const spanDays = expanded ? EXPANDED_SPAN_DAYS : SPAN_DAYS;
+	return useMemo(
+		() => ({
+			...win,
+			...computeWindow(win.offsetDays, spanDays),
+			spanDays,
+			expanded,
+			setExpanded,
+		}),
+		[win, spanDays, expanded],
+	);
+}
+
+// Keep the tick count stable as the span widens.
+function tickInterval(spanDays: number, ticks: number): number {
+	return Math.ceil(spanDays / ticks) - 1;
+}
+
 function WindowNav() {
 	const { back, forward, latest, canForward } = useWindowNav();
 	return (
-		<div className="text-muted-foreground flex items-center gap-1 text-xs">
-			<Button
-				variant="ghost"
-				size="icon"
-				className="size-6"
-				onClick={back}
-				aria-label="Go back one day"
-			>
-				<ChevronLeft className="size-4" />
-			</Button>
-			<Button
-				variant="ghost"
-				size="icon"
-				className="size-6"
-				onClick={forward}
-				disabled={!canForward}
-				aria-label="Go forward one day"
-			>
-				<ChevronRight className="size-4" />
-			</Button>
-			<Button
-				variant="ghost"
-				size="icon"
-				className="size-6"
-				onClick={latest}
-				disabled={!canForward}
-				aria-label="Jump to latest"
-			>
-				<ChevronsRight className="size-4" />
-			</Button>
-		</div>
+		<PanelNav
+			unit="day"
+			canForward={canForward}
+			back={back}
+			forward={forward}
+			latest={latest}
+		/>
 	);
 }
 
 // Faint dotted separators on every Sunday, so week boundaries are readable in
 // any daily chart. Returns an array because recharts only recognises its own
 // element types as chart children, not wrapper components.
-function weekLines(end: Date, yAxisId?: string | number) {
+function weekLines(end: Date, spanDays: number, yAxisId?: string | number) {
 	const lines = [];
-	for (let i = SPAN_DAYS - 1; i >= 0; i--) {
+	for (let i = spanDays - 1; i >= 0; i--) {
 		const day = new Date(end);
 		day.setDate(end.getDate() - i);
 		if (day.getDay() !== 0) continue;
@@ -232,13 +241,14 @@ const SLEEP_COLORS = {
 	score: "#DCA561",
 };
 
-// Rolling `windowDays` sum of `contribution` for each of the last SPAN_DAYS days.
-// windowDays === 1 gives a plain day-for-day series.
+// Rolling `windowDays` sum of `contribution` for each of the last `spanDays`
+// days. windowDays === 1 gives a plain day-for-day series.
 function rolling(
 	activities: CalendarActivity[],
 	contribution: (a: CalendarActivity) => number | null,
 	windowDays: number,
 	end: Date,
+	spanDays: number,
 ): number[] {
 	const perDay = new Map<string, number>();
 	for (const a of activities) {
@@ -249,7 +259,7 @@ function rolling(
 		perDay.set(key, (perDay.get(key) ?? 0) + v);
 	}
 	const out: number[] = [];
-	for (let i = SPAN_DAYS - 1; i >= 0; i--) {
+	for (let i = spanDays - 1; i >= 0; i--) {
 		const day = new Date(end);
 		day.setDate(end.getDate() - i);
 		let sum = 0;
@@ -263,9 +273,9 @@ function rolling(
 	return out;
 }
 
-function dayLabels(end: Date): string[] {
+function dayLabels(end: Date, spanDays: number): string[] {
 	const labels: string[] = [];
-	for (let i = SPAN_DAYS - 1; i >= 0; i--) {
+	for (let i = spanDays - 1; i >= 0; i--) {
 		const day = new Date(end);
 		day.setDate(end.getDate() - i);
 		labels.push(dayKey(day).slice(5));
@@ -278,15 +288,18 @@ function Panel({
 	action,
 	showNav = true,
 	className,
+	expanded,
+	onExpandedChange,
 	children,
 }: {
 	title: string;
 	action?: ReactNode;
 	showNav?: boolean;
 	className?: string;
+	expanded: boolean;
+	onExpandedChange: (value: boolean) => void;
 	children: ReactNode;
 }) {
-	const [expanded, setExpanded] = useState(false);
 	const header = (open: boolean) => (
 		<CardHeader className="px-4">
 			<CardTitle className="text-sm font-medium">{title}</CardTitle>
@@ -299,7 +312,7 @@ function Panel({
 						size="icon"
 						className="text-muted-foreground size-6"
 						aria-label={`${open ? "Collapse" : "Expand"} ${title}`}
-						onClick={() => setExpanded(!open)}
+						onClick={() => onExpandedChange(!open)}
 					>
 						{open ? <CollapseIcon size={16} /> : <ExpandIcon size={16} />}
 					</Button>
@@ -314,11 +327,9 @@ function Panel({
 				<CardContent className="min-h-0 flex-1 px-4 pb-1">{children}</CardContent>
 			</Card>
 			{expanded ? (
-				<ExpandedPanel title={title} onClose={() => setExpanded(false)}>
+				<ExpandedPanel title={title} onClose={() => onExpandedChange(false)}>
 					{header(true)}
-					<CardContent className="min-h-0 flex-1 px-4 pb-1">
-						{children}
-					</CardContent>
+					<CardContent className="min-h-0 flex-1 px-4 pb-1">{children}</CardContent>
 				</ExpandedPanel>
 			) : null}
 		</>
@@ -431,6 +442,7 @@ function objectiveByDay(
 	objectives: WeekObjective[],
 	objective: { metric: Metric; sport: Sport },
 	end: Date,
+	spanDays: number,
 ): (number | null)[] {
 	const perWeek = new Map<string, number>();
 	for (const r of objectives) {
@@ -440,7 +452,7 @@ function objectiveByDay(
 	}
 	const fromBase = METRIC_META[objective.metric].fromBase;
 	const out: (number | null)[] = [];
-	for (let i = SPAN_DAYS - 1; i >= 0; i--) {
+	for (let i = spanDays - 1; i >= 0; i--) {
 		const day = new Date(end);
 		day.setDate(end.getDate() - i);
 		const target = day.getDay() === 0 ? perWeek.get(toIsoWeek(day)) : undefined;
@@ -462,7 +474,8 @@ function LoadPanel({
 }) {
 	const { data, isPending } = useActivities();
 	const activities = data?.activities ?? [];
-	const { end } = useWindowNav();
+	const win = usePanelWindow();
+	const { end, spanDays } = win;
 	const { data: objectives } = useWeekObjectivesQuery();
 	const [showObjectives, setShowObjectives] = useState(false);
 	const objectiveSeries = useMemo(
@@ -474,14 +487,14 @@ function LoadPanel({
 	);
 
 	const rows = useMemo(() => {
-		const labels = dayLabels(end);
+		const labels = dayLabels(end, spanDays);
 		const cols = series.map((s) =>
-			rolling(activities, s.contribution, WINDOW_DAYS, end),
+			rolling(activities, s.contribution, WINDOW_DAYS, end, spanDays),
 		);
 		const objectiveCols = new Map(
 			objectiveSeries.map((s) => [
 				s.key,
-				objectiveByDay(objectives ?? [], s.objective, end),
+				objectiveByDay(objectives ?? [], s.objective, end, spanDays),
 			]),
 		);
 		return labels.map((date, i) => {
@@ -494,7 +507,7 @@ function LoadPanel({
 			}
 			return row;
 		});
-	}, [activities, series, end, objectives, objectiveSeries]);
+	}, [activities, series, end, spanDays, objectives, objectiveSeries]);
 
 	const config = useMemo(
 		() =>
@@ -548,11 +561,17 @@ function LoadPanel({
 	);
 
 	return (
-		<Panel title={title} action={badges} className={className}>
+		<Panel
+			title={title}
+			action={badges}
+			className={className}
+			expanded={win.expanded}
+			onExpandedChange={win.setExpanded}
+		>
 			<PanelBody
 				isPending={isPending}
 				isEmpty={!hasData}
-				emptyText={`Nothing in the last ${SPAN_DAYS} days.`}
+				emptyText={`Nothing in the last ${spanDays} days.`}
 			>
 				<ChartContainer config={config} className="aspect-auto h-full w-full">
 					<ComposedChart data={rows} margin={{ top: 6, right: 0, left: 0 }}>
@@ -572,10 +591,10 @@ function LoadPanel({
 							))}
 						</defs>
 						<CartesianGrid strokeDasharray="3 3" vertical={false} />
-						{weekLines(end, "left")}
+						{weekLines(end, spanDays, "left")}
 						<XAxis
 							dataKey="date"
-							interval={4}
+							interval={tickInterval(spanDays, 6)}
 							tickLine={false}
 							axisLine={false}
 							tickMargin={6}
@@ -726,7 +745,7 @@ const SLEEP_TOOLTIP_ORDER: Record<string, number> = {
 
 function SleepPanel() {
 	const { data, isPending } = useSleep(HISTORY_DAYS);
-	const win = useWindowNav();
+	const win = usePanelWindow();
 	const rows = useMemo(
 		() =>
 			[...(data?.sleep ?? [])]
@@ -771,6 +790,8 @@ function SleepPanel() {
 			title="Sleep"
 			action={legend}
 			className="h-[280px] md:h-full md:flex-1"
+			expanded={win.expanded}
+			onExpandedChange={win.setExpanded}
 		>
 			<PanelBody
 				isPending={isPending}
@@ -795,10 +816,10 @@ function SleepPanel() {
 							))}
 						</defs>
 						<CartesianGrid strokeDasharray="3 3" vertical={false} />
-						{weekLines(win.end, "hours")}
+						{weekLines(win.end, win.spanDays, "hours")}
 						<XAxis
 							dataKey="date"
-							interval={2}
+							interval={tickInterval(win.spanDays, 10)}
 							tickLine={false}
 							axisLine={false}
 							tickMargin={6}
@@ -873,7 +894,7 @@ const hrvConfig = {
 
 function HrvPanel() {
 	const { data, isPending } = useHrv(HISTORY_DAYS);
-	const win = useWindowNav();
+	const win = usePanelWindow();
 	const rows = useMemo(
 		() =>
 			[...(data?.daily_hrv ?? [])]
@@ -920,7 +941,13 @@ function HrvPanel() {
 	);
 
 	return (
-		<Panel title="HRV" action={legend} className="h-[280px] md:h-full md:flex-1">
+		<Panel
+			title="HRV"
+			action={legend}
+			className="h-[280px] md:h-full md:flex-1"
+			expanded={win.expanded}
+			onExpandedChange={win.setExpanded}
+		>
 			<PanelBody
 				isPending={isPending}
 				isEmpty={rows.length === 0}
@@ -935,10 +962,10 @@ function HrvPanel() {
 							</linearGradient>
 						</defs>
 						<CartesianGrid strokeDasharray="3 3" vertical={false} />
-						{weekLines(win.end)}
+						{weekLines(win.end, win.spanDays)}
 						<XAxis
 							dataKey="date"
-							interval={2}
+							interval={tickInterval(win.spanDays, 10)}
 							tickLine={false}
 							axisLine={false}
 							tickMargin={6}
@@ -1018,7 +1045,7 @@ const READINESS_LEGEND = ["score", "acuteLoad", ...READINESS_FACTORS] as const;
 
 function ReadinessPanel() {
 	const { data, isPending } = useReadiness(HISTORY_DAYS);
-	const win = useWindowNav();
+	const win = usePanelWindow();
 	const rows = useMemo(() => {
 		const seen = new Set<string>();
 		const daily = [];
@@ -1064,6 +1091,8 @@ function ReadinessPanel() {
 			title="Training readiness"
 			action={legend}
 			className="h-[320px] md:h-full md:flex-1"
+			expanded={win.expanded}
+			onExpandedChange={win.setExpanded}
 		>
 			<PanelBody
 				isPending={isPending}
@@ -1076,10 +1105,10 @@ function ReadinessPanel() {
 				>
 					<ComposedChart data={rows} margin={{ top: 6, right: 0, left: 0 }}>
 						<CartesianGrid strokeDasharray="3 3" vertical={false} />
-						{weekLines(win.end, "pct")}
+						{weekLines(win.end, win.spanDays, "pct")}
 						<XAxis
 							dataKey="date"
-							interval={2}
+							interval={tickInterval(win.spanDays, 10)}
 							tickLine={false}
 							axisLine={false}
 							tickMargin={6}
@@ -1234,6 +1263,7 @@ function AnalysisPanels() {
 					series={EFFORT_SERIES}
 					className="h-[280px] md:h-full md:flex-1"
 				/>
+				<MonthMini className="aspect-square h-[280px] md:h-full md:shrink-0" />
 			</div>
 			<div className={cn("flex flex-col gap-4 md:flex-row", ROW)}>
 				<SleepPanel />

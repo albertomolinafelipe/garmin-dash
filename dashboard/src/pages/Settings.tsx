@@ -21,7 +21,6 @@ import {
 	Card,
 	CardAction,
 	CardContent,
-	CardDescription,
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
@@ -39,6 +38,7 @@ import {
 } from "@/components/ui/dialog";
 import { TagsInput } from "@/components/ui/tags-input";
 import { TimelineList } from "@/components/timeline-list";
+import { ObjectivePlanner } from "@/components/settings/objective-planner";
 import { useActivities } from "@/lib/queries";
 import { dayKey } from "@/lib/format";
 import {
@@ -65,6 +65,45 @@ import { raceIcon as RaceIcon } from "@/lib/plans";
 const RacesMap = lazy(() =>
 	import("@/components/races-map").then((m) => ({ default: m.RacesMap })),
 );
+const RoutesHeatmap = lazy(() =>
+	import("@/components/routes-heatmap").then((m) => ({
+		default: m.RoutesHeatmap,
+	})),
+);
+
+// --- Route heat map -----------------------------------------------------------
+
+function RoutesCard() {
+	// Every track stays in memory as a polyline, so keep the map unmounted — and
+	// its chunk and query untouched — until it is explicitly switched on.
+	const [shown, setShown] = useState(false);
+	return (
+		<Card>
+			<CardHeader>
+				<CardTitle>Route heat map</CardTitle>
+				<CardAction>
+					<Button
+						variant={shown ? "secondary" : "outline"}
+						size="sm"
+						onClick={() => setShown((on) => !on)}
+					>
+						<MapIcon />
+						{shown ? "Hide" : "Show"}
+					</Button>
+				</CardAction>
+			</CardHeader>
+			{shown ? (
+				<CardContent>
+					<div className="isolate aspect-square overflow-hidden rounded-lg border">
+						<Suspense fallback={null}>
+							<RoutesHeatmap />
+						</Suspense>
+					</div>
+				</CardContent>
+			) : null}
+		</Card>
+	);
+}
 
 // --- Exercises ----------------------------------------------------------------
 
@@ -221,9 +260,6 @@ function ExercisesCard() {
 		<Card>
 			<CardHeader>
 				<CardTitle>Exercise catalog</CardTitle>
-				<CardDescription>
-					Exercises available to strength annotations, with their equipment tags.
-				</CardDescription>
 			</CardHeader>
 			<CardContent className="space-y-4">
 				<div className="bg-muted/30 flex flex-col gap-2 rounded-lg border border-dashed p-3 sm:flex-row sm:items-center">
@@ -428,9 +464,6 @@ function RacesCard() {
 		<Card>
 			<CardHeader>
 				<CardTitle>Races</CardTitle>
-				<CardDescription>
-					Races show on the calendar on their date, past ones flagged.
-				</CardDescription>
 				<CardAction>
 					<div className="flex items-center gap-2">
 						<Button size="sm" variant="outline" onClick={() => setMapOpen(true)}>
@@ -709,9 +742,6 @@ function ShoesCard() {
 		<Card>
 			<CardHeader>
 				<CardTitle>Shoes</CardTitle>
-				<CardDescription>
-					Gear for tracking mileage; pick one when annotating a run, hike or ski.
-				</CardDescription>
 				<CardAction>
 					<Button size="sm" onClick={() => setCreateOpen(true)}>
 						<Plus className="size-4" />
@@ -742,11 +772,15 @@ function ShoesCard() {
 }
 
 export function Settings() {
+	// CSS columns rather than a grid: cards flow down one column and into the
+	// next, so a tall card never stretches the row beside it.
 	return (
-		<div className="grid items-start gap-4 p-4 lg:grid-cols-2">
+		<div className="columns-1 gap-4 p-4 lg:columns-2 [&>*]:mb-4 [&>*]:break-inside-avoid">
+			<ObjectivePlanner />
 			<ExercisesCard />
 			<RacesCard />
 			<ShoesCard />
+			<RoutesCard />
 		</div>
 	);
 }

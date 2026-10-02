@@ -256,6 +256,35 @@ export function useActivity(
 	>;
 }
 
+// Every recorded track in one request. Hasura's `path` argument slices the
+// track out of the stream payload server-side, so the HR and elevation series
+// never cross the wire. Kept as a raw request (not codegen) so the generated
+// types stay untouched.
+export interface RouteTrack {
+	activity_id: number | string;
+	payload: TrackPoint[] | null;
+}
+
+const ROUTE_TRACKS = `
+	query RouteTracks {
+		activity_streams {
+			activity_id
+			payload(path: "track")
+		}
+	}
+`;
+
+export function useRouteTracks(): UseQueryResult<
+	{ activity_streams: RouteTrack[] },
+	Error
+> {
+	return useQuery({
+		queryKey: ["route-tracks"],
+		queryFn: () =>
+			graphQLClient.request<{ activity_streams: RouteTrack[] }>(ROUTE_TRACKS),
+	});
+}
+
 // One row per FIT record from the full-resolution hypertable. geom arrives as
 // GeoJSON; distance_m is cumulative, so the map and the elevation/HR profile can
 // both be plotted against distance. Kept as a raw request (not codegen) so the

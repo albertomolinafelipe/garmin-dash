@@ -11,6 +11,9 @@ import { cn } from "@/lib/utils";
 // it. `content` is a function, not a node, so expensive previews (maps, queries)
 // are only constructed once the card actually opens and are torn down on close.
 // Nothing here knows what it is previewing — see ActivityPreview for a consumer.
+//
+// Uncontrolled by default; pass `open`/`onOpenChange` when the trigger also has
+// to open the card on click, which hover alone cannot do on touch.
 export function HoverPreview({
 	children,
 	content,
@@ -19,6 +22,8 @@ export function HoverPreview({
 	align = "start",
 	openDelay = 350,
 	closeDelay = 100,
+	open: openProp,
+	onOpenChange,
 }: {
 	children: ReactNode;
 	content: () => ReactNode;
@@ -27,8 +32,12 @@ export function HoverPreview({
 	align?: "start" | "center" | "end";
 	openDelay?: number;
 	closeDelay?: number;
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
 }) {
-	const [open, setOpen] = useState(false);
+	const [uncontrolled, setUncontrolled] = useState(false);
+	const open = openProp ?? uncontrolled;
+	const setOpen = onOpenChange ?? setUncontrolled;
 	return (
 		<HoverCard
 			open={open}

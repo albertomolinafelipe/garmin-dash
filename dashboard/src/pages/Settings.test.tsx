@@ -45,6 +45,19 @@ vi.mock("@/graphql/hooks", () => ({
 	useUpdateRaceMutation: () => ({ mutateAsync: mocks.update, isPending: false }),
 	useDeleteRaceMutation: () => ({ mutateAsync: mocks.remove, isPending: false }),
 	useCalendarActivitiesQuery: () => ({ data: { activities: [] } }),
+	useWeekObjectivesQuery: () => ({ data: [] }),
+	useInsertWeekObjectiveMutation: () => ({
+		mutateAsync: mocks.insert,
+		isPending: false,
+	}),
+	useUpdateWeekObjectiveMutation: () => ({
+		mutateAsync: mocks.update,
+		isPending: false,
+	}),
+	useDeleteWeekObjectiveMutation: () => ({
+		mutateAsync: mocks.remove,
+		isPending: false,
+	}),
 }));
 
 function setup() {
