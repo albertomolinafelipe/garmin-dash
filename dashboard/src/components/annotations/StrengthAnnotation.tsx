@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef } from "react";
+import { useEffect, useId, useReducer, useRef, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { useExercisesQuery } from "@/graphql/hooks";
 import { SCALE_OPTIONS } from "@/lib/activity-types";
@@ -8,22 +8,11 @@ import {
 	type StrengthEntry,
 } from "@/lib/annotations";
 import { Button } from "@/components/ui/button";
-import {
-	Command,
-	CommandEmpty,
-	CommandInput,
-	CommandItem,
-	CommandList,
-} from "@/components/ui/command";
 import { NumberInput } from "@/components/ui/number-input";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { Field, SegmentedField } from "./fields";
-import { strengthRowsReducer } from "./strength-rows";
+import { strengthRowsReducer, type StrengthRowsAction } from "./strength-rows";
 
 export interface StrengthActivity {
 	id: unknown;
@@ -36,6 +25,133 @@ interface Props {
 	onSave: (patch: AnnotationInput) => unknown;
 	foodOptions?: string[];
 }
+
+const MAX_SUGGESTIONS = 8;
+
+function rankSuggestions(names: string[], query: string): string[] {
+	const q = query.trim().toLowerCase();
+	if (!q) return names.slice(0, MAX_SUGGESTIONS);
+	const starts: string[] = [];
+	const contains: string[] = [];
+	for (const name of names) {
+		const n = name.toLowerCase();
+		if (n.startsWith(q)) starts.push(name);
+		else if (n.includes(q)) contains.push(name);
+	}
+	return [...starts, ...contains].slice(0, MAX_SUGGESTIONS);
+}
+
+interface ExerciseInputProps {
+	value: string;
+	options: string[];
+	ariaLabel: string;
+	inputRef?: (el: HTMLInputElement | null) => void;
+	onChange: (value: string) => void;
+	onCommit: (value: string) => void;
+}
+
+// Inline combobox: typing filters suggestions, arrows move, Enter/Tab accept
+// the highlighted one, Escape keeps exactly what was typed.
+function ExerciseInput({
+	value,
+	options,
+	ariaLabel,
+	inputRef,
+	onChange,
+	onCommit,
+}: ExerciseInputProps) {
+	const listId = useId();
+	const [open, setOpen] = useState(false);
+	const [active, setActive] = useState(-1);
+	const suggestions = rankSuggestions(options, value).filter(
+		(name) => name !== value,
+	);
+	const visible = open && suggestions.length > 0;
+	const highlighted = visible && active >= 0 ? suggestions[active] : undefined;
+
+	const pick = (name: string) => {
+		onChange(name);
+		setOpen(false);
+		setActive(-1);
+	};
+
+	return (
+		<div className="relative">
+			<Input
+				ref={inputRef}
+				role="combobox"
+				aria-label={ariaLabel}
+				aria-expanded={visible}
+				aria-controls={listId}
+				aria-autocomplete="list"
+				autoComplete="off"
+				value={value}
+				placeholder="Exercise"
+				onFocus={() => setOpen(true)}
+				onChange={(event) => {
+					onChange(event.target.value);
+					setOpen(true);
+					// Pre-highlight the best match only once something is typed.
+					setActive(event.target.value.trim() ? 0 : -1);
+				}}
+				onKeyDown={(event) => {
+					if (event.key === "ArrowDown") {
+						event.preventDefault();
+						setOpen(true);
+						setActive((i) => Math.min(i + 1, suggestions.length - 1));
+					} else if (event.key === "ArrowUp") {
+						event.preventDefault();
+						setActive((i) => Math.max(i - 1, -1));
+					} else if (event.key === "Escape" && visible) {
+						event.preventDefault();
+						event.stopPropagation();
+						setOpen(false);
+						setActive(-1);
+					} else if (event.key === "Enter") {
+						event.preventDefault();
+						if (highlighted) pick(highlighted);
+					} else if (event.key === "Tab" && !event.shiftKey && highlighted) {
+						// Accept and let focus move on to Sets.
+						pick(highlighted);
+					}
+				}}
+				onBlur={(event) => {
+					setOpen(false);
+					setActive(-1);
+					onCommit(event.currentTarget.value);
+				}}
+			/>
+			{visible && (
+				<ul
+					id={listId}
+					role="listbox"
+					className="bg-popover text-popover-foreground absolute top-full left-0 z-50 mt-1 max-h-64 w-full min-w-48 overflow-auto rounded-md border p-1 shadow-md"
+				>
+					{suggestions.map((name, i) => (
+						<li
+							key={name}
+							role="option"
+							aria-selected={i === active}
+							className={cn(
+								"cursor-pointer rounded-sm px-2 py-1.5 text-sm",
+								i === active && "bg-accent text-accent-foreground",
+							)}
+							// mousedown keeps focus in the input so blur doesn't race the pick.
+							onMouseDown={(event) => {
+								event.preventDefault();
+								pick(name);
+							}}
+							onMouseEnter={() => setActive(i)}
+						>
+							{name}
+						</li>
+					))}
+				</ul>
+			)}
+		</div>
+	);
+}
+
 export function StrengthAnnotation({ activity, onSave }: Props) {
 	const [rows, dispatch] = useReducer(
 		strengthRowsReducer,
@@ -44,7 +160,23 @@ export function StrengthAnnotation({ activity, onSave }: Props) {
 	);
 	const dirty = useRef(false);
 	const activityId = useRef(activity.id);
-	const exercises = useExercisesQuery().data?.exercises ?? [];
+	// Saves read from this ref: a Tab right after an edit blurs before re-render.
+	const latest = useRef(rows);
+	latest.current = rows;
+	const exerciseInputs = useRef<(HTMLInputElement | null)[]>([]);
+	const focusRow = useRef<number | null>(null);
+	useEffect(() => {
+		if (focusRow.current === null) return;
+		exerciseInputs.current[focusRow.current]?.focus();
+		focusRow.current = null;
+	});
+	const exerciseNames = (useExercisesQuery().data?.exercises ?? []).map(
+		(exercise) => exercise.name,
+	);
+	const apply = (action: StrengthRowsAction) => {
+		latest.current = strengthRowsReducer(latest.current, action);
+		dispatch(action);
+	};
 	useEffect(() => {
 		if (activityId.current !== activity.id) {
 			activityId.current = activity.id;
@@ -53,8 +185,8 @@ export function StrengthAnnotation({ activity, onSave }: Props) {
 		} else if (!dirty.current)
 			dispatch({ type: "reset", value: activity.strength_exercises });
 	}, [activity.id, activity.strength_exercises]);
-	const save = async (next: StrengthEntry[]) => {
-		const ok = await onSave({ strength_exercises: next });
+	const save = async () => {
+		const ok = await onSave({ strength_exercises: latest.current });
 		if (ok !== false) dirty.current = false;
 	};
 	const edit = (
@@ -63,7 +195,13 @@ export function StrengthAnnotation({ activity, onSave }: Props) {
 		value: string | number | null,
 	) => {
 		dirty.current = true;
-		dispatch({ type: "edit", index, field, value });
+		apply({ type: "edit", index, field, value });
+	};
+	const addRow = () => {
+		dirty.current = true;
+		apply({ type: "add" });
+		focusRow.current = latest.current.length - 1;
+		void save();
 	};
 	const scale = (
 		label: string,
@@ -105,48 +243,16 @@ export function StrengthAnnotation({ activity, onSave }: Props) {
 							key={index}
 							className="grid grid-cols-2 gap-2 sm:grid-cols-[minmax(10rem,2fr)_1fr_1fr_1fr_auto]"
 						>
-							<Popover>
-								<PopoverTrigger asChild>
-									<Input
-										aria-label={`Exercise ${index + 1}`}
-										value={row.exercise}
-										placeholder="Exercise"
-										onChange={(event) =>
-											edit(index, "exercise", event.target.value)
-										}
-										onBlur={() => void save(rows)}
-									/>
-								</PopoverTrigger>
-								<PopoverContent className="p-0">
-									<Command>
-										<CommandInput placeholder="Find exercise" />
-										<CommandList>
-											<CommandEmpty>No exercises found.</CommandEmpty>
-											{exercises.map((exercise) => (
-												<CommandItem
-													key={String(exercise.id)}
-													value={exercise.name}
-													onSelect={(value) => {
-														const next = rows.map((item, i) =>
-															i === index ? { ...item, exercise: value } : item,
-														);
-														dispatch({
-															type: "edit",
-															index,
-															field: "exercise",
-															value,
-														});
-														dirty.current = true;
-														void save(next);
-													}}
-												>
-													{exercise.name}
-												</CommandItem>
-											))}
-										</CommandList>
-									</Command>
-								</PopoverContent>
-							</Popover>
+							<ExerciseInput
+								ariaLabel={`Exercise ${index + 1}`}
+								value={row.exercise}
+								options={exerciseNames}
+								inputRef={(el) => {
+									exerciseInputs.current[index] = el;
+								}}
+								onChange={(value) => edit(index, "exercise", value)}
+								onCommit={() => void save()}
+							/>
 							{(["sets", "reps", "weight"] as const).map((field) => (
 								<NumberInput
 									key={field}
@@ -156,7 +262,13 @@ export function StrengthAnnotation({ activity, onSave }: Props) {
 									nonNegative
 									value={row[field]}
 									onChange={(value) => edit(index, field, value)}
-									onBlur={() => void save(rows)}
+									onBlur={() => void save()}
+									onKeyDown={(event) => {
+										if (event.key === "Enter" && index === rows.length - 1) {
+											event.preventDefault();
+											addRow();
+										}
+									}}
 								/>
 							))}
 							<Button
@@ -165,10 +277,9 @@ export function StrengthAnnotation({ activity, onSave }: Props) {
 								size="icon"
 								aria-label={`Remove exercise ${index + 1}`}
 								onClick={() => {
-									const next = rows.filter((_, i) => i !== index);
-									dispatch({ type: "remove", index });
 									dirty.current = true;
-									void save(next);
+									apply({ type: "remove", index });
+									void save();
 								}}
 							>
 								<Trash2 />
@@ -179,15 +290,7 @@ export function StrengthAnnotation({ activity, onSave }: Props) {
 						type="button"
 						variant="outline"
 						size="sm"
-						onClick={() => {
-							const next = [
-								...rows,
-								{ exercise: "", sets: null, reps: null, weight: null },
-							];
-							dispatch({ type: "add" });
-							dirty.current = true;
-							void save(next);
-						}}
+						onClick={addRow}
 					>
 						<Plus /> Add exercise
 					</Button>

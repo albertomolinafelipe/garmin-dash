@@ -1,6 +1,10 @@
 table:
   name: shoes
   schema: public
+object_relationships:
+  - name: shoe_sport
+    using:
+      foreign_key_constraint_on: sport
 array_relationships:
   - name: activities
     using:

@@ -9,6 +9,13 @@ array_relationships:
         table:
           name: day_plans
           schema: public
+  - name: shoes
+    using:
+      foreign_key_constraint_on:
+        column: sport
+        table:
+          name: shoes
+          schema: public
   - name: week_objectives
     using:
       foreign_key_constraint_on:
