@@ -19,3 +19,5 @@ dashboard/vite.config.d.ts
 # local-only artifacts
 .vitest/
 garmin-backup
+.env.staging
+.env.production

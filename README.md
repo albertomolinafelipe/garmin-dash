@@ -11,7 +11,7 @@ Hasura), annotated and planned through a React dashboard.
 
 | Path                | What it is                                              |
 | ------------------- | ------------------------------------------------------- |
-| `dashboard/`        | React + Vite SPA, deployed as an Nhost Run service       |
+| `dashboard/`        | React + Vite SPA, run locally (`npm run dev`)            |
 | `sync/`             | Garmin -> Hasura/Postgres CLI (`make sync`, `make backfill`) |
 | `nhost/migrations/` | Postgres migrations (`nhost.toml` is the project config) |
 | `nhost/metadata/`   | Hasura table metadata and permissions                    |
@@ -60,9 +60,13 @@ NODE_TLS_REJECT_UNAUTHORIZED=0 npm run codegen
 
 ### Deploying
 
-The dashboard is not deployed; run it locally with `npm run dev`. The Nhost
-project is linked to this GitHub repo, so pushing to `main` deploys `nhost/`
-(config, migrations, metadata).
+The dashboard is not deployed; run it locally with `npm run dev`. Schema
+changes are not deployed by CI either — apply those yourself:
+
+```sh
+nhost config apply --subdomain <subdomain>   # nhost.toml
+# migrations + metadata: via the Nhost dashboard or CLI
+```
 
 ### Extensions
 
