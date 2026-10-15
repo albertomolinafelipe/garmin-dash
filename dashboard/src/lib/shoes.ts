@@ -14,6 +14,9 @@ export interface Shoe {
 	name: string;
 	image_url: string | null;
 	starting_km: number | string | null;
+	sport: ShoeSport;
+	// Retired: kept for history, demoted in pickers.
+	archived: boolean;
 	activities_aggregate: {
 		aggregate: {
 			count: number;
@@ -29,6 +32,26 @@ export interface ShoeInput {
 	name: string;
 	image_url: string | null;
 	starting_km: number;
+	sport: ShoeSport;
+	archived?: boolean;
+}
+
+// shoes.sport references public.sports; these are the sports gear is bought for.
+// Hiking activities borrow running shoes, so it has no group of its own.
+export type ShoeSport = "running" | "climbing" | "skiing";
+export const SHOE_SPORTS: readonly ShoeSport[] = ["running", "climbing", "skiing"];
+
+// Which shoe group an activity category draws from, if any.
+export function shoeSportFor(category: string): ShoeSport | null {
+	if (category === "hiking") return "running";
+	return (SHOE_SPORTS as readonly string[]).includes(category)
+		? (category as ShoeSport)
+		: null;
+}
+
+// Climbing shoes carry no distance, so their wear is tracked in hours.
+export function wearsByDistance(sport: ShoeSport): boolean {
+	return sport !== "climbing";
 }
 
 const SHOES = `
@@ -38,6 +61,8 @@ const SHOES = `
 			name
 			image_url
 			starting_km
+			sport
+			archived
 			activities_aggregate {
 				aggregate {
 					count

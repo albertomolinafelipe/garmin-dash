@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
 	ANNOTATED_CUTOFF,
+	CLIMBING_SHOE_CUTOFF,
 	needsAnnotation,
 	needsSubtype,
 	terrainOptions,
@@ -138,6 +139,20 @@ describe("terrainOptions", () => {
 });
 
 describe("needsSubtype", () => {
+	it("requires a shoe for climbing from its cutoff on", () => {
+		const climb = {
+			activity_type: "rock_climbing",
+			subtype: "boulder",
+			focus: "power",
+			start_time: `${CLIMBING_SHOE_CUTOFF}T08:00:00Z`,
+		};
+		expect(needsAnnotation(complete(climb))).toBe(true);
+		expect(needsAnnotation(complete({ ...climb, shoe_id: 1 }))).toBe(false);
+		expect(
+			needsAnnotation(complete({ ...climb, start_time: "2026-10-11T08:00:00Z" })),
+		).toBe(false);
+	});
+
 	it("requires a subtype for native climbing", () => {
 		expect(needsSubtype("rock_climbing", null)).toBe(true);
 		expect(needsSubtype("rock_climbing", "route")).toBe(false);

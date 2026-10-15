@@ -17,8 +17,12 @@ vi.mock("sonner", () => ({ toast: { error: mocks.toastError } }));
 vi.mock("@/lib/shoes", () => ({
 	useShoes: () => ({ data: { shoes: [] }, isLoading: false, isError: false }),
 	useInsertShoe: () => ({ mutateAsync: mocks.insert, isPending: false }),
+	useUpdateShoe: () => ({ mutateAsync: mocks.update, isPending: false }),
 	useDeleteShoe: () => ({ mutateAsync: mocks.remove, isPending: false }),
 	lifetimeKm: () => 0,
+	lifetimeHours: () => 0,
+	wearsByDistance: (sport: string) => sport !== "climbing",
+	SHOE_SPORTS: ["running", "climbing", "skiing"],
 }));
 vi.mock("@/graphql/hooks", () => ({
 	useExercisesQuery: () => ({

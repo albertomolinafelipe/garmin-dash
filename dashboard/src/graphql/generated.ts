@@ -10179,9 +10179,9 @@ export type Query_Root = {
   races_aggregate: Races_Aggregate;
   /** fetch data from the table: "races" using primary key columns */
   races_by_pk?: Maybe<Races>;
-  /** fetch data from the table: "shoes" */
+  /** An array relationship */
   shoes: Array<Shoes>;
-  /** fetch aggregated fields from the table: "shoes" */
+  /** An aggregate relationship */
   shoes_aggregate: Shoes_Aggregate;
   /** fetch data from the table: "shoes" using primary key columns */
   shoes_by_pk?: Maybe<Shoes>;
@@ -11237,9 +11237,13 @@ export type Shoes = {
   activities: Array<Activities>;
   /** An aggregate relationship */
   activities_aggregate: Activities_Aggregate;
+  archived: Scalars['Boolean']['output'];
   id: Scalars['bigint']['output'];
   image_url?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
+  /** An object relationship */
+  shoe_sport: Sports;
+  sport: Scalars['String']['output'];
   starting_km: Scalars['numeric']['output'];
 };
 
@@ -11270,6 +11274,33 @@ export type Shoes_Aggregate = {
   nodes: Array<Shoes>;
 };
 
+export type Shoes_Aggregate_Bool_Exp = {
+  bool_and?: InputMaybe<Shoes_Aggregate_Bool_Exp_Bool_And>;
+  bool_or?: InputMaybe<Shoes_Aggregate_Bool_Exp_Bool_Or>;
+  count?: InputMaybe<Shoes_Aggregate_Bool_Exp_Count>;
+};
+
+export type Shoes_Aggregate_Bool_Exp_Bool_And = {
+  arguments: Shoes_Select_Column_Shoes_Aggregate_Bool_Exp_Bool_And_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+  filter?: InputMaybe<Shoes_Bool_Exp>;
+  predicate: Boolean_Comparison_Exp;
+};
+
+export type Shoes_Aggregate_Bool_Exp_Bool_Or = {
+  arguments: Shoes_Select_Column_Shoes_Aggregate_Bool_Exp_Bool_Or_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+  filter?: InputMaybe<Shoes_Bool_Exp>;
+  predicate: Boolean_Comparison_Exp;
+};
+
+export type Shoes_Aggregate_Bool_Exp_Count = {
+  arguments?: InputMaybe<Array<Shoes_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+  filter?: InputMaybe<Shoes_Bool_Exp>;
+  predicate: Int_Comparison_Exp;
+};
+
 /** aggregate fields of "shoes" */
 export type Shoes_Aggregate_Fields = {
   __typename?: 'shoes_aggregate_fields';
@@ -11293,11 +11324,39 @@ export type Shoes_Aggregate_FieldsCountArgs = {
   distinct?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
+/** order by aggregate values of table "shoes" */
+export type Shoes_Aggregate_Order_By = {
+  avg?: InputMaybe<Shoes_Avg_Order_By>;
+  count?: InputMaybe<Order_By>;
+  max?: InputMaybe<Shoes_Max_Order_By>;
+  min?: InputMaybe<Shoes_Min_Order_By>;
+  stddev?: InputMaybe<Shoes_Stddev_Order_By>;
+  stddev_pop?: InputMaybe<Shoes_Stddev_Pop_Order_By>;
+  stddev_samp?: InputMaybe<Shoes_Stddev_Samp_Order_By>;
+  sum?: InputMaybe<Shoes_Sum_Order_By>;
+  var_pop?: InputMaybe<Shoes_Var_Pop_Order_By>;
+  var_samp?: InputMaybe<Shoes_Var_Samp_Order_By>;
+  variance?: InputMaybe<Shoes_Variance_Order_By>;
+};
+
+/** input type for inserting array relation for remote table "shoes" */
+export type Shoes_Arr_Rel_Insert_Input = {
+  data: Array<Shoes_Insert_Input>;
+  /** upsert condition */
+  on_conflict?: InputMaybe<Shoes_On_Conflict>;
+};
+
 /** aggregate avg on columns */
 export type Shoes_Avg_Fields = {
   __typename?: 'shoes_avg_fields';
   id?: Maybe<Scalars['Float']['output']>;
   starting_km?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by avg() on columns of table "shoes" */
+export type Shoes_Avg_Order_By = {
+  id?: InputMaybe<Order_By>;
+  starting_km?: InputMaybe<Order_By>;
 };
 
 /** Boolean expression to filter rows from the table "shoes". All fields are combined with a logical 'AND'. */
@@ -11307,9 +11366,12 @@ export type Shoes_Bool_Exp = {
   _or?: InputMaybe<Array<Shoes_Bool_Exp>>;
   activities?: InputMaybe<Activities_Bool_Exp>;
   activities_aggregate?: InputMaybe<Activities_Aggregate_Bool_Exp>;
+  archived?: InputMaybe<Boolean_Comparison_Exp>;
   id?: InputMaybe<Bigint_Comparison_Exp>;
   image_url?: InputMaybe<String_Comparison_Exp>;
   name?: InputMaybe<String_Comparison_Exp>;
+  shoe_sport?: InputMaybe<Sports_Bool_Exp>;
+  sport?: InputMaybe<String_Comparison_Exp>;
   starting_km?: InputMaybe<Numeric_Comparison_Exp>;
 };
 
@@ -11327,8 +11389,11 @@ export type Shoes_Inc_Input = {
 /** input type for inserting data into table "shoes" */
 export type Shoes_Insert_Input = {
   activities?: InputMaybe<Activities_Arr_Rel_Insert_Input>;
+  archived?: InputMaybe<Scalars['Boolean']['input']>;
   image_url?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  shoe_sport?: InputMaybe<Sports_Obj_Rel_Insert_Input>;
+  sport?: InputMaybe<Scalars['String']['input']>;
   starting_km?: InputMaybe<Scalars['numeric']['input']>;
 };
 
@@ -11338,7 +11403,17 @@ export type Shoes_Max_Fields = {
   id?: Maybe<Scalars['bigint']['output']>;
   image_url?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  sport?: Maybe<Scalars['String']['output']>;
   starting_km?: Maybe<Scalars['numeric']['output']>;
+};
+
+/** order by max() on columns of table "shoes" */
+export type Shoes_Max_Order_By = {
+  id?: InputMaybe<Order_By>;
+  image_url?: InputMaybe<Order_By>;
+  name?: InputMaybe<Order_By>;
+  sport?: InputMaybe<Order_By>;
+  starting_km?: InputMaybe<Order_By>;
 };
 
 /** aggregate min on columns */
@@ -11347,7 +11422,17 @@ export type Shoes_Min_Fields = {
   id?: Maybe<Scalars['bigint']['output']>;
   image_url?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  sport?: Maybe<Scalars['String']['output']>;
   starting_km?: Maybe<Scalars['numeric']['output']>;
+};
+
+/** order by min() on columns of table "shoes" */
+export type Shoes_Min_Order_By = {
+  id?: InputMaybe<Order_By>;
+  image_url?: InputMaybe<Order_By>;
+  name?: InputMaybe<Order_By>;
+  sport?: InputMaybe<Order_By>;
+  starting_km?: InputMaybe<Order_By>;
 };
 
 /** response of any mutation on the table "shoes" */
@@ -11376,9 +11461,12 @@ export type Shoes_On_Conflict = {
 /** Ordering options when selecting data from "shoes". */
 export type Shoes_Order_By = {
   activities_aggregate?: InputMaybe<Activities_Aggregate_Order_By>;
+  archived?: InputMaybe<Order_By>;
   id?: InputMaybe<Order_By>;
   image_url?: InputMaybe<Order_By>;
   name?: InputMaybe<Order_By>;
+  shoe_sport?: InputMaybe<Sports_Order_By>;
+  sport?: InputMaybe<Order_By>;
   starting_km?: InputMaybe<Order_By>;
 };
 
@@ -11390,19 +11478,37 @@ export type Shoes_Pk_Columns_Input = {
 /** select columns of table "shoes" */
 export enum Shoes_Select_Column {
   /** column name */
+  Archived = 'archived',
+  /** column name */
   Id = 'id',
   /** column name */
   ImageUrl = 'image_url',
   /** column name */
   Name = 'name',
   /** column name */
+  Sport = 'sport',
+  /** column name */
   StartingKm = 'starting_km'
+}
+
+/** select "shoes_aggregate_bool_exp_bool_and_arguments_columns" columns of table "shoes" */
+export enum Shoes_Select_Column_Shoes_Aggregate_Bool_Exp_Bool_And_Arguments_Columns {
+  /** column name */
+  Archived = 'archived'
+}
+
+/** select "shoes_aggregate_bool_exp_bool_or_arguments_columns" columns of table "shoes" */
+export enum Shoes_Select_Column_Shoes_Aggregate_Bool_Exp_Bool_Or_Arguments_Columns {
+  /** column name */
+  Archived = 'archived'
 }
 
 /** input type for updating data in table "shoes" */
 export type Shoes_Set_Input = {
+  archived?: InputMaybe<Scalars['Boolean']['input']>;
   image_url?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  sport?: InputMaybe<Scalars['String']['input']>;
   starting_km?: InputMaybe<Scalars['numeric']['input']>;
 };
 
@@ -11413,6 +11519,12 @@ export type Shoes_Stddev_Fields = {
   starting_km?: Maybe<Scalars['Float']['output']>;
 };
 
+/** order by stddev() on columns of table "shoes" */
+export type Shoes_Stddev_Order_By = {
+  id?: InputMaybe<Order_By>;
+  starting_km?: InputMaybe<Order_By>;
+};
+
 /** aggregate stddev_pop on columns */
 export type Shoes_Stddev_Pop_Fields = {
   __typename?: 'shoes_stddev_pop_fields';
@@ -11420,11 +11532,23 @@ export type Shoes_Stddev_Pop_Fields = {
   starting_km?: Maybe<Scalars['Float']['output']>;
 };
 
+/** order by stddev_pop() on columns of table "shoes" */
+export type Shoes_Stddev_Pop_Order_By = {
+  id?: InputMaybe<Order_By>;
+  starting_km?: InputMaybe<Order_By>;
+};
+
 /** aggregate stddev_samp on columns */
 export type Shoes_Stddev_Samp_Fields = {
   __typename?: 'shoes_stddev_samp_fields';
   id?: Maybe<Scalars['Float']['output']>;
   starting_km?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by stddev_samp() on columns of table "shoes" */
+export type Shoes_Stddev_Samp_Order_By = {
+  id?: InputMaybe<Order_By>;
+  starting_km?: InputMaybe<Order_By>;
 };
 
 /** Streaming cursor of the table "shoes" */
@@ -11437,9 +11561,11 @@ export type Shoes_Stream_Cursor_Input = {
 
 /** Initial value of the column from where the streaming should start */
 export type Shoes_Stream_Cursor_Value_Input = {
+  archived?: InputMaybe<Scalars['Boolean']['input']>;
   id?: InputMaybe<Scalars['bigint']['input']>;
   image_url?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  sport?: InputMaybe<Scalars['String']['input']>;
   starting_km?: InputMaybe<Scalars['numeric']['input']>;
 };
 
@@ -11450,12 +11576,22 @@ export type Shoes_Sum_Fields = {
   starting_km?: Maybe<Scalars['numeric']['output']>;
 };
 
+/** order by sum() on columns of table "shoes" */
+export type Shoes_Sum_Order_By = {
+  id?: InputMaybe<Order_By>;
+  starting_km?: InputMaybe<Order_By>;
+};
+
 /** update columns of table "shoes" */
 export enum Shoes_Update_Column {
+  /** column name */
+  Archived = 'archived',
   /** column name */
   ImageUrl = 'image_url',
   /** column name */
   Name = 'name',
+  /** column name */
+  Sport = 'sport',
   /** column name */
   StartingKm = 'starting_km'
 }
@@ -11476,6 +11612,12 @@ export type Shoes_Var_Pop_Fields = {
   starting_km?: Maybe<Scalars['Float']['output']>;
 };
 
+/** order by var_pop() on columns of table "shoes" */
+export type Shoes_Var_Pop_Order_By = {
+  id?: InputMaybe<Order_By>;
+  starting_km?: InputMaybe<Order_By>;
+};
+
 /** aggregate var_samp on columns */
 export type Shoes_Var_Samp_Fields = {
   __typename?: 'shoes_var_samp_fields';
@@ -11483,11 +11625,23 @@ export type Shoes_Var_Samp_Fields = {
   starting_km?: Maybe<Scalars['Float']['output']>;
 };
 
+/** order by var_samp() on columns of table "shoes" */
+export type Shoes_Var_Samp_Order_By = {
+  id?: InputMaybe<Order_By>;
+  starting_km?: InputMaybe<Order_By>;
+};
+
 /** aggregate variance on columns */
 export type Shoes_Variance_Fields = {
   __typename?: 'shoes_variance_fields';
   id?: Maybe<Scalars['Float']['output']>;
   starting_km?: Maybe<Scalars['Float']['output']>;
+};
+
+/** order by variance() on columns of table "shoes" */
+export type Shoes_Variance_Order_By = {
+  id?: InputMaybe<Order_By>;
+  starting_km?: InputMaybe<Order_By>;
 };
 
 /** columns and relationships of "sleep" */
@@ -11909,6 +12063,10 @@ export type Sports = {
   /** An aggregate relationship */
   day_plans_aggregate: Day_Plans_Aggregate;
   label: Scalars['String']['output'];
+  /** An array relationship */
+  shoes: Array<Shoes>;
+  /** An aggregate relationship */
+  shoes_aggregate: Shoes_Aggregate;
   sort_order: Scalars['Int']['output'];
   value: Scalars['String']['output'];
   /** An array relationship */
@@ -11935,6 +12093,26 @@ export type SportsDay_Plans_AggregateArgs = {
   offset?: InputMaybe<Scalars['Int']['input']>;
   order_by?: InputMaybe<Array<Day_Plans_Order_By>>;
   where?: InputMaybe<Day_Plans_Bool_Exp>;
+};
+
+
+/** columns and relationships of "sports" */
+export type SportsShoesArgs = {
+  distinct_on?: InputMaybe<Array<Shoes_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Shoes_Order_By>>;
+  where?: InputMaybe<Shoes_Bool_Exp>;
+};
+
+
+/** columns and relationships of "sports" */
+export type SportsShoes_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Shoes_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Shoes_Order_By>>;
+  where?: InputMaybe<Shoes_Bool_Exp>;
 };
 
 
@@ -12001,6 +12179,8 @@ export type Sports_Bool_Exp = {
   day_plans?: InputMaybe<Day_Plans_Bool_Exp>;
   day_plans_aggregate?: InputMaybe<Day_Plans_Aggregate_Bool_Exp>;
   label?: InputMaybe<String_Comparison_Exp>;
+  shoes?: InputMaybe<Shoes_Bool_Exp>;
+  shoes_aggregate?: InputMaybe<Shoes_Aggregate_Bool_Exp>;
   sort_order?: InputMaybe<Int_Comparison_Exp>;
   value?: InputMaybe<String_Comparison_Exp>;
   week_objectives?: InputMaybe<Week_Objectives_Bool_Exp>;
@@ -12024,6 +12204,7 @@ export type Sports_Inc_Input = {
 export type Sports_Insert_Input = {
   day_plans?: InputMaybe<Day_Plans_Arr_Rel_Insert_Input>;
   label?: InputMaybe<Scalars['String']['input']>;
+  shoes?: InputMaybe<Shoes_Arr_Rel_Insert_Input>;
   sort_order?: InputMaybe<Scalars['Int']['input']>;
   value?: InputMaybe<Scalars['String']['input']>;
   week_objectives?: InputMaybe<Week_Objectives_Arr_Rel_Insert_Input>;
@@ -12072,6 +12253,7 @@ export type Sports_On_Conflict = {
 export type Sports_Order_By = {
   day_plans_aggregate?: InputMaybe<Day_Plans_Aggregate_Order_By>;
   label?: InputMaybe<Order_By>;
+  shoes_aggregate?: InputMaybe<Shoes_Aggregate_Order_By>;
   sort_order?: InputMaybe<Order_By>;
   value?: InputMaybe<Order_By>;
   week_objectives_aggregate?: InputMaybe<Week_Objectives_Aggregate_Order_By>;
@@ -12386,9 +12568,9 @@ export type Subscription_Root = {
   races_by_pk?: Maybe<Races>;
   /** fetch data from the table in a streaming manner: "races" */
   races_stream: Array<Races>;
-  /** fetch data from the table: "shoes" */
+  /** An array relationship */
   shoes: Array<Shoes>;
-  /** fetch aggregated fields from the table: "shoes" */
+  /** An aggregate relationship */
   shoes_aggregate: Shoes_Aggregate;
   /** fetch data from the table: "shoes" using primary key columns */
   shoes_by_pk?: Maybe<Shoes>;
@@ -15568,6 +15750,23 @@ export type GeneratedInt_Comparison_Exp = {
 };
 
 /** Boolean expression to compare columns of type "String". All fields are combined with logical 'AND'. */
+export type GeneratedString_Array_Comparison_Exp = {
+  /** is the array contained in the given array value */
+  _contained_in?: Array<string> | null | undefined;
+  /** does the array contain the given value */
+  _contains?: Array<string> | null | undefined;
+  _eq?: Array<string> | null | undefined;
+  _gt?: Array<string> | null | undefined;
+  _gte?: Array<string> | null | undefined;
+  _in?: Array<Array<string>> | null | undefined;
+  _is_null?: boolean | null | undefined;
+  _lt?: Array<string> | null | undefined;
+  _lte?: Array<string> | null | undefined;
+  _neq?: Array<string> | null | undefined;
+  _nin?: Array<Array<string>> | null | undefined;
+};
+
+/** Boolean expression to compare columns of type "String". All fields are combined with logical 'AND'. */
 export type GeneratedString_Comparison_Exp = {
   _eq?: string | null | undefined;
   _gt?: string | null | undefined;
@@ -15600,6 +15799,389 @@ export type GeneratedString_Comparison_Exp = {
   _similar?: string | null | undefined;
 };
 
+export type GeneratedActivities_Aggregate_Bool_Exp = {
+  avg?: GeneratedActivities_Aggregate_Bool_Exp_Avg | null | undefined;
+  corr?: GeneratedActivities_Aggregate_Bool_Exp_Corr | null | undefined;
+  count?: GeneratedActivities_Aggregate_Bool_Exp_Count | null | undefined;
+  covar_samp?: GeneratedActivities_Aggregate_Bool_Exp_Covar_Samp | null | undefined;
+  max?: GeneratedActivities_Aggregate_Bool_Exp_Max | null | undefined;
+  min?: GeneratedActivities_Aggregate_Bool_Exp_Min | null | undefined;
+  stddev_samp?: GeneratedActivities_Aggregate_Bool_Exp_Stddev_Samp | null | undefined;
+  sum?: GeneratedActivities_Aggregate_Bool_Exp_Sum | null | undefined;
+  var_samp?: GeneratedActivities_Aggregate_Bool_Exp_Var_Samp | null | undefined;
+};
+
+export type GeneratedActivities_Aggregate_Bool_Exp_Avg = {
+  arguments: GeneratedActivities_Select_Column_Activities_Aggregate_Bool_Exp_Avg_Arguments_Columns;
+  distinct?: boolean | null | undefined;
+  filter?: GeneratedActivities_Bool_Exp | null | undefined;
+  predicate: GeneratedFloat8_Comparison_Exp;
+};
+
+export type GeneratedActivities_Aggregate_Bool_Exp_Corr = {
+  arguments: GeneratedActivities_Aggregate_Bool_Exp_Corr_Arguments;
+  distinct?: boolean | null | undefined;
+  filter?: GeneratedActivities_Bool_Exp | null | undefined;
+  predicate: GeneratedFloat8_Comparison_Exp;
+};
+
+export type GeneratedActivities_Aggregate_Bool_Exp_Corr_Arguments = {
+  X: GeneratedActivities_Select_Column_Activities_Aggregate_Bool_Exp_Corr_Arguments_Columns;
+  Y: GeneratedActivities_Select_Column_Activities_Aggregate_Bool_Exp_Corr_Arguments_Columns;
+};
+
+export type GeneratedActivities_Aggregate_Bool_Exp_Count = {
+  arguments?: Array<GeneratedActivities_Select_Column> | null | undefined;
+  distinct?: boolean | null | undefined;
+  filter?: GeneratedActivities_Bool_Exp | null | undefined;
+  predicate: GeneratedInt_Comparison_Exp;
+};
+
+export type GeneratedActivities_Aggregate_Bool_Exp_Covar_Samp = {
+  arguments: GeneratedActivities_Aggregate_Bool_Exp_Covar_Samp_Arguments;
+  distinct?: boolean | null | undefined;
+  filter?: GeneratedActivities_Bool_Exp | null | undefined;
+  predicate: GeneratedFloat8_Comparison_Exp;
+};
+
+export type GeneratedActivities_Aggregate_Bool_Exp_Covar_Samp_Arguments = {
+  X: GeneratedActivities_Select_Column_Activities_Aggregate_Bool_Exp_Covar_Samp_Arguments_Columns;
+  Y: GeneratedActivities_Select_Column_Activities_Aggregate_Bool_Exp_Covar_Samp_Arguments_Columns;
+};
+
+export type GeneratedActivities_Aggregate_Bool_Exp_Max = {
+  arguments: GeneratedActivities_Select_Column_Activities_Aggregate_Bool_Exp_Max_Arguments_Columns;
+  distinct?: boolean | null | undefined;
+  filter?: GeneratedActivities_Bool_Exp | null | undefined;
+  predicate: GeneratedFloat8_Comparison_Exp;
+};
+
+export type GeneratedActivities_Aggregate_Bool_Exp_Min = {
+  arguments: GeneratedActivities_Select_Column_Activities_Aggregate_Bool_Exp_Min_Arguments_Columns;
+  distinct?: boolean | null | undefined;
+  filter?: GeneratedActivities_Bool_Exp | null | undefined;
+  predicate: GeneratedFloat8_Comparison_Exp;
+};
+
+export type GeneratedActivities_Aggregate_Bool_Exp_Stddev_Samp = {
+  arguments: GeneratedActivities_Select_Column_Activities_Aggregate_Bool_Exp_Stddev_Samp_Arguments_Columns;
+  distinct?: boolean | null | undefined;
+  filter?: GeneratedActivities_Bool_Exp | null | undefined;
+  predicate: GeneratedFloat8_Comparison_Exp;
+};
+
+export type GeneratedActivities_Aggregate_Bool_Exp_Sum = {
+  arguments: GeneratedActivities_Select_Column_Activities_Aggregate_Bool_Exp_Sum_Arguments_Columns;
+  distinct?: boolean | null | undefined;
+  filter?: GeneratedActivities_Bool_Exp | null | undefined;
+  predicate: GeneratedFloat8_Comparison_Exp;
+};
+
+export type GeneratedActivities_Aggregate_Bool_Exp_Var_Samp = {
+  arguments: GeneratedActivities_Select_Column_Activities_Aggregate_Bool_Exp_Var_Samp_Arguments_Columns;
+  distinct?: boolean | null | undefined;
+  filter?: GeneratedActivities_Bool_Exp | null | undefined;
+  predicate: GeneratedFloat8_Comparison_Exp;
+};
+
+/** input type for inserting array relation for remote table "activities" */
+export type GeneratedActivities_Arr_Rel_Insert_Input = {
+  data: Array<GeneratedActivities_Insert_Input>;
+  /** upsert condition */
+  on_conflict?: GeneratedActivities_On_Conflict | null | undefined;
+};
+
+/** Boolean expression to filter rows from the table "activities". All fields are combined with a logical 'AND'. */
+export type GeneratedActivities_Bool_Exp = {
+  _and?: Array<GeneratedActivities_Bool_Exp> | null | undefined;
+  _not?: GeneratedActivities_Bool_Exp | null | undefined;
+  _or?: Array<GeneratedActivities_Bool_Exp> | null | undefined;
+  activity_streams?: GeneratedActivity_Streams_Bool_Exp | null | undefined;
+  activity_streams_aggregate?: GeneratedActivity_Streams_Aggregate_Bool_Exp | null | undefined;
+  activity_type?: GeneratedString_Comparison_Exp | null | undefined;
+  avg_hr?: GeneratedInt_Comparison_Exp | null | undefined;
+  avg_power_w?: GeneratedFloat8_Comparison_Exp | null | undefined;
+  avg_speed_mps?: GeneratedFloat8_Comparison_Exp | null | undefined;
+  caffeine?: GeneratedString_Comparison_Exp | null | undefined;
+  calories?: GeneratedInt_Comparison_Exp | null | undefined;
+  distance_m?: GeneratedFloat8_Comparison_Exp | null | undefined;
+  duration_s?: GeneratedFloat8_Comparison_Exp | null | undefined;
+  effort?: GeneratedInt_Comparison_Exp | null | undefined;
+  elevation_gain_m?: GeneratedFloat8_Comparison_Exp | null | undefined;
+  feeling?: GeneratedInt_Comparison_Exp | null | undefined;
+  focus?: GeneratedString_Comparison_Exp | null | undefined;
+  food_after?: GeneratedString_Array_Comparison_Exp | null | undefined;
+  food_during?: GeneratedString_Array_Comparison_Exp | null | undefined;
+  garmin_activity_id?: GeneratedBigint_Comparison_Exp | null | undefined;
+  hard_tries?: GeneratedInt_Comparison_Exp | null | undefined;
+  id?: GeneratedBigint_Comparison_Exp | null | undefined;
+  max_hr?: GeneratedInt_Comparison_Exp | null | undefined;
+  name?: GeneratedString_Comparison_Exp | null | undefined;
+  notes?: GeneratedString_Comparison_Exp | null | undefined;
+  samples_synced_at?: GeneratedTimestamptz_Comparison_Exp | null | undefined;
+  shoe?: GeneratedShoes_Bool_Exp | null | undefined;
+  shoe_id?: GeneratedBigint_Comparison_Exp | null | undefined;
+  start_lat?: GeneratedFloat8_Comparison_Exp | null | undefined;
+  start_lng?: GeneratedFloat8_Comparison_Exp | null | undefined;
+  start_time?: GeneratedTimestamptz_Comparison_Exp | null | undefined;
+  strength_exercises?: GeneratedJsonb_Comparison_Exp | null | undefined;
+  subtype?: GeneratedString_Comparison_Exp | null | undefined;
+  synced_at?: GeneratedTimestamptz_Comparison_Exp | null | undefined;
+  weather?: GeneratedString_Comparison_Exp | null | undefined;
+};
+
+/** unique or primary key constraints on table "activities" */
+export type GeneratedActivities_Constraint =
+  /** unique or primary key constraint on columns "garmin_activity_id" */
+  | 'activities_garmin_activity_id_key'
+  /** unique or primary key constraint on columns "id" */
+  | 'activities_pkey';
+
+/** input type for inserting data into table "activities" */
+export type GeneratedActivities_Insert_Input = {
+  activity_streams?: GeneratedActivity_Streams_Arr_Rel_Insert_Input | null | undefined;
+  activity_type?: string | null | undefined;
+  avg_hr?: number | null | undefined;
+  avg_power_w?: unknown;
+  avg_speed_mps?: unknown;
+  caffeine?: string | null | undefined;
+  calories?: number | null | undefined;
+  distance_m?: unknown;
+  duration_s?: unknown;
+  effort?: number | null | undefined;
+  elevation_gain_m?: unknown;
+  feeling?: number | null | undefined;
+  focus?: string | null | undefined;
+  food_after?: Array<string> | null | undefined;
+  food_during?: Array<string> | null | undefined;
+  garmin_activity_id?: unknown;
+  hard_tries?: number | null | undefined;
+  max_hr?: number | null | undefined;
+  name?: string | null | undefined;
+  notes?: string | null | undefined;
+  samples_synced_at?: unknown;
+  shoe?: GeneratedShoes_Obj_Rel_Insert_Input | null | undefined;
+  shoe_id?: unknown;
+  start_lat?: unknown;
+  start_lng?: unknown;
+  start_time?: unknown;
+  strength_exercises?: unknown;
+  subtype?: string | null | undefined;
+  synced_at?: unknown;
+  weather?: string | null | undefined;
+};
+
+/** input type for inserting object relation for remote table "activities" */
+export type GeneratedActivities_Obj_Rel_Insert_Input = {
+  data: GeneratedActivities_Insert_Input;
+  /** upsert condition */
+  on_conflict?: GeneratedActivities_On_Conflict | null | undefined;
+};
+
+/** on_conflict condition type for table "activities" */
+export type GeneratedActivities_On_Conflict = {
+  constraint: GeneratedActivities_Constraint;
+  update_columns?: Array<GeneratedActivities_Update_Column>;
+  where?: GeneratedActivities_Bool_Exp | null | undefined;
+};
+
+/** select columns of table "activities" */
+export type GeneratedActivities_Select_Column =
+  /** column name */
+  | 'activity_type'
+  /** column name */
+  | 'avg_hr'
+  /** column name */
+  | 'avg_power_w'
+  /** column name */
+  | 'avg_speed_mps'
+  /** column name */
+  | 'caffeine'
+  /** column name */
+  | 'calories'
+  /** column name */
+  | 'distance_m'
+  /** column name */
+  | 'duration_s'
+  /** column name */
+  | 'effort'
+  /** column name */
+  | 'elevation_gain_m'
+  /** column name */
+  | 'feeling'
+  /** column name */
+  | 'focus'
+  /** column name */
+  | 'food_after'
+  /** column name */
+  | 'food_during'
+  /** column name */
+  | 'garmin_activity_id'
+  /** column name */
+  | 'hard_tries'
+  /** column name */
+  | 'id'
+  /** column name */
+  | 'max_hr'
+  /** column name */
+  | 'name'
+  /** column name */
+  | 'notes'
+  /** column name */
+  | 'samples_synced_at'
+  /** column name */
+  | 'shoe_id'
+  /** column name */
+  | 'start_lat'
+  /** column name */
+  | 'start_lng'
+  /** column name */
+  | 'start_time'
+  /** column name */
+  | 'strength_exercises'
+  /** column name */
+  | 'subtype'
+  /** column name */
+  | 'synced_at'
+  /** column name */
+  | 'weather';
+
+/** select "activities_aggregate_bool_exp_avg_arguments_columns" columns of table "activities" */
+export type GeneratedActivities_Select_Column_Activities_Aggregate_Bool_Exp_Avg_Arguments_Columns =
+  /** column name */
+  | 'avg_power_w'
+  /** column name */
+  | 'avg_speed_mps'
+  /** column name */
+  | 'distance_m'
+  /** column name */
+  | 'duration_s'
+  /** column name */
+  | 'elevation_gain_m'
+  /** column name */
+  | 'start_lat'
+  /** column name */
+  | 'start_lng';
+
+/** select "activities_aggregate_bool_exp_corr_arguments_columns" columns of table "activities" */
+export type GeneratedActivities_Select_Column_Activities_Aggregate_Bool_Exp_Corr_Arguments_Columns =
+  /** column name */
+  | 'avg_power_w'
+  /** column name */
+  | 'avg_speed_mps'
+  /** column name */
+  | 'distance_m'
+  /** column name */
+  | 'duration_s'
+  /** column name */
+  | 'elevation_gain_m'
+  /** column name */
+  | 'start_lat'
+  /** column name */
+  | 'start_lng';
+
+/** select "activities_aggregate_bool_exp_covar_samp_arguments_columns" columns of table "activities" */
+export type GeneratedActivities_Select_Column_Activities_Aggregate_Bool_Exp_Covar_Samp_Arguments_Columns =
+  /** column name */
+  | 'avg_power_w'
+  /** column name */
+  | 'avg_speed_mps'
+  /** column name */
+  | 'distance_m'
+  /** column name */
+  | 'duration_s'
+  /** column name */
+  | 'elevation_gain_m'
+  /** column name */
+  | 'start_lat'
+  /** column name */
+  | 'start_lng';
+
+/** select "activities_aggregate_bool_exp_max_arguments_columns" columns of table "activities" */
+export type GeneratedActivities_Select_Column_Activities_Aggregate_Bool_Exp_Max_Arguments_Columns =
+  /** column name */
+  | 'avg_power_w'
+  /** column name */
+  | 'avg_speed_mps'
+  /** column name */
+  | 'distance_m'
+  /** column name */
+  | 'duration_s'
+  /** column name */
+  | 'elevation_gain_m'
+  /** column name */
+  | 'start_lat'
+  /** column name */
+  | 'start_lng';
+
+/** select "activities_aggregate_bool_exp_min_arguments_columns" columns of table "activities" */
+export type GeneratedActivities_Select_Column_Activities_Aggregate_Bool_Exp_Min_Arguments_Columns =
+  /** column name */
+  | 'avg_power_w'
+  /** column name */
+  | 'avg_speed_mps'
+  /** column name */
+  | 'distance_m'
+  /** column name */
+  | 'duration_s'
+  /** column name */
+  | 'elevation_gain_m'
+  /** column name */
+  | 'start_lat'
+  /** column name */
+  | 'start_lng';
+
+/** select "activities_aggregate_bool_exp_stddev_samp_arguments_columns" columns of table "activities" */
+export type GeneratedActivities_Select_Column_Activities_Aggregate_Bool_Exp_Stddev_Samp_Arguments_Columns =
+  /** column name */
+  | 'avg_power_w'
+  /** column name */
+  | 'avg_speed_mps'
+  /** column name */
+  | 'distance_m'
+  /** column name */
+  | 'duration_s'
+  /** column name */
+  | 'elevation_gain_m'
+  /** column name */
+  | 'start_lat'
+  /** column name */
+  | 'start_lng';
+
+/** select "activities_aggregate_bool_exp_sum_arguments_columns" columns of table "activities" */
+export type GeneratedActivities_Select_Column_Activities_Aggregate_Bool_Exp_Sum_Arguments_Columns =
+  /** column name */
+  | 'avg_power_w'
+  /** column name */
+  | 'avg_speed_mps'
+  /** column name */
+  | 'distance_m'
+  /** column name */
+  | 'duration_s'
+  /** column name */
+  | 'elevation_gain_m'
+  /** column name */
+  | 'start_lat'
+  /** column name */
+  | 'start_lng';
+
+/** select "activities_aggregate_bool_exp_var_samp_arguments_columns" columns of table "activities" */
+export type GeneratedActivities_Select_Column_Activities_Aggregate_Bool_Exp_Var_Samp_Arguments_Columns =
+  /** column name */
+  | 'avg_power_w'
+  /** column name */
+  | 'avg_speed_mps'
+  /** column name */
+  | 'distance_m'
+  /** column name */
+  | 'duration_s'
+  /** column name */
+  | 'elevation_gain_m'
+  /** column name */
+  | 'start_lat'
+  /** column name */
+  | 'start_lng';
+
 /** input type for updating data in table "activities" */
 export type GeneratedActivities_Set_Input = {
   activity_type?: string | null | undefined;
@@ -15631,6 +16213,131 @@ export type GeneratedActivities_Set_Input = {
   synced_at?: unknown;
   weather?: string | null | undefined;
 };
+
+/** update columns of table "activities" */
+export type GeneratedActivities_Update_Column =
+  /** column name */
+  | 'activity_type'
+  /** column name */
+  | 'avg_hr'
+  /** column name */
+  | 'avg_power_w'
+  /** column name */
+  | 'avg_speed_mps'
+  /** column name */
+  | 'caffeine'
+  /** column name */
+  | 'calories'
+  /** column name */
+  | 'distance_m'
+  /** column name */
+  | 'duration_s'
+  /** column name */
+  | 'effort'
+  /** column name */
+  | 'elevation_gain_m'
+  /** column name */
+  | 'feeling'
+  /** column name */
+  | 'focus'
+  /** column name */
+  | 'food_after'
+  /** column name */
+  | 'food_during'
+  /** column name */
+  | 'garmin_activity_id'
+  /** column name */
+  | 'hard_tries'
+  /** column name */
+  | 'max_hr'
+  /** column name */
+  | 'name'
+  /** column name */
+  | 'notes'
+  /** column name */
+  | 'samples_synced_at'
+  /** column name */
+  | 'shoe_id'
+  /** column name */
+  | 'start_lat'
+  /** column name */
+  | 'start_lng'
+  /** column name */
+  | 'start_time'
+  /** column name */
+  | 'strength_exercises'
+  /** column name */
+  | 'subtype'
+  /** column name */
+  | 'synced_at'
+  /** column name */
+  | 'weather';
+
+export type GeneratedActivity_Streams_Aggregate_Bool_Exp = {
+  count?: GeneratedActivity_Streams_Aggregate_Bool_Exp_Count | null | undefined;
+};
+
+export type GeneratedActivity_Streams_Aggregate_Bool_Exp_Count = {
+  arguments?: Array<GeneratedActivity_Streams_Select_Column> | null | undefined;
+  distinct?: boolean | null | undefined;
+  filter?: GeneratedActivity_Streams_Bool_Exp | null | undefined;
+  predicate: GeneratedInt_Comparison_Exp;
+};
+
+/** input type for inserting array relation for remote table "activity_streams" */
+export type GeneratedActivity_Streams_Arr_Rel_Insert_Input = {
+  data: Array<GeneratedActivity_Streams_Insert_Input>;
+  /** upsert condition */
+  on_conflict?: GeneratedActivity_Streams_On_Conflict | null | undefined;
+};
+
+/** Boolean expression to filter rows from the table "activity_streams". All fields are combined with a logical 'AND'. */
+export type GeneratedActivity_Streams_Bool_Exp = {
+  _and?: Array<GeneratedActivity_Streams_Bool_Exp> | null | undefined;
+  _not?: GeneratedActivity_Streams_Bool_Exp | null | undefined;
+  _or?: Array<GeneratedActivity_Streams_Bool_Exp> | null | undefined;
+  activity?: GeneratedActivities_Bool_Exp | null | undefined;
+  activity_id?: GeneratedBigint_Comparison_Exp | null | undefined;
+  id?: GeneratedBigint_Comparison_Exp | null | undefined;
+  payload?: GeneratedJsonb_Comparison_Exp | null | undefined;
+};
+
+/** unique or primary key constraints on table "activity_streams" */
+export type GeneratedActivity_Streams_Constraint =
+  /** unique or primary key constraint on columns "activity_id" */
+  | 'activity_streams_activity_id_key'
+  /** unique or primary key constraint on columns "id" */
+  | 'activity_streams_pkey';
+
+/** input type for inserting data into table "activity_streams" */
+export type GeneratedActivity_Streams_Insert_Input = {
+  activity?: GeneratedActivities_Obj_Rel_Insert_Input | null | undefined;
+  activity_id?: unknown;
+  payload?: unknown;
+};
+
+/** on_conflict condition type for table "activity_streams" */
+export type GeneratedActivity_Streams_On_Conflict = {
+  constraint: GeneratedActivity_Streams_Constraint;
+  update_columns?: Array<GeneratedActivity_Streams_Update_Column>;
+  where?: GeneratedActivity_Streams_Bool_Exp | null | undefined;
+};
+
+/** select columns of table "activity_streams" */
+export type GeneratedActivity_Streams_Select_Column =
+  /** column name */
+  | 'activity_id'
+  /** column name */
+  | 'id'
+  /** column name */
+  | 'payload';
+
+/** update columns of table "activity_streams" */
+export type GeneratedActivity_Streams_Update_Column =
+  /** column name */
+  | 'activity_id'
+  /** column name */
+  | 'payload';
 
 /** Boolean expression to compare columns of type "bigint". All fields are combined with logical 'AND'. */
 export type GeneratedBigint_Comparison_Exp = {
@@ -15739,6 +16446,19 @@ export type GeneratedDay_Plans_Update_Column =
 export type GeneratedExercises_Set_Input = {
   categories?: Array<string> | null | undefined;
   name?: string | null | undefined;
+};
+
+/** Boolean expression to compare columns of type "float8". All fields are combined with logical 'AND'. */
+export type GeneratedFloat8_Comparison_Exp = {
+  _eq?: unknown;
+  _gt?: unknown;
+  _gte?: unknown;
+  _in?: Array<unknown> | null | undefined;
+  _is_null?: boolean | null | undefined;
+  _lt?: unknown;
+  _lte?: unknown;
+  _neq?: unknown;
+  _nin?: Array<unknown> | null | undefined;
 };
 
 export type GeneratedJournal_Entries_Aggregate_Bool_Exp = {
@@ -15965,6 +16685,124 @@ export type GeneratedRaces_Set_Input = {
   name?: string | null | undefined;
 };
 
+export type GeneratedShoes_Aggregate_Bool_Exp = {
+  bool_and?: GeneratedShoes_Aggregate_Bool_Exp_Bool_And | null | undefined;
+  bool_or?: GeneratedShoes_Aggregate_Bool_Exp_Bool_Or | null | undefined;
+  count?: GeneratedShoes_Aggregate_Bool_Exp_Count | null | undefined;
+};
+
+export type GeneratedShoes_Aggregate_Bool_Exp_Bool_And = {
+  arguments: GeneratedShoes_Select_Column_Shoes_Aggregate_Bool_Exp_Bool_And_Arguments_Columns;
+  distinct?: boolean | null | undefined;
+  filter?: GeneratedShoes_Bool_Exp | null | undefined;
+  predicate: GeneratedBoolean_Comparison_Exp;
+};
+
+export type GeneratedShoes_Aggregate_Bool_Exp_Bool_Or = {
+  arguments: GeneratedShoes_Select_Column_Shoes_Aggregate_Bool_Exp_Bool_Or_Arguments_Columns;
+  distinct?: boolean | null | undefined;
+  filter?: GeneratedShoes_Bool_Exp | null | undefined;
+  predicate: GeneratedBoolean_Comparison_Exp;
+};
+
+export type GeneratedShoes_Aggregate_Bool_Exp_Count = {
+  arguments?: Array<GeneratedShoes_Select_Column> | null | undefined;
+  distinct?: boolean | null | undefined;
+  filter?: GeneratedShoes_Bool_Exp | null | undefined;
+  predicate: GeneratedInt_Comparison_Exp;
+};
+
+/** input type for inserting array relation for remote table "shoes" */
+export type GeneratedShoes_Arr_Rel_Insert_Input = {
+  data: Array<GeneratedShoes_Insert_Input>;
+  /** upsert condition */
+  on_conflict?: GeneratedShoes_On_Conflict | null | undefined;
+};
+
+/** Boolean expression to filter rows from the table "shoes". All fields are combined with a logical 'AND'. */
+export type GeneratedShoes_Bool_Exp = {
+  _and?: Array<GeneratedShoes_Bool_Exp> | null | undefined;
+  _not?: GeneratedShoes_Bool_Exp | null | undefined;
+  _or?: Array<GeneratedShoes_Bool_Exp> | null | undefined;
+  activities?: GeneratedActivities_Bool_Exp | null | undefined;
+  activities_aggregate?: GeneratedActivities_Aggregate_Bool_Exp | null | undefined;
+  archived?: GeneratedBoolean_Comparison_Exp | null | undefined;
+  id?: GeneratedBigint_Comparison_Exp | null | undefined;
+  image_url?: GeneratedString_Comparison_Exp | null | undefined;
+  name?: GeneratedString_Comparison_Exp | null | undefined;
+  shoe_sport?: GeneratedSports_Bool_Exp | null | undefined;
+  sport?: GeneratedString_Comparison_Exp | null | undefined;
+  starting_km?: GeneratedNumeric_Comparison_Exp | null | undefined;
+};
+
+/** unique or primary key constraints on table "shoes" */
+export type GeneratedShoes_Constraint =
+  /** unique or primary key constraint on columns "id" */
+  | 'shoes_pkey';
+
+/** input type for inserting data into table "shoes" */
+export type GeneratedShoes_Insert_Input = {
+  activities?: GeneratedActivities_Arr_Rel_Insert_Input | null | undefined;
+  archived?: boolean | null | undefined;
+  image_url?: string | null | undefined;
+  name?: string | null | undefined;
+  shoe_sport?: GeneratedSports_Obj_Rel_Insert_Input | null | undefined;
+  sport?: string | null | undefined;
+  starting_km?: unknown;
+};
+
+/** input type for inserting object relation for remote table "shoes" */
+export type GeneratedShoes_Obj_Rel_Insert_Input = {
+  data: GeneratedShoes_Insert_Input;
+  /** upsert condition */
+  on_conflict?: GeneratedShoes_On_Conflict | null | undefined;
+};
+
+/** on_conflict condition type for table "shoes" */
+export type GeneratedShoes_On_Conflict = {
+  constraint: GeneratedShoes_Constraint;
+  update_columns?: Array<GeneratedShoes_Update_Column>;
+  where?: GeneratedShoes_Bool_Exp | null | undefined;
+};
+
+/** select columns of table "shoes" */
+export type GeneratedShoes_Select_Column =
+  /** column name */
+  | 'archived'
+  /** column name */
+  | 'id'
+  /** column name */
+  | 'image_url'
+  /** column name */
+  | 'name'
+  /** column name */
+  | 'sport'
+  /** column name */
+  | 'starting_km';
+
+/** select "shoes_aggregate_bool_exp_bool_and_arguments_columns" columns of table "shoes" */
+export type GeneratedShoes_Select_Column_Shoes_Aggregate_Bool_Exp_Bool_And_Arguments_Columns =
+  /** column name */
+  | 'archived';
+
+/** select "shoes_aggregate_bool_exp_bool_or_arguments_columns" columns of table "shoes" */
+export type GeneratedShoes_Select_Column_Shoes_Aggregate_Bool_Exp_Bool_Or_Arguments_Columns =
+  /** column name */
+  | 'archived';
+
+/** update columns of table "shoes" */
+export type GeneratedShoes_Update_Column =
+  /** column name */
+  | 'archived'
+  /** column name */
+  | 'image_url'
+  /** column name */
+  | 'name'
+  /** column name */
+  | 'sport'
+  /** column name */
+  | 'starting_km';
+
 /** Boolean expression to compare columns of type "smallint". All fields are combined with logical 'AND'. */
 export type GeneratedSmallint_Comparison_Exp = {
   _eq?: unknown;
@@ -15986,6 +16824,8 @@ export type GeneratedSports_Bool_Exp = {
   day_plans?: GeneratedDay_Plans_Bool_Exp | null | undefined;
   day_plans_aggregate?: GeneratedDay_Plans_Aggregate_Bool_Exp | null | undefined;
   label?: GeneratedString_Comparison_Exp | null | undefined;
+  shoes?: GeneratedShoes_Bool_Exp | null | undefined;
+  shoes_aggregate?: GeneratedShoes_Aggregate_Bool_Exp | null | undefined;
   sort_order?: GeneratedInt_Comparison_Exp | null | undefined;
   value?: GeneratedString_Comparison_Exp | null | undefined;
   week_objectives?: GeneratedWeek_Objectives_Bool_Exp | null | undefined;
@@ -16003,6 +16843,7 @@ export type GeneratedSports_Constraint =
 export type GeneratedSports_Insert_Input = {
   day_plans?: GeneratedDay_Plans_Arr_Rel_Insert_Input | null | undefined;
   label?: string | null | undefined;
+  shoes?: GeneratedShoes_Arr_Rel_Insert_Input | null | undefined;
   sort_order?: number | null | undefined;
   value?: string | null | undefined;
   week_objectives?: GeneratedWeek_Objectives_Arr_Rel_Insert_Input | null | undefined;
@@ -16030,6 +16871,19 @@ export type GeneratedSports_Update_Column =
   | 'sort_order'
   /** column name */
   | 'value';
+
+/** Boolean expression to compare columns of type "timestamptz". All fields are combined with logical 'AND'. */
+export type GeneratedTimestamptz_Comparison_Exp = {
+  _eq?: unknown;
+  _gt?: unknown;
+  _gte?: unknown;
+  _in?: Array<unknown> | null | undefined;
+  _is_null?: boolean | null | undefined;
+  _lt?: unknown;
+  _lte?: unknown;
+  _neq?: unknown;
+  _nin?: Array<unknown> | null | undefined;
+};
 
 /** input type for inserting data into table "week_notes" */
 export type GeneratedWeek_Notes_Insert_Input = {

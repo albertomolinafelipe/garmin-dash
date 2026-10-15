@@ -156,7 +156,15 @@ export const ANNOTATED_CUTOFF = "2026-07-13";
 
 // Recording a shoe became required on this date, for the sports run on foot/gear.
 export const SHOE_CUTOFF = "2026-09-15";
+// Climbing joined later, so older sessions aren't flagged retroactively.
+export const CLIMBING_SHOE_CUTOFF = "2026-10-12";
 const SHOE_SPORTS = new Set<Category>(["running", "hiking", "skiing"]);
+
+// Whether an activity of this category on this day must record a shoe.
+export function shoeRequired(category: Category, day: string): boolean {
+	if (category === "climbing") return day >= CLIMBING_SHOE_CUTOFF;
+	return SHOE_SPORTS.has(category) && day >= SHOE_CUTOFF;
+}
 
 type AnnotationCompletenessActivity = {
 	start_time: string | null;
@@ -175,8 +183,7 @@ export function needsAnnotation(a: AnnotationCompletenessActivity): boolean {
 	}
 	const category = categoryOf(a.activity_type, a.subtype);
 	const day = a.start_time?.slice(0, 10) ?? "";
-	const needsShoe =
-		SHOE_SPORTS.has(category) && day >= SHOE_CUTOFF && a.shoe_id == null;
+	const needsShoe = shoeRequired(category, day) && a.shoe_id == null;
 	if (category === "running") {
 		return (
 			needsShoe ||
@@ -187,7 +194,13 @@ export function needsAnnotation(a: AnnotationCompletenessActivity): boolean {
 		);
 	}
 	if (category === "climbing") {
-		return !a.subtype || !a.focus || a.feeling == null || a.effort == null;
+		return (
+			needsShoe ||
+			!a.subtype ||
+			!a.focus ||
+			a.feeling == null ||
+			a.effort == null
+		);
 	}
 	if (category === "strength") {
 		return a.feeling == null || a.effort == null;

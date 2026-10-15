@@ -54,7 +54,7 @@ import {
 	categoryOf,
 	effectiveSubtype,
 	needsAnnotation,
-	SHOE_CUTOFF,
+	shoeRequired,
 } from "@/lib/activity-types";
 import { dayKey, fmtDate, fmtDistance, fmtDuration } from "@/lib/format";
 import {
@@ -630,6 +630,7 @@ export function ActivityDetail() {
 	const streamElevation = payload.elevation ?? [];
 
 	const track = useSamples ? sample.track : (payload.track ?? []);
+	const hasMap = track.length > 1;
 	const hasChart = useSamples
 		? sample.hasHr || sample.hasElevation
 		: streamHr.length > 0 || streamElevation.length > 0;
@@ -722,15 +723,17 @@ export function ActivityDetail() {
 				)}
 			</div>
 			{/* Map fills the left column, matching the height of the chart and notes
-			    cards stacked beside it. */}
+			    cards stacked beside it. Without a map (climbing, gym) the chart and
+			    notes sit side by side instead. */}
 			<div
 				className={cn(
-					"grid items-stretch gap-4",
-					track.length > 1 ? "lg:grid-cols-2" : "lg:w-1/2",
+					"grid gap-4",
+					hasMap || hasChart ? "lg:grid-cols-2" : "lg:w-1/2",
+					hasMap ? "items-stretch" : "items-start",
 				)}
 			>
-				{track.length > 1 && <RouteMap track={track} marker={hoverMarker} />}
-				<div className="flex min-w-0 flex-col gap-4">
+				{hasMap && <RouteMap track={track} marker={hoverMarker} />}
+				<div className={hasMap ? "flex min-w-0 flex-col gap-4" : "contents"}>
 					{hasChart &&
 						(useSamples ? (
 							<SampleChart
@@ -757,12 +760,12 @@ export function ActivityDetail() {
 									category === "hiking" ||
 									category === "skiing" ||
 									category === "climbing";
-								const shoeRequired =
-									shoeSport &&
-									category !== "climbing" &&
-									(activity.start_time?.slice(0, 10) ?? "") >= SHOE_CUTOFF;
+								const needsShoe = shoeRequired(
+									category,
+									activity.start_time?.slice(0, 10) ?? "",
+								);
 								const shoe = shoeSport ? (
-									<ShoeField activity={activity} onSave={save} required={shoeRequired} />
+									<ShoeField activity={activity} sport={category} onSave={save} required={needsShoe} />
 								) : null;
 
 								if (category === "running") {
