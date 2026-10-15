@@ -15,3 +15,7 @@ dashboard/vite.config.d.ts
 
 # nhost-code agent scratch artifacts
 .nhost-code/
+
+# local-only artifacts
+.vitest/
+garmin-backup

@@ -60,14 +60,9 @@ NODE_TLS_REJECT_UNAUTHORIZED=0 npm run codegen
 
 ### Deploying
 
-Pushing to `main` with changes under `dashboard/**` builds a multi-arch image to
-GHCR and runs `nhost run config-deploy` (`.github/workflows/dashboard.yml`).
-Schema changes are **not** deployed by CI — apply those yourself:
-
-```sh
-nhost config apply --subdomain <subdomain>   # nhost.toml
-# migrations + metadata: via the Nhost dashboard or CLI
-```
+The dashboard is not deployed; run it locally with `npm run dev`. The Nhost
+project is linked to this GitHub repo, so pushing to `main` deploys `nhost/`
+(config, migrations, metadata).
 
 ### Extensions
 
