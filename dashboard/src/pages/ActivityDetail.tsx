@@ -667,6 +667,29 @@ function SampleChart({
 	);
 }
 
+// The page's cards, empty, at their final sizes: shown while the activity loads
+// so the layout is already in place when the data fills it.
+function ActivityShell() {
+	return (
+		<div className="space-y-4 p-4" aria-busy="true" aria-label="Loading activity">
+			<div className="flex flex-col gap-4 lg:flex-row lg:items-stretch">
+				<div className="grid flex-1 gap-4 sm:grid-cols-3 lg:min-h-[13rem]">
+					<Card className="sm:col-span-1" />
+					<Card className="sm:col-span-2" />
+				</div>
+				<Card className="aspect-square w-full max-w-[14rem] lg:size-52 lg:max-w-none" />
+			</div>
+			<div className="grid items-stretch gap-4 lg:grid-cols-2">
+				<Card className="min-h-[392px]" />
+				<div className="flex min-w-0 flex-col gap-4">
+					<Card className="h-[352px]" />
+					<Card className="h-40" />
+				</div>
+			</div>
+		</div>
+	);
+}
+
 function EditableName({
 	activity,
 	onSave,
@@ -749,12 +772,7 @@ export function ActivityDetail() {
 		[sample, showGrade],
 	);
 
-	if (isPending)
-		return (
-			<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
-				Loading activity…
-			</div>
-		);
+	if (isPending) return <ActivityShell />;
 	if (isError || !activity)
 		return (
 			<div className="flex h-full flex-col items-center justify-center gap-4">
