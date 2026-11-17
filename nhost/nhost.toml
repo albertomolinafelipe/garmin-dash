@@ -1,7 +1,7 @@
 [global]
 
 [hasura]
-version = 'v2.48.10-ce'
+version = 'v2.50.3-ce'
 adminSecret = '{{ secrets.HASURA_GRAPHQL_ADMIN_SECRET }}'
 webhookSecret = '{{ secrets.NHOST_WEBHOOK_SECRET }}'
 
@@ -29,7 +29,7 @@ level = 'warn'
 httpPoolSize = 100
 
 [auth]
-version = '0.49.1'
+version = '0.53.0'
 
 [auth.signUp]
 enabled = false
@@ -41,7 +41,7 @@ disableNewUsers = true
 enabled = true
 
 [postgres]
-version = '16.8-20250530-1'
+version = '18.6-20260930-1'
 
 [postgres.resources]
 enablePublicAccess = true
