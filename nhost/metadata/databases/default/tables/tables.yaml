@@ -1,4 +1,5 @@
 - "!include public_activities.yaml"
+- "!include public_activity_gap.yaml"
 - "!include public_activity_samples.yaml"
 - "!include public_activity_streams.yaml"
 - "!include public_daily_hrv.yaml"
@@ -6,6 +7,7 @@
 - "!include public_exercises.yaml"
 - "!include public_food_options.yaml"
 - "!include public_gap_curve.yaml"
+- "!include public_gap_trend.yaml"
 - "!include public_journal_entries.yaml"
 - "!include public_journal_kinds.yaml"
 - "!include public_races.yaml"

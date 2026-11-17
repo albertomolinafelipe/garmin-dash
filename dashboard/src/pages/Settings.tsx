@@ -63,6 +63,7 @@ import {
 	useUpdateExerciseMutation,
 } from "@/graphql/hooks";
 import { raceIcon as RaceIcon } from "@/lib/plans";
+import { GapCurveCard } from "@/components/settings/gap-curve-card";
 
 // Leaflet ships its own CSS bundle, so keep it out of the settings chunk.
 const RacesMap = lazy(() =>
@@ -559,6 +560,7 @@ export function Settings() {
 			<div className="flex min-w-0 flex-col gap-4">
 				<ObjectivePlanner />
 				<ShoesCard />
+				<GapCurveCard />
 			</div>
 			<div className="flex min-w-0 flex-col gap-4">
 				<RacesCard />

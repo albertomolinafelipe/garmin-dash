@@ -1,0 +1,13 @@
+table:
+  name: gap_trend
+  schema: public
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - quarter
+        - uphill_index
+        - uphill_windows
+        - downhill_index
+        - downhill_windows
+      filter: {}

@@ -1,0 +1,10 @@
+table:
+  name: activity_gap
+  schema: public
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - activity_id
+        - gap_ratio
+      filter: {}

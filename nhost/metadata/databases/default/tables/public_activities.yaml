@@ -2,6 +2,16 @@ table:
   name: activities
   schema: public
 object_relationships:
+  # Grade adjusted pace ratio; a materialized view, so joined by hand.
+  - name: gap
+    using:
+      manual_configuration:
+        column_mapping:
+          id: activity_id
+        insertion_order: null
+        remote_table:
+          name: activity_gap
+          schema: public
   - name: shoe
     using:
       foreign_key_constraint_on: shoe_id
