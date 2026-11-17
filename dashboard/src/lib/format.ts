@@ -20,7 +20,7 @@ export function fmtDistance(meters: number | null): string {
 export function fmtDate(iso: string | null): string {
 	if (!iso) return "—";
 	const d = new Date(iso);
-	return Number.isNaN(d.getTime()) ? iso : d.toLocaleString();
+	return Number.isNaN(d.getTime()) ? iso : d.toLocaleString(undefined, { hourCycle: "h23" });
 }
 
 export function fmtDay(iso: string | null): string {

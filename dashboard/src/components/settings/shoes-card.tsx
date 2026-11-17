@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Archive, ArchiveRestore, Footprints, Plus, Trash2 } from "lucide-react";
+import {
+	Archive,
+	ArchiveRestore,
+	ChevronDown,
+	Clock,
+	Footprints,
+	Mountain,
+	Plus,
+	Route,
+	Trash2,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { SegmentedField, cap } from "@/components/annotations/fields";
@@ -18,10 +28,16 @@ import {
 import { Button } from "@/components/ui/button";
 import {
 	Card,
+	CardAction,
 	CardContent,
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
 	Dialog,
 	DialogContent,
@@ -35,6 +51,7 @@ import { Label } from "@/components/ui/label";
 import { NumberInput } from "@/components/ui/number-input";
 import { categoryColor, categoryIcon } from "@/lib/activity-types";
 import {
+	lifetimeElevationM,
 	lifetimeHours,
 	lifetimeKm,
 	SHOE_SPORTS,
@@ -204,13 +221,19 @@ function ShoeRow({ shoe, onEdit }: { shoe: Shoe; onEdit: () => void }) {
 	const queryClient = useQueryClient();
 	const remove = useDeleteShoe();
 	const update = useUpdateShoe();
-	const km = lifetimeKm(shoe);
-	const hours = lifetimeHours(shoe);
 	const count = shoe.activities_aggregate.aggregate?.count ?? 0;
+	const number = new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 });
+	// Distance and climb only mean something for distance sports; time always does.
+	const byDistance = wearsByDistance(shoe.sport);
+	const elevation = lifetimeElevationM(shoe);
 	const stats = [
-		...(wearsByDistance(shoe.sport) ? [`${km.toFixed(0)} km`] : []),
-		`${hours.toFixed(0)} h`,
-		`${count} ${count === 1 ? "activity" : "activities"}`,
+		...(byDistance
+			? [{ icon: Route, label: "Distance", value: `${number.format(lifetimeKm(shoe))} km` }]
+			: []),
+		{ icon: Clock, label: "Time", value: `${number.format(lifetimeHours(shoe))} h` },
+		...(byDistance && elevation > 0
+			? [{ icon: Mountain, label: "Elevation gain", value: `${number.format(elevation)} m` }]
+			: []),
 	];
 
 	const deleteShoe = async () => {
@@ -239,7 +262,7 @@ function ShoeRow({ shoe, onEdit }: { shoe: Shoe; onEdit: () => void }) {
 	return (
 		<div
 			className={cn(
-				"hover:bg-muted/40 group flex items-center gap-1 pl-1",
+				"hover:bg-muted/40 group flex items-center gap-1 pr-1 pl-2",
 				shoe.archived && "text-muted-foreground",
 			)}
 		>
@@ -247,18 +270,28 @@ function ShoeRow({ shoe, onEdit }: { shoe: Shoe; onEdit: () => void }) {
 				type="button"
 				onClick={onEdit}
 				aria-label={`Edit ${shoe.name}`}
-				title={stats.join(" · ")}
-				className="flex min-w-0 flex-1 items-center gap-2 py-2 text-left"
+				className="flex min-w-0 flex-1 items-center gap-3 py-2 text-left"
 			>
 				<ShoeThumb
 					src={shoe.image_url ?? ""}
-					className={cn("size-20", shoe.archived && "opacity-50 grayscale")}
+					className={cn("size-16", shoe.archived && "opacity-50 grayscale")}
 				/>
-				<span className="min-w-0 text-xs font-medium break-words">{shoe.name}</span>
-				<span className="text-muted-foreground ml-auto shrink-0 text-[11px] tabular-nums">
-					{wearsByDistance(shoe.sport)
-						? `${km.toFixed(0)} km`
-						: `${hours.toFixed(0)} h`}
+				<span className="flex min-w-0 flex-col gap-1">
+					<span className="text-sm leading-tight font-medium break-words">
+						{shoe.name}
+					</span>
+					<span className="text-muted-foreground flex flex-wrap gap-x-3 gap-y-0.5 text-xs tabular-nums">
+						{stats.map(({ icon: Icon, label, value }) => (
+							<span key={label} className="flex items-center gap-1" title={label}>
+								<Icon className="size-3" aria-hidden />
+								<span className="sr-only">{label}: </span>
+								{value}
+							</span>
+						))}
+					</span>
+					<span className="text-muted-foreground text-[11px]">
+						{count} {count === 1 ? "activity" : "activities"}
+					</span>
 				</span>
 			</button>
 			<Button
@@ -335,22 +368,10 @@ export function ShoesCard() {
 		);
 		return (
 			<section className={cn("space-y-1.5", className)}>
-				<div className="flex items-center justify-between">
-					<h3 className="text-muted-foreground flex items-center gap-1.5 text-[11px] font-semibold tracking-wide uppercase">
-						<Icon className="size-3.5" style={{ color: categoryColor[sport] }} />
-						{cap(sport)}
-						<span className="font-normal">· {active.length}</span>
-					</h3>
-					<Button
-						variant="ghost"
-						size="icon"
-						className="size-7"
-						aria-label={`New ${sport} shoe`}
-						onClick={() => setDialog({ open: true, sport })}
-					>
-						<Plus className="size-4" />
-					</Button>
-				</div>
+				<h3 className="text-muted-foreground flex items-center gap-1.5 text-[11px] font-semibold tracking-wide uppercase">
+					<Icon className="size-3.5" style={{ color: categoryColor[sport] }} />
+					{cap(sport)}
+				</h3>
 				{active.length === 0 ? (
 					<p className="text-muted-foreground rounded-md border border-dashed py-3 text-center text-xs">
 						No {sport} shoes.
@@ -359,12 +380,19 @@ export function ShoesCard() {
 					list(active)
 				)}
 				{archived.length > 0 && (
-					<>
-						<div className="text-muted-foreground pt-1 text-[10px] font-semibold tracking-wide uppercase">
-							Archived · {archived.length}
-						</div>
-						{list(archived)}
-					</>
+					<Collapsible className="group/archived space-y-1.5">
+						<CollapsibleTrigger asChild>
+							<Button
+								variant="ghost"
+								size="sm"
+								className="text-muted-foreground h-7 w-full justify-between px-2 text-xs"
+							>
+								Archived · {archived.length}
+								<ChevronDown className="size-4 transition-transform group-data-[state=open]/archived:rotate-180" />
+							</Button>
+						</CollapsibleTrigger>
+						<CollapsibleContent>{list(archived)}</CollapsibleContent>
+					</Collapsible>
 				)}
 			</section>
 		);
@@ -374,6 +402,16 @@ export function ShoesCard() {
 		<Card>
 			<CardHeader>
 				<CardTitle>Shoes</CardTitle>
+				<CardAction>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => setDialog({ open: true, sport: "running" })}
+					>
+						<Plus />
+						New shoe
+					</Button>
+				</CardAction>
 			</CardHeader>
 			<CardContent className="px-3">
 				{shoes.isLoading ? (

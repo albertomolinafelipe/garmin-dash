@@ -1,10 +1,9 @@
 import { useMemo, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { addWeeks, format } from "date-fns";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
+import { PanelNav } from "@/components/panel-nav";
 import {
 	Card,
 	CardAction,
@@ -222,29 +221,13 @@ export function ObjectivePlanner() {
 			<CardHeader>
 				<CardTitle>Weekly objectives</CardTitle>
 				<CardAction>
-					<div className="flex items-center gap-1">
-						<Button
-							variant="outline"
-							size="icon"
-							onClick={() => shift(-WEEKS_SHOWN)}
-						>
-							<ChevronLeft />
-						</Button>
-						<Button
-							variant="outline"
-							size="sm"
-							onClick={() => setAnchor(currentIsoWeek())}
-						>
-							Today
-						</Button>
-						<Button
-							variant="outline"
-							size="icon"
-							onClick={() => shift(WEEKS_SHOWN)}
-						>
-							<ChevronRight />
-						</Button>
-					</div>
+					<PanelNav
+						unit="week"
+						canForward
+						back={() => shift(-1)}
+						forward={() => shift(1)}
+						latest={() => setAnchor(currentIsoWeek())}
+					/>
 				</CardAction>
 			</CardHeader>
 			<CardContent>

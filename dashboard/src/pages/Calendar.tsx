@@ -353,6 +353,8 @@ function CalendarInner() {
 													"border-r last:border-r-0",
 													offMonth &&
 														"bg-[color-mix(in_oklab,var(--muted)_30%,var(--card))]",
+													key === dayKey(new Date()) &&
+														"ring-muted-foreground/25 rounded-sm ring-2 ring-inset",
 													rangeDrag.inRange(key) && "bg-primary/10",
 												)}
 											>

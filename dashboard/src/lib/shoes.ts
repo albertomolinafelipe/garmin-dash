@@ -23,6 +23,7 @@ export interface Shoe {
 			sum: {
 				distance_m: number | string | null;
 				duration_s: number | string | null;
+				elevation_gain_m: number | string | null;
 			} | null;
 		} | null;
 	};
@@ -69,6 +70,7 @@ const SHOES = `
 					sum {
 						distance_m
 						duration_s
+						elevation_gain_m
 					}
 				}
 			}
@@ -134,6 +136,13 @@ export function lifetimeKm(shoe: Shoe): number {
 		shoe.activities_aggregate.aggregate?.sum?.distance_m ?? 0,
 	);
 	return start + summed / 1000;
+}
+
+// Summed activity elevation gain, in metres.
+export function lifetimeElevationM(shoe: Shoe): number {
+	return Number(
+		shoe.activities_aggregate.aggregate?.sum?.elevation_gain_m ?? 0,
+	);
 }
 
 // Summed activity duration, in hours. Climbing sessions carry no distance, so

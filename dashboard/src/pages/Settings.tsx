@@ -2,7 +2,12 @@ import { type FocusEvent, lazy, Suspense, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
-import { Footprints, Map as MapIcon, Plus, Trash2 } from "lucide-react";
+import {
+	ChevronDown,
+	Map as MapIcon,
+	Plus,
+	Trash2,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -24,6 +29,11 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -58,45 +68,6 @@ import { raceIcon as RaceIcon } from "@/lib/plans";
 const RacesMap = lazy(() =>
 	import("@/components/races-map").then((m) => ({ default: m.RacesMap })),
 );
-const RoutesHeatmap = lazy(() =>
-	import("@/components/routes-heatmap").then((m) => ({
-		default: m.RoutesHeatmap,
-	})),
-);
-
-// --- Route heat map -----------------------------------------------------------
-
-function RoutesCard() {
-	// Every track stays in memory as a polyline, so keep the map unmounted — and
-	// its chunk and query untouched — until it is explicitly switched on.
-	const [shown, setShown] = useState(false);
-	return (
-		<Card>
-			<CardHeader>
-				<CardTitle>Route heat map</CardTitle>
-				<CardAction>
-					<Button
-						variant={shown ? "secondary" : "outline"}
-						size="sm"
-						onClick={() => setShown((on) => !on)}
-					>
-						<MapIcon />
-						{shown ? "Hide" : "Show"}
-					</Button>
-				</CardAction>
-			</CardHeader>
-			{shown ? (
-				<CardContent>
-					<div className="isolate aspect-square overflow-hidden rounded-lg border">
-						<Suspense fallback={null}>
-							<RoutesHeatmap />
-						</Suspense>
-					</div>
-				</CardContent>
-			) : null}
-		</Card>
-	);
-}
 
 // --- Exercises ----------------------------------------------------------------
 
@@ -289,18 +260,32 @@ function ExercisesCard() {
 				) : rows.length === 0 ? (
 					<p className="text-muted-foreground text-sm">No exercises yet.</p>
 				) : (
-					<div className="divide-y rounded-lg border">
-						{rows.map((exercise) => (
-							<ExerciseRow
-								key={String(exercise.id)}
-								exercise={exercise}
-								pending={pending}
-								onPendingChange={(active) =>
-									setRowPending((count) => Math.max(0, count + (active ? 1 : -1)))
-								}
-							/>
-						))}
-					</div>
+					<Collapsible className="group/exercises space-y-2">
+						<CollapsibleTrigger asChild>
+							<Button
+								variant="ghost"
+								size="sm"
+								className="text-muted-foreground w-full justify-between"
+							>
+								{rows.length} {rows.length === 1 ? "exercise" : "exercises"}
+								<ChevronDown className="size-4 transition-transform group-data-[state=open]/exercises:rotate-180" />
+							</Button>
+						</CollapsibleTrigger>
+						<CollapsibleContent>
+							<div className="divide-y rounded-lg border">
+								{rows.map((exercise) => (
+									<ExerciseRow
+										key={String(exercise.id)}
+										exercise={exercise}
+										pending={pending}
+										onPendingChange={(active) =>
+											setRowPending((count) => Math.max(0, count + (active ? 1 : -1)))
+										}
+									/>
+								))}
+							</div>
+						</CollapsibleContent>
+					</Collapsible>
 				)}
 			</CardContent>
 		</Card>
@@ -567,15 +552,18 @@ function RacesCard() {
 }
 
 export function Settings() {
-	// CSS columns rather than a grid: cards flow down one column and into the
-	// next, so a tall card never stretches the row beside it.
+	// Two explicit stacks rather than one grid, so a tall card never stretches
+	// the one beside it and each card keeps its column.
 	return (
-		<div className="columns-1 gap-4 p-4 lg:columns-2 [&>*]:mb-4 [&>*]:break-inside-avoid">
-			<ObjectivePlanner />
-			<ExercisesCard />
-			<RacesCard />
-			<ShoesCard />
-			<RoutesCard />
+		<div className="grid grid-cols-1 items-start gap-4 p-4 lg:grid-cols-2">
+			<div className="flex min-w-0 flex-col gap-4">
+				<ObjectivePlanner />
+				<ShoesCard />
+			</div>
+			<div className="flex min-w-0 flex-col gap-4">
+				<RacesCard />
+				<ExercisesCard />
+			</div>
 		</div>
 	);
 }
