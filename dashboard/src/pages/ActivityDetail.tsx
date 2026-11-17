@@ -608,17 +608,31 @@ function SampleChart({
 											parts.push(fmtGrade(Number(point.grade)));
 										return parts.join(" · ");
 									}}
-									formatter={(value, name) => {
+									formatter={(value, name, item) => {
 										if (value == null || Number.isNaN(Number(value))) return null;
 										const isHr = name === "hr" || name === "Heart rate";
-										return (
-											<div className="flex w-full items-center justify-between gap-4">
-												<span className="text-muted-foreground">
-													{isHr ? "Heart rate" : "Elevation"}
-												</span>
+										const row = (label: string, text: string) => (
+											<div
+												key={label}
+												className="flex w-full items-center justify-between gap-4"
+											>
+												<span className="text-muted-foreground">{label}</span>
 												<span className="text-foreground font-mono font-medium tabular-nums">
-													{Math.round(Number(value))} {isHr ? "bpm" : "m"}
+													{text}
 												</span>
+											</div>
+										);
+										if (isHr) return row("Heart rate", `${Math.round(Number(value))} bpm`);
+										// Elevation also carries the climbing done up to this point.
+										const point = item?.payload as SamplePoint | undefined;
+										return (
+											<div className="flex w-full flex-col gap-1">
+												{row("Elevation", `${Math.round(Number(value))} m`)}
+												{point &&
+													row(
+														"Climbed",
+														`+${Math.round(point.ascent)} / −${Math.round(point.descent)} m`,
+													)}
 											</div>
 										);
 									}}
