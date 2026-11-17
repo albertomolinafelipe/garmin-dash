@@ -35,6 +35,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const TerrainRouteMap = lazy(() =>
@@ -54,6 +60,7 @@ import {
 	categoryIcon,
 	categoryOf,
 	effectiveSubtype,
+	iconifyIcon,
 	needsAnnotation,
 	shoeRequired,
 } from "@/lib/activity-types";
@@ -85,6 +92,8 @@ import { type SamplePoint, buildSamplePoints } from "@/lib/samples";
 import { raceIcon as RaceIcon } from "@/lib/plans";
 
 const HR = "#E46876";
+const ExpandIcon = iconifyIcon("mdi:arrow-expand");
+const CollapseIcon = iconifyIcon("mdi:arrow-collapse");
 const ELEVATION = "#7AA89F";
 
 function formatPace(speed: number): string {
@@ -177,17 +186,31 @@ function Metrics({ activity }: { activity: Activity }) {
 	);
 }
 
+type MapMode = "2d" | "3d";
+
+// Header controls follow the Analysis panels: ghost buttons in muted text that
+// switch to the foreground colour when on, rather than outlined boxes.
+const SEGMENT =
+	"text-muted-foreground hover:text-foreground h-6 px-1.5 text-xs data-[state=on]:bg-transparent data-[state=on]:text-foreground";
+
 function RouteMap({
 	track,
 	segments,
 	marker,
+	mode,
+	onModeChange,
+	expanded,
+	onExpandedChange,
 }: {
 	track: { lat: number; lng: number }[];
 	// Grade-coloured pieces of the track; without them it draws in one colour.
 	segments?: RouteSegment[];
 	marker?: { lat: number; lng: number } | null;
+	mode: MapMode;
+	onModeChange: (mode: MapMode) => void;
+	expanded: boolean;
+	onExpandedChange: (value: boolean) => void;
 }) {
-	const [mode, setMode] = useState<"2d" | "3d">("2d");
 	const positions: LatLngExpression[] = track.map((point) => [
 		point.lat,
 		point.lng,
@@ -198,16 +221,30 @@ function RouteMap({
 		<Card className="flex h-full flex-col gap-3 overflow-hidden py-4">
 			<CardHeader className="flex flex-row items-center justify-between px-4">
 				<CardTitle className="text-sm">Route</CardTitle>
-				<ToggleGroup
-					type="single"
-					value={mode}
-					onValueChange={(value) => value && setMode(value as "2d" | "3d")}
-					variant="outline"
-					size="sm"
-				>
-					<ToggleGroupItem value="2d">2D</ToggleGroupItem>
-					<ToggleGroupItem value="3d">3D</ToggleGroupItem>
-				</ToggleGroup>
+				<div className="flex items-center gap-3">
+					<ToggleGroup
+						type="single"
+						value={mode}
+						onValueChange={(value) => value && onModeChange(value as MapMode)}
+						className="gap-0"
+					>
+						<ToggleGroupItem value="2d" className={SEGMENT}>
+							2D
+						</ToggleGroupItem>
+						<ToggleGroupItem value="3d" className={SEGMENT}>
+							3D
+						</ToggleGroupItem>
+					</ToggleGroup>
+					<Button
+						variant="ghost"
+						size="icon"
+						className="text-muted-foreground size-6"
+						aria-label={expanded ? "Collapse route" : "Expand route"}
+						onClick={() => onExpandedChange(!expanded)}
+					>
+						{expanded ? <CollapseIcon size={16} /> : <ExpandIcon size={16} />}
+					</Button>
+				</div>
 			</CardHeader>
 			<CardContent className="min-h-0 flex-1 px-4">
 				<div className="isolate h-full min-h-[320px] overflow-hidden rounded-lg border">
@@ -300,10 +337,12 @@ function StreamChart({
 	hr,
 	elevation,
 	onHover,
+	contentClassName,
 }: {
 	hr: StreamSample[];
 	elevation: StreamSample[];
 	onHover?: (t: number | null) => void;
+	contentClassName?: string;
 }) {
 	const rows = useMemo(() => mergeStreams(hr, elevation), [hr, elevation]);
 	const hasHr = hr.length > 0;
@@ -315,7 +354,7 @@ function StreamChart({
 					{hasElevation ? "Heart rate & elevation" : "Heart rate"}
 				</CardTitle>
 			</CardHeader>
-			<CardContent className="h-[296px] px-4 pb-1">
+			<CardContent className={cn("h-[296px] px-4 pb-1", contentClassName)}>
 				<ChartContainer config={streamConfig} className="aspect-auto h-full w-full">
 					<ComposedChart
 						data={rows}
@@ -437,6 +476,7 @@ function SampleChart({
 	showGrade,
 	onShowGradeChange,
 	onHover,
+	contentClassName,
 }: {
 	points: SamplePoint[];
 	hasHr: boolean;
@@ -444,6 +484,7 @@ function SampleChart({
 	showGrade: boolean;
 	onShowGradeChange: (value: boolean) => void;
 	onHover?: (index: number | null) => void;
+	contentClassName?: string;
 }) {
 	const stops = useMemo(
 		() => (showGrade && hasElevation ? profileStops(points) : []),
@@ -461,18 +502,25 @@ function SampleChart({
 					<div className="flex flex-wrap items-center justify-end gap-3">
 						{graded && <GradeLegend />}
 						<Button
-							variant={showGrade ? "secondary" : "outline"}
-							size="sm"
+							variant="ghost"
+							size="icon"
+							className="size-7"
+							aria-label="Colour by grade"
+							title="Colour by grade"
 							aria-pressed={showGrade}
 							onClick={() => onShowGradeChange(!showGrade)}
 						>
-							<Mountain />
-							Grade
+							<Mountain
+								className={cn(
+									"size-4",
+									showGrade ? "text-foreground" : "text-muted-foreground",
+								)}
+							/>
 						</Button>
 					</div>
 				)}
 			</CardHeader>
-			<CardContent className="h-[296px] px-4 pb-1">
+			<CardContent className={cn("h-[296px] px-4 pb-1", contentClassName)}>
 				<ChartContainer config={streamConfig} className="aspect-auto h-full w-full">
 					<ComposedChart
 						data={points}
@@ -685,6 +733,9 @@ export function ActivityDetail() {
 	const [hoverIdx, setHoverIdx] = useState<number | null>(null);
 	// Grade colouring is opt-in, switched from the elevation chart.
 	const [showGrade, setShowGrade] = useState(false);
+	// Shared by the inline map and the expanded view, so 2D/3D carries over.
+	const [mapMode, setMapMode] = useState<MapMode>("2d");
+	const [expanded, setExpanded] = useState(false);
 	const { data: samplesData } = useActivitySamples(id);
 	const sample = useMemo(
 		() => buildSamplePoints(samplesData?.activity_samples ?? []),
@@ -754,8 +805,55 @@ export function ActivityDetail() {
 				: null;
 	}
 
+	// The map and chart render inline and again, larger, in the expanded view.
+	const routeMap = (isExpanded: boolean) => (
+		<RouteMap
+			track={track}
+			segments={useSamples ? segments : undefined}
+			marker={hoverMarker}
+			mode={mapMode}
+			onModeChange={setMapMode}
+			expanded={isExpanded}
+			onExpandedChange={setExpanded}
+		/>
+	);
+	const chart = (contentClassName?: string) =>
+		hasChart &&
+		(useSamples ? (
+			<SampleChart
+				points={sample.points}
+				showGrade={showGrade}
+				onShowGradeChange={setShowGrade}
+				hasHr={sample.hasHr}
+				hasElevation={sample.hasElevation}
+				onHover={setHoverIdx}
+				contentClassName={contentClassName}
+			/>
+		) : (
+			<StreamChart
+				hr={streamHr}
+				elevation={streamElevation}
+				onHover={setHoverT}
+				contentClassName={contentClassName}
+			/>
+		));
+
 	return (
 		<div className="space-y-4 p-4">
+			{hasMap && (
+				<Dialog open={expanded} onOpenChange={setExpanded}>
+					<DialogContent
+						showCloseButton={false}
+						className="flex h-[calc(100svh-4rem)] w-[calc(100vw-4rem)] max-w-none flex-col gap-4 border-0 bg-transparent p-0 shadow-none sm:max-w-none"
+					>
+						<DialogHeader className="sr-only">
+							<DialogTitle>Route and profile</DialogTitle>
+						</DialogHeader>
+						<div className="min-h-0 flex-1">{routeMap(true)}</div>
+						{chart("h-[28svh]")}
+					</DialogContent>
+				</Dialog>
+			)}
 			<div className="flex flex-col gap-4 lg:flex-row lg:items-stretch">
 				<div className="grid flex-1 gap-4 sm:grid-cols-3 lg:min-h-[13rem]">
 					<Card
@@ -826,31 +924,9 @@ export function ActivityDetail() {
 					hasMap ? "items-stretch" : "items-start",
 				)}
 			>
-				{hasMap && (
-					<RouteMap
-						track={track}
-						segments={useSamples ? segments : undefined}
-						marker={hoverMarker}
-					/>
-				)}
+				{hasMap && routeMap(false)}
 				<div className={hasMap ? "flex min-w-0 flex-col gap-4" : "contents"}>
-					{hasChart &&
-						(useSamples ? (
-							<SampleChart
-								points={sample.points}
-								showGrade={showGrade}
-								onShowGradeChange={setShowGrade}
-								hasHr={sample.hasHr}
-								hasElevation={sample.hasElevation}
-								onHover={setHoverIdx}
-							/>
-						) : (
-							<StreamChart
-								hr={streamHr}
-								elevation={streamElevation}
-								onHover={setHoverT}
-							/>
-						))}
+					{chart()}
 					<Card className="gap-4 py-4">
 						<CardHeader className="px-6">
 							<CardTitle className="text-sm">Notes & annotations</CardTitle>
