@@ -1,1 +1,1 @@
-Code {{.Ticket}}
+Code ${ticket}
