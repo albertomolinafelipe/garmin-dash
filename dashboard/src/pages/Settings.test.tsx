@@ -90,6 +90,11 @@ beforeEach(() => {
 	mocks.toastError.mockReset();
 });
 
+// The exercise list starts collapsed behind its "N exercises" toggle.
+async function expandExercises(user: ReturnType<typeof userEvent.setup>) {
+	await user.click(screen.getByRole("button", { name: /\d+ exercises?/ }));
+}
+
 describe("Settings", () => {
 	it("inserts an exercise with non-null empty categories and invalidates the catalog", async () => {
 		const user = userEvent.setup();
@@ -128,6 +133,7 @@ describe("Settings", () => {
 		);
 		const user = userEvent.setup();
 		setup();
+		await expandExercises(user);
 		const input = screen.getByLabelText("Name for Deadlift");
 		await user.clear(input);
 		await user.type(input, "DEADLIFT");
@@ -141,6 +147,7 @@ describe("Settings", () => {
 	it("does not delete on cancel, then deletes on confirm and invalidates", async () => {
 		const user = userEvent.setup();
 		const { invalidate } = setup();
+		await expandExercises(user);
 		await user.click(screen.getByRole("button", { name: "Delete Deadlift" }));
 		await user.click(screen.getByRole("button", { name: "Cancel" }));
 		expect(mocks.remove).not.toHaveBeenCalled();

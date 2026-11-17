@@ -37,3 +37,21 @@ export function routeColor(): string {
 }
 
 const ROUTE_COLOR_FALLBACK = "#2F7DF6";
+
+// Casing drawn under routes: the page background, so the line reads as cut out
+// of the map. The theme defines it in oklch, which MapLibre cannot parse, so
+// paint it to a 1×1 canvas and read back plain rgb.
+export function routeCasingColor(): string {
+	if (typeof document === "undefined") return CASING_COLOR_FALLBACK;
+	const value = getComputedStyle(document.documentElement)
+		.getPropertyValue("--background")
+		.trim();
+	const context = document.createElement("canvas").getContext("2d");
+	if (!value || !context) return CASING_COLOR_FALLBACK;
+	context.fillStyle = value;
+	context.fillRect(0, 0, 1, 1);
+	const [r, g, b] = context.getImageData(0, 0, 1, 1).data;
+	return `rgb(${r}, ${g}, ${b})`;
+}
+
+const CASING_COLOR_FALLBACK = "#09090b";

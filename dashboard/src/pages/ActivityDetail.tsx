@@ -25,6 +25,7 @@ import {
 } from "recharts";
 
 import { DaySleepPanel } from "@/components/day-sleep-panel";
+import { GradeLegend } from "@/components/grade-legend";
 import { ClimbingAnnotation } from "@/components/annotations/ClimbingAnnotation";
 import { RunningAnnotation } from "@/components/annotations/RunningAnnotation";
 import { ShoeField } from "@/components/annotations/shoe-field";
@@ -60,6 +61,7 @@ import { dayKey, fmtDate, fmtDistance, fmtDuration } from "@/lib/format";
 import {
 	STADIA_ATTRIBUTION,
 	STADIA_MAX_ZOOM,
+	routeCasingColor,
 	routeColor,
 	STADIA_SATELLITE_TILE_URL,
 } from "@/lib/map-tiles";
@@ -73,6 +75,12 @@ import {
 	useActivitySamples,
 	useRacesByDay,
 } from "@/lib/queries";
+import {
+	type RouteSegment,
+	gradeRuns,
+	profileStops,
+	routeSegments,
+} from "@/lib/grade";
 import { type SamplePoint, buildSamplePoints } from "@/lib/samples";
 import { raceIcon as RaceIcon } from "@/lib/plans";
 
@@ -171,9 +179,12 @@ function Metrics({ activity }: { activity: Activity }) {
 
 function RouteMap({
 	track,
+	segments,
 	marker,
 }: {
 	track: { lat: number; lng: number }[];
+	// Grade-coloured pieces of the track; without them it draws in one colour.
+	segments?: RouteSegment[];
 	marker?: { lat: number; lng: number } | null;
 }) {
 	const [mode, setMode] = useState<"2d" | "3d">("2d");
@@ -208,7 +219,7 @@ function RouteMap({
 								</div>
 							}
 						>
-							<TerrainRouteMap track={track} marker={marker} />
+							<TerrainRouteMap track={track} segments={segments} marker={marker} />
 						</Suspense>
 					) : (
 						<MapContainer
@@ -224,10 +235,28 @@ function RouteMap({
 								attribution={STADIA_ATTRIBUTION}
 								zIndex={1}
 							/>
+							{/* Casing in the page background colour, so the route stands out on
+							    any imagery. */}
 							<Polyline
 								positions={positions}
-								pathOptions={{ color: routeColor(), weight: 4, opacity: 0.95 }}
+								pathOptions={{ color: routeCasingColor(), weight: 7, opacity: 0.9 }}
 							/>
+							{segments?.length ? (
+								segments.map((segment, i) => (
+									<Polyline
+										// Segments are rebuilt wholesale per activity; order is stable.
+										// biome-ignore lint/suspicious/noArrayIndexKey: see above
+										key={i}
+										positions={segment.positions.map((p) => [p.lat, p.lng])}
+										pathOptions={{ color: segment.color, weight: 3.5, opacity: 0.95 }}
+									/>
+								))
+							) : (
+								<Polyline
+									positions={positions}
+									pathOptions={{ color: routeColor(), weight: 3.5, opacity: 0.95 }}
+								/>
+							)}
 							{marker && (
 								<CircleMarker
 									center={[marker.lat, marker.lng]}
@@ -392,24 +421,56 @@ function StreamChart({
 	);
 }
 
+function fmtGrade(grade: number): string {
+	const rounded = Math.round(grade);
+	return `${rounded > 0 ? "+" : ""}${rounded}%`;
+}
+
 // Heart rate and elevation against distance (km), from full-resolution samples.
+// The grade toggle colours the elevation profile (and, via the parent, the map)
+// by steepness; heart rate then steps back to a neutral line so it does not
+// read as one more grade band.
 function SampleChart({
 	points,
 	hasHr,
 	hasElevation,
+	showGrade,
+	onShowGradeChange,
 	onHover,
 }: {
 	points: SamplePoint[];
 	hasHr: boolean;
 	hasElevation: boolean;
+	showGrade: boolean;
+	onShowGradeChange: (value: boolean) => void;
 	onHover?: (index: number | null) => void;
 }) {
+	const stops = useMemo(
+		() => (showGrade && hasElevation ? profileStops(points) : []),
+		[points, showGrade, hasElevation],
+	);
+	const graded = stops.length > 0;
+	const hrColor = graded ? "var(--muted-foreground)" : HR;
 	return (
 		<Card className="gap-3 py-4">
-			<CardHeader className="px-4">
+			<CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 px-4">
 				<CardTitle className="text-sm">
 					{hasElevation ? "Heart rate & elevation" : "Heart rate"}
 				</CardTitle>
+				{hasElevation && (
+					<div className="flex flex-wrap items-center justify-end gap-3">
+						{graded && <GradeLegend />}
+						<Button
+							variant={showGrade ? "secondary" : "outline"}
+							size="sm"
+							aria-pressed={showGrade}
+							onClick={() => onShowGradeChange(!showGrade)}
+						>
+							<Mountain />
+							Grade
+						</Button>
+					</div>
+				)}
 			</CardHeader>
 			<CardContent className="h-[296px] px-4 pb-1">
 				<ChartContainer config={streamConfig} className="aspect-auto h-full w-full">
@@ -434,6 +495,27 @@ function SampleChart({
 								<stop offset="0%" stopColor={HR} stopOpacity={0.3} />
 								<stop offset="100%" stopColor={HR} stopOpacity={0.03} />
 							</linearGradient>
+							{graded && (
+								<>
+									<linearGradient id="activity-grade-stroke" x1="0" y1="0" x2="1" y2="0">
+										{stops.map((stop, i) => (
+											// biome-ignore lint/suspicious/noArrayIndexKey: stops are positional
+											<stop key={i} offset={stop.offset} stopColor={stop.color} />
+										))}
+									</linearGradient>
+									<linearGradient id="activity-grade-fill" x1="0" y1="0" x2="1" y2="0">
+										{stops.map((stop, i) => (
+											<stop
+												// biome-ignore lint/suspicious/noArrayIndexKey: stops are positional
+												key={i}
+												offset={stop.offset}
+												stopColor={stop.color}
+												stopOpacity={0.35}
+											/>
+										))}
+									</linearGradient>
+								</>
+							)}
 						</defs>
 						<CartesianGrid strokeDasharray="3 3" vertical={false} />
 						<XAxis
@@ -474,6 +556,8 @@ function SampleChart({
 										// first sample is legitimately at 0s.
 										if (t != null)
 											parts.push(Number(t) === 0 ? "0s" : fmtDuration(Number(t)));
+										if (graded && point?.grade != null)
+											parts.push(fmtGrade(Number(point.grade)));
 										return parts.join(" · ");
 									}}
 									formatter={(value, name) => {
@@ -498,8 +582,9 @@ function SampleChart({
 								yAxisId="elevation"
 								type="monotone"
 								dataKey="elevation"
-								stroke={ELEVATION}
-								fill="url(#activity-elevation)"
+								stroke={graded ? "url(#activity-grade-stroke)" : ELEVATION}
+								strokeWidth={graded ? 2.5 : 1}
+								fill={graded ? "url(#activity-grade-fill)" : "url(#activity-elevation)"}
 								dot={false}
 								connectNulls
 							/>
@@ -510,8 +595,8 @@ function SampleChart({
 									yAxisId="hr"
 									type="monotone"
 									dataKey="hr"
-									stroke={HR}
-									strokeWidth={2}
+									stroke={hrColor}
+									strokeWidth={graded ? 1.5 : 2}
 									dot={false}
 									connectNulls
 								/>
@@ -598,10 +683,19 @@ export function ActivityDetail() {
 	const racesByDay = useRacesByDay();
 	const [hoverT, setHoverT] = useState<number | null>(null);
 	const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+	// Grade colouring is opt-in, switched from the elevation chart.
+	const [showGrade, setShowGrade] = useState(false);
 	const { data: samplesData } = useActivitySamples(id);
 	const sample = useMemo(
 		() => buildSamplePoints(samplesData?.activity_samples ?? []),
 		[samplesData],
+	);
+	const segments = useMemo(
+		() =>
+			showGrade && sample.hasElevation
+				? routeSegments(sample.points, gradeRuns(sample.points))
+				: [],
+		[sample, showGrade],
 	);
 
 	if (isPending)
@@ -732,12 +826,20 @@ export function ActivityDetail() {
 					hasMap ? "items-stretch" : "items-start",
 				)}
 			>
-				{hasMap && <RouteMap track={track} marker={hoverMarker} />}
+				{hasMap && (
+					<RouteMap
+						track={track}
+						segments={useSamples ? segments : undefined}
+						marker={hoverMarker}
+					/>
+				)}
 				<div className={hasMap ? "flex min-w-0 flex-col gap-4" : "contents"}>
 					{hasChart &&
 						(useSamples ? (
 							<SampleChart
 								points={sample.points}
+								showGrade={showGrade}
+								onShowGradeChange={setShowGrade}
 								hasHr={sample.hasHr}
 								hasElevation={sample.hasElevation}
 								onHover={setHoverIdx}
