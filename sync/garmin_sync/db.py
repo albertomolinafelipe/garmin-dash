@@ -90,3 +90,14 @@ def activities_needing_samples(
     with conn.cursor() as cur:
         cur.execute(statement, params)
         return [(int(row[0]), int(row[1])) for row in cur.fetchall()]
+
+
+def refresh_gap_curve(conn: psycopg.Connection) -> None:
+    """Recompute the personal grade adjustment curve from all samples.
+
+    CONCURRENTLY keeps the old curve readable while the new one is built; the
+    view's unique index on grade_pct is what allows it.
+    """
+    with conn.cursor() as cur:
+        cur.execute(sql.SQL("REFRESH MATERIALIZED VIEW CONCURRENTLY public.gap_curve"))
+    conn.commit()

@@ -1,0 +1,12 @@
+table:
+  name: gap_curve
+  schema: public
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - grade_pct
+        - factor
+        - windows
+        - activities
+      filter: {}

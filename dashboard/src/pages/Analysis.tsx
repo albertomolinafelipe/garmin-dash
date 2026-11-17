@@ -67,6 +67,7 @@ import {
 } from "@/lib/queries";
 import { useWeekObjectivesQuery } from "@/graphql/hooks";
 import { type Metric, METRIC_META, type Sport, toIsoWeek } from "@/lib/plans";
+import { stravaFactor, useGapCurve } from "@/lib/gap";
 import { cn } from "@/lib/utils";
 
 const ExpandIcon = iconifyIcon("mdi:arrow-expand");
@@ -1031,6 +1032,139 @@ function HrvPanel() {
 	);
 }
 
+const GAP_COLORS = { you: "#7E9CD8", strava: "#FFA066" } as const;
+
+const gapConfig = {
+	you: { label: "You", color: GAP_COLORS.you },
+	strava: { label: "Strava", color: GAP_COLORS.strava },
+} satisfies ChartConfig;
+
+function fmtGradeTick(grade: number): string {
+	return `${grade > 0 ? "+" : ""}${grade}%`;
+}
+
+// Pace multiplier per grade at equal heart rate: this athlete's own curve,
+// measured from all their runs, against Strava's population model. Not tied to
+// the date window, so it has no window navigation.
+function GapCurvePanel({ className }: { className?: string }) {
+	const { data, isPending, isError } = useGapCurve();
+	const [expanded, setExpanded] = useState(false);
+	const rows = useMemo(() => {
+		const points = data?.gap_curve ?? [];
+		return points.map((point) => ({
+			grade: point.grade_pct,
+			you: num(point.factor),
+			strava: stravaFactor(point.grade_pct),
+			windows: point.windows,
+			activities: point.activities,
+		}));
+	}, [data]);
+	const animate = useInitialAnimation(rows.length > 0);
+
+	const legend = (
+		<div className="text-muted-foreground flex items-center gap-3 text-xs">
+			<span className="flex items-center gap-1">
+				<span
+					className="size-2 rounded-full"
+					style={{ backgroundColor: GAP_COLORS.you }}
+				/>
+				You
+			</span>
+			<span className="flex items-center gap-1">
+				<span
+					className="size-2 rounded-full"
+					style={{ backgroundColor: GAP_COLORS.strava }}
+				/>
+				Strava
+			</span>
+		</div>
+	);
+
+	return (
+		<Panel
+			title="Grade adjustment"
+			action={legend}
+			showNav={false}
+			className={className}
+			expanded={expanded}
+			onExpandedChange={setExpanded}
+		>
+			<PanelBody
+				isPending={isPending}
+				isEmpty={rows.length === 0}
+				emptyText={
+					isError
+						? "Couldn't load the grade curve."
+						: "No grade curve yet; run a sync."
+				}
+			>
+				<ChartContainer config={gapConfig} className="aspect-auto h-full w-full">
+					<ComposedChart data={rows} margin={{ top: 6, right: 8, left: 0 }}>
+						<CartesianGrid strokeDasharray="3 3" />
+						<XAxis
+							dataKey="grade"
+							type="number"
+							domain={["dataMin", "dataMax"]}
+							ticks={rows.map((row) => row.grade).filter((g) => g % 10 === 0)}
+							tickFormatter={fmtGradeTick}
+							tickLine={false}
+							axisLine={false}
+							tickMargin={6}
+						/>
+						<YAxis
+							width={40}
+							tickLine={false}
+							axisLine={false}
+							tickFormatter={(value) => `${Number(value).toFixed(1)}×`}
+						/>
+						{/* Flat-equivalent: on this line a slope costs the same as level. */}
+						<ReferenceLine y={1} stroke="currentColor" strokeOpacity={0.3} />
+						<ReferenceLine x={0} stroke="currentColor" strokeOpacity={0.3} />
+						<ChartTooltip
+							content={
+								<ChartTooltipContent
+									labelFormatter={(_, payload) => {
+										const row = payload?.[0]?.payload;
+										if (!row) return null;
+										return `${fmtGradeTick(row.grade)} · ${row.windows} min from ${row.activities} runs`;
+									}}
+									formatter={(value, name) => {
+										const cfg = gapConfig[name as keyof typeof gapConfig];
+										return (
+											<TooltipItem
+												color={cfg?.color}
+												label={cfg?.label ?? String(name)}
+												value={`${Number(value).toFixed(2)}×`}
+											/>
+										);
+									}}
+								/>
+							}
+						/>
+						<Line
+							type="monotone"
+							dataKey="strava"
+							stroke={GAP_COLORS.strava}
+							strokeWidth={2}
+							strokeDasharray="4 3"
+							dot={false}
+							isAnimationActive={animate}
+						/>
+						<Line
+							type="monotone"
+							dataKey="you"
+							stroke={GAP_COLORS.you}
+							strokeWidth={2}
+							dot={{ r: 2 }}
+							isAnimationActive={animate}
+						/>
+					</ComposedChart>
+				</ChartContainer>
+			</PanelBody>
+		</Panel>
+	);
+}
+
 const readinessConfig = {
 	score: { label: "Readiness", color: READINESS_COLORS.score },
 	acuteLoad: { label: "Acute load", color: READINESS_COLORS.acuteLoad },
@@ -1272,6 +1406,9 @@ function AnalysisPanels() {
 			<div className={cn("flex flex-col gap-4 md:flex-row", ROW)}>
 				<ReadinessPanel />
 				<WeeklyHrZones className="aspect-square h-[280px] md:h-full md:shrink-0" />
+			</div>
+			<div className={cn("flex flex-col gap-4 md:flex-row", ROW)}>
+				<GapCurvePanel className="h-[280px] md:h-full md:flex-1" />
 			</div>
 			<ReadinessSection />
 		</div>

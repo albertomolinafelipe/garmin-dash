@@ -100,6 +100,9 @@ def _run_sync(settings: Settings, args: argparse.Namespace) -> int:
             force=args.force,
             report=report,
         )
+        # New samples move the personal GAP curve; skip the full scan otherwise.
+        if report.samples:
+            db.refresh_gap_curve(conn)
         if not args.skip_daily:
             sync_daily(hasura, client, settings, days=args.days, report=report)
     return _finish(report)
